@@ -14,8 +14,13 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
     const [studentData, setStudentData] = useState(null);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [showSensitive, setShowSensitive] = useState(false);
     const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [verifying, setVerifying] = useState(false);
+    const [verifyError, setVerifyError] = useState('');
 
     useEffect(() => {
         getProfile();
@@ -41,6 +46,12 @@ const Profile = () => {
 
             if (error) throw error;
             setStudentData(data);
+
+            // SuperAdmin Check
+            const superAdminEmail = 'jcsayan7@gmail.com';
+            const superAdminRoll = '25/EE/092';
+            const isUserSuperAdmin = user.email === superAdminEmail || data?.class_roll_no === superAdminRoll;
+            setIsSuperAdmin(isUserSuperAdmin);
         } catch (error) {
             console.error('Error fetching profile:', error);
         } finally {
@@ -98,6 +109,40 @@ const Profile = () => {
             alert('Failed to update profile picture.');
         } finally {
             setUploadingProfilePic(false);
+        }
+    };
+
+    const handleRevealProtected = async (e) => {
+        e.preventDefault();
+        if (showSensitive) {
+            setShowSensitive(false);
+            return;
+        }
+        setShowVerifyModal(true);
+    };
+
+    const verifyAndReveal = async () => {
+        try {
+            setVerifying(true);
+            setVerifyError('');
+
+            const { error } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: confirmPassword,
+            });
+
+            if (error) {
+                setVerifyError('Incorrect password. Access denied.');
+                return;
+            }
+
+            setShowSensitive(true);
+            setShowVerifyModal(false);
+            setConfirmPassword('');
+        } catch (err) {
+            setVerifyError('An error occurred. Please try again.');
+        } finally {
+            setVerifying(false);
         }
     };
 
@@ -166,6 +211,45 @@ const Profile = () => {
 
     return (
         <div className="profile-container">
+            {/* Password Verification Modal */}
+            {showVerifyModal && (
+                <div className="verify-overlay">
+                    <div className="verify-modal">
+                        <div className="verify-header">
+                            <Lock size={20} className="accent-icon" />
+                            <h3>Authentication Required</h3>
+                        </div>
+                        <p>Please enter your password to reveal sensitive identity details.</p>
+
+                        <div className="verify-input-group">
+                            <input
+                                type="password"
+                                placeholder="Your Login Password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                autoFocus
+                            />
+                            {verifyError && <span className="error-text">{verifyError}</span>}
+                        </div>
+
+                        <div className="verify-actions">
+                            <button className="cancel-btn" onClick={() => {
+                                setShowVerifyModal(false);
+                                setConfirmPassword('');
+                                setVerifyError('');
+                            }}>Cancel</button>
+                            <button
+                                className="confirm-btn"
+                                onClick={verifyAndReveal}
+                                disabled={verifying || !confirmPassword}
+                            >
+                                {verifying ? <Loader2 className="spinner" size={16} /> : "Verify & Reveal"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="profile-header-main">
                 <div className="profile-info-group">
                     <div className="avatar-large-container">
@@ -198,7 +282,11 @@ const Profile = () => {
                     </div>
                     <div className="user-text">
                         <h1>{studentData.name}</h1>
-                        <span className="roll-badge">{studentData.class_roll_no}</span>
+                        <div className="badge-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            <span className="roll-badge">{studentData.class_roll_no}</span>
+                            {isSuperAdmin && <span className="admin-badge super" style={{ background: 'linear-gradient(90deg, #f59e0b, #ef4444)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>Superadmin & Developer</span>}
+                            {!isSuperAdmin && studentData.is_admin && <span className="admin-badge" style={{ background: 'var(--accent-color)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>Admin</span>}
+                        </div>
                     </div>
                 </div>
 
@@ -226,10 +314,10 @@ const Profile = () => {
                             <h3>Identity Details</h3>
                             <button
                                 className="reveal-btn"
-                                onClick={() => setShowSensitive(!showSensitive)}
+                                onClick={handleRevealProtected}
                             >
                                 {showSensitive ? <EyeOff size={16} /> : <Eye size={16} />}
-                                {showSensitive ? "Hide Details" : "Reveal Sensitive Info"}
+                                {showSensitive ? "Hide Details" : "Verify & Reveal Info"}
                             </button>
                         </div>
 
@@ -259,14 +347,14 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {studentData.is_admin && (
+                    {(studentData.is_admin || isSuperAdmin) && (
                         <div className="admin-access-card">
                             <div className="admin-icon-box">
                                 <ShieldCheck size={28} />
                             </div>
                             <div className="admin-text">
                                 <h3>Admin Control</h3>
-                                <p>Access student records and approvals</p>
+                                <p>{isSuperAdmin ? 'Full Platform Oversight' : 'Access student records and approvals'}</p>
                             </div>
                             <button className="admin-go-btn" onClick={() => navigate('/admin')}>
                                 <LayoutDashboard size={18} />

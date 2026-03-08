@@ -334,4 +334,8 @@
         color: var(--accent-color);
         box-shadow: 0 4px 20px var(--accent-glow);
     }
+
+    body.keyboard-open .navbar {
+        display: none !important;
+    }
 }

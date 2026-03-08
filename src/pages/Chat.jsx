@@ -97,7 +97,7 @@ const Chat = () => {
     };
 
     const handleSendMessage = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         if (!newMessage.trim() || !session || sending) return;
 
         setSending(true);
@@ -176,25 +176,35 @@ const Chat = () => {
                         <p>Please <a href="/login">Sign In</a> to join the conversation</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleSendMessage} className="chat-form">
+                    <div className="chat-form">
                         <button type="button" className="emoji-btn">
                             <Smile size={22} />
                         </button>
                         <input
                             type="text"
+                            name="chatMessage"
+                            id="chatMessageInput"
                             placeholder="Type a message..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSendMessage(e);
+                                }
+                            }}
                             maxLength={500}
                             autoComplete="off"
+                            data-lpignore="true"
+                            data-1p-ignore="true"
+                            data-form-type="other"
                             autoCorrect="on"
                             spellCheck="true"
                             enterKeyHint="send"
                         />
-                        <button type="submit" className="send-btn" disabled={!newMessage.trim() || sending}>
+                        <button type="button" onClick={handleSendMessage} className="send-btn" disabled={!newMessage.trim() || sending}>
                             {sending ? <Loader2 size={18} className="spinner" /> : <Send size={18} />}
                         </button>
-                    </form>
+                    </div>
                 )}
             </div>
         </div>

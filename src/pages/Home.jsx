@@ -1,41 +1,672 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+import {
+    Zap, BookOpen, MessageSquare, Bell, ShieldCheck,
+    TrendingUp, Globe, Heart, Star, Quote, ArrowRight,
+    Clock, Calendar, Upload, Coins,
+    Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight,
+    FileText, Landmark
+} from 'lucide-react';
+import './Home.css';
 
 const Home = () => {
-    return (
-        <div className="home-container">
-            <header className="hero-section">
-                <div className="hero-content">
-                    <h1 className="title">EEvolution <span className="highlight">2.0</span></h1>
-                    <p className="subtitle">Electrical Engineering Batch 2</p>
-                    <div className="welcome-message">
-                        Welcome to the ultimate hub for all things Electrical Engineering.
+    const [status, setStatus] = useState('loading');
+    const [session, setSession] = useState(null);
+
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setStatus('ready');
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    if (status === 'loading') return null;
+
+    // Guest Landing Page View
+    const GuestView = () => (
+        <div className="guest-home">
+            {/* Hero Section */}
+            <section className="guest-hero">
+                <h1>EEvolution <span style={{ color: 'var(--accent-color)' }}>2.0</span></h1>
+                <p>The pioneering digital ecosystem for Electrical Engineering Batch 2. Built for excellence, designed for evolution.</p>
+                <div className="hero-btns">
+                    <Link to="/login" className="primary-btn">Get Started</Link>
+                    <Link to="/explore" className="secondary-btn">Explore Hub</Link>
+                </div>
+                <div className="hero-scroll-indicator" style={{ marginTop: '2rem', opacity: 0.5 }}>
+                    <ArrowRight size={24} style={{ transform: 'rotate(90deg)' }} />
+                </div>
+            </section>
+
+            {/* Redesigned Features Section */}
+            <section className="features-section">
+                <div className="features-header">
+                    <span className="badge">Platform Features</span>
+                    <h2>Evolving the way you study</h2>
+                </div>
+
+                <div className="showcase-grid">
+                    <div className="showcase-card study-hub">
+                        <div className="card-visual">
+                            <div className="book-stack">
+                                <div className="book book-1"></div>
+                                <div className="book book-2"></div>
+                                <div className="book book-3"></div>
+                            </div>
+                        </div>
+                        <div className="card-info">
+                            <div className="icon-badge"><BookOpen size={24} /></div>
+                            <h3>Study Hub</h3>
+                            <p>Handwritten notes, PYQs, and daily class materials organized by semester.</p>
+                            <Link to="/explore" className="card-link">Enter Hub <ArrowRight size={16} /></Link>
+                        </div>
+                    </div>
+
+                    <div className="showcase-side">
+                        <div className="showcase-card live-alerts">
+                            <div className="card-info">
+                                <div className="icon-badge"><Bell size={24} /></div>
+                                <h3>Live Alerts</h3>
+                                <p>Real-time updates on schedule changes and exam news.</p>
+                            </div>
+                            <div className="alerts-visual">
+                                <div className="alert-item">
+                                    <div className="ping"></div>
+                                    <span>Class Canceled</span>
+                                </div>
+                                <div className="alert-item delay">
+                                    <div className="ping"></div>
+                                    <span>Exam Dates Out</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="showcase-card batch-feed">
+                            <div className="card-info">
+                                <div className="icon-badge"><MessageSquare size={24} /></div>
+                                <h3>Batch Feed</h3>
+                                <p>Collaborate and share memories with your batchmates.</p>
+                            </div>
+                            <div className="feed-visual">
+                                <div className="avatar">JD</div>
+                                <div className="avatar">AS</div>
+                                <div className="avatar">RK</div>
+                                <div className="avatar-plus">+48</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </header>
+            </section>
 
-            <main className="main-content">
-                <section className="about-section card">
-                    <div className="card-content">
-                        <h2>About EEvolution 2.0</h2>
-                        <p>
-                            EEvolution 2.0 is the central platform for the Electrical Engineering Batch 2 students.
-                            We've evolved from our original site to a fully interactive and dynamic React application.
-                        </p>
-                        <p>
-                            Here you will find everything you need to succeed in your coursework:
-                        </p>
-                        <ul className="features-list">
-                            <li>📚 <strong>Study Section:</strong> Question practice sets, PYQs, and handwritten notes.</li>
-                            <li>📝 <strong>Daily Notes:</strong> Instant access to daily class and lab notes.</li>
-                            <li>🗓️ <strong>Schedules:</strong> Up-to-date daily class schedules and upcoming exam dates.</li>
-                            <li>💬 <strong>Community:</strong> Real-time chat and memory posting features.</li>
-                            <li>📢 <strong>Notices:</strong> Important updates and event details.</li>
-                        </ul>
+            {/* Legacy Section */}
+            <section className="legacy-section">
+                <div className="legacy-container">
+                    <div className="legacy-visual">
+                        <div className="visual-glow"></div>
+                        <div className="visual-card main-card">
+                            <div className="visual-badge">EST. 2026</div>
+                            <h3>Batch 2</h3>
+                            <p>Electrical Engineering</p>
+                        </div>
+                        <div className="visual-card sub-card delay-1">
+                            <TrendingUp color="var(--accent-color)" size={28} />
+                            <span>Pioneering</span>
+                        </div>
+                        <div className="visual-card sub-card delay-2">
+                            <Award color="var(--accent-color)" size={28} />
+                            <span>Excellence</span>
+                        </div>
                     </div>
-                </section>
-            </main>
+
+                    <div className="legacy-content">
+                        <span className="badge">Our Manifesto</span>
+                        <h2>The EEvolution Legacy</h2>
+                        <div className="legacy-text">
+                            <p>
+                                EEvolution 2.0 stands as a pioneering digital ecosystem, serving as a dedicated hub for department study.
+                                It was built to solve the chaos of lost files and fragmented communications, providing a professional hub for students to excel.
+                            </p>
+                            <p>
+                                Our mission is to bridge the gap between traditional academics and modern digital accessibility.
+                                By centralizing resources, providing real-time schedule alerts, and fostering a collaborative batch feed,
+                                we've created a workspace where knowledge flows freely.
+                            </p>
+                            <p>
+                                Together, we are not just studying; we are evolving the way we learn.
+                                This project is a testament to the collective spirit of Batch 2, setting a new benchmark for departmental digitalization.
+                            </p>
+                        </div>
+                        <div className="legacy-actions">
+                            <div className="stat-pill">
+                                <Users size={18} />
+                                <span>Student-led Initiative</span>
+                            </div>
+                            <div className="stat-pill">
+                                <Zap size={18} />
+                                <span>Digital Ecosystem</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Redesigned Donator Section - Hall of Fame */}
+            <section className="pioneer-section">
+                <div className="pioneer-header">
+                    <span className="pioneer-badge">Legacy Support</span>
+                    <h2>Pioneer Hall of Fame</h2>
+                    <p>The visionaries whose contributions powered the EEvolution.</p>
+                </div>
+
+                <div className="pioneer-grid">
+                    <div className="pioneer-card top-contributor">
+                        <div className="tier-tag"><Heart size={14} fill="currentColor" /> Top Contributor</div>
+
+                        <div className="pioneer-image-container">
+                            <img
+                                src="https://res.cloudinary.com/dytmgybqm/image/upload/v1772395818/Untitled_design_1_edptux.jpg"
+                                alt="Sambuddha Samanta"
+                                className="pioneer-img"
+                            />
+                            <div className="verified-crown">
+                                <TrendingUp size={20} />
+                            </div>
+                        </div>
+
+                        <div className="pioneer-info">
+                            <h3 className="premium-name">Sambuddha Samanta</h3>
+                            <p className="pioneer-tagline">"A valued supporter whose contribution fuels the growth of our departmental ecosystem."</p>
+
+                            <div className="pioneer-stats">
+                                <div className="p-stat">
+                                    <span>Batch Supporter</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pioneer-mission-note">
+                    <div className="mission-icon"><ShieldCheck size={28} /></div>
+                    <p>
+                        EEvolution 2.0 is a <strong>100% Student-funded</strong> and <strong>Developer-supported</strong> project.
+                        While we feature our top supporters, the development and maintenance are sustained by the dev team to keep these resources free for everyone.
+                    </p>
+                </div>
+            </section>
+
+            {/* Redesigned Student Reviews - Voices of EEvolution */}
+            <section className="voices-section">
+                <div className="section-header center">
+                    <span className="section-badge">Student Feedback</span>
+                    <h2>Voices from the Batch</h2>
+                    <p>Real experiences from students who are evolving their study workflow.</p>
+                </div>
+
+                <div className="voices-container">
+                    <div className="voice-card">
+                        <div className="quote-icon"><Quote size={32} /></div>
+
+                        <div className="voice-rating">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <Star key={i} size={14} fill="#fbbf24" stroke="none" />
+                            ))}
+                        </div>
+
+                        <p className="voice-text">
+                            "I really loved EEVOLUTION 2.0. It is very helpful, clean, and easy to use.
+                            The Upload Section allows everyone to share notes and resources, which makes learning
+                            collaborative and supportive."
+                        </p>
+
+                        <div className="voice-footer">
+                            <div className="voice-avatar">SM</div>
+                            <div className="voice-info">
+                                <h4>Sathi Mondal</h4>
+                                <div className="student-verify">
+                                    <ShieldCheck size={12} />
+                                    <span>25/EE/088 • Verified Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="voice-card">
+                        <div className="quote-icon"><Quote size={32} /></div>
+
+                        <div className="voice-rating">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <Star key={i} size={14} fill="#fbbf24" stroke="none" />
+                            ))}
+                        </div>
+
+                        <p className="voice-text">
+                            "Electrical Engineering is a gauntlet. EEvolution replaces the frantic WhatsApp hunt with
+                            a clean, no-nonsense hub that respects your sanity. It's a digital lifeline built for the batch."
+                        </p>
+
+                        <div className="voice-footer">
+                            <div className="voice-avatar secondary">SK</div>
+                            <div className="voice-info">
+                                <h4>Sohan Kundu</h4>
+                                <div className="student-verify">
+                                    <ShieldCheck size={12} />
+                                    <span>25/EE/106 • Verified Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer style={{ textAlign: 'center', padding: '4rem 2rem', opacity: 0.6 }}>
+                <p>© 2026 EEvolution 2.0 - Built by Students for Students</p>
+            </footer>
         </div>
     );
+
+    // Logged In User View - with schedule, leaderboards, community
+    const UserView = () => {
+        const userName = session?.user?.user_metadata?.full_name?.split(' ')[0] || 'Student';
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+        const GreetIcon = hour < 6 ? Moon : hour < 12 ? Sunrise : hour < 18 ? Sun : Moon;
+
+        // Schedule state
+        const [todaySchedule, setTodaySchedule] = useState([]);
+        const [scheduleLoading, setScheduleLoading] = useState(true);
+        const [isHoliday, setIsHoliday] = useState(null); // null=loading, false=workday, string=holiday name
+        const [contributors, setContributors] = useState([]);
+        const [donators, setDonators] = useState([]);
+        const [communityLoading, setCommunityLoading] = useState(true);
+
+        const today = new Date();
+        const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+        const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const isWeekend = dayName === 'Saturday' || dayName === 'Sunday';
+        const now = today.getHours() * 60 + today.getMinutes();
+
+        useEffect(() => {
+            const loadAll = async () => {
+                // Load schedule + holidays + community in parallel
+                const [routineRes, holidayRes, contribRes, donatorRes] = await Promise.all([
+                    supabase.from('routines').select('*').eq('day', dayName).order('start_time', { ascending: true }),
+                    supabase.from('holidays').select('*').eq('date', dateStr),
+                    supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3),
+                    supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3),
+                ]);
+
+                if (!routineRes.error) setTodaySchedule(routineRes.data || []);
+                setIsHoliday(holidayRes.data?.length > 0 ? holidayRes.data[0].name : false);
+                setScheduleLoading(false);
+
+                if (!contribRes.error) setContributors(contribRes.data || []);
+                if (!donatorRes.error) setDonators(donatorRes.data || []);
+                setCommunityLoading(false);
+            };
+            loadAll();
+        }, []);
+
+        // Parse "HH:MM" time string to minutes from midnight
+        const toMin = (t) => {
+            if (!t) return 0;
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        const formatTime = (t) => {
+            if (!t) return '';
+            const [h, m] = t.split(':').map(Number);
+            const ampm = h < 12 ? 'AM' : 'PM';
+            const hr = h % 12 || 12;
+            return `${hr}:${String(m).padStart(2, '0')} ${ampm}`;
+        };
+
+        const getLiveStatus = (item) => {
+            const start = toMin(item.start_time);
+            const end = toMin(item.end_time);
+            if (now >= start && now < end) return 'live';
+            if (now < start) return 'upcoming';
+            return 'done';
+        };
+
+        // Build schedule rows with breaks inserted between classes
+        const buildRows = () => {
+            const rows = [];
+            for (let i = 0; i < todaySchedule.length; i++) {
+                rows.push({ type: 'class', data: todaySchedule[i] });
+                if (i < todaySchedule.length - 1) {
+                    const gapStart = toMin(todaySchedule[i].end_time);
+                    const gapEnd = toMin(todaySchedule[i + 1].start_time);
+                    const gapMin = gapEnd - gapStart;
+                    if (gapMin >= 5) {
+                        rows.push({ type: 'break', minutes: gapMin, from: todaySchedule[i].end_time, to: todaySchedule[i + 1].start_time });
+                    }
+                }
+            }
+            return rows;
+        };
+
+        const rankLabels = ['🥇', '🥈', '🥉'];
+
+        return (
+            <div className="user-dashboard">
+                {/* --- Welcome Hero --- */}
+                <div className="dashboard-hero">
+                    <div className="dashboard-hero-content">
+                        <div className="greeting-badge">
+                            <GreetIcon size={16} /> {greeting}
+                        </div>
+                        <h1 className="dashboard-title">Welcome back, <span className="highlight">{userName}</span></h1>
+                        <p className="dashboard-subtitle">Your central command center for Electrical Engineering.</p>
+                    </div>
+                </div>
+
+                {/* --- Today's Schedule --- */}
+                <section className="ds-section">
+                    <div className="ds-section-header">
+                        <div className="ds-section-label">
+                            <Calendar size={18} />
+                            <span>Today's Schedule</span>
+                        </div>
+                        <div className="ds-section-date">
+                            {today.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
+                        </div>
+                    </div>
+
+                    {scheduleLoading ? (
+                        <div className="schedule-skeleton-list">
+                            {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" />)}
+                        </div>
+                    ) : isWeekend ? (
+                        <div className="schedule-off-card weekend">
+                            <div className="schedule-off-icon">🎉</div>
+                            <h3>Weekend — Day Off!</h3>
+                            <p>Kick back, relax. No classes today.</p>
+                        </div>
+                    ) : isHoliday ? (
+                        <div className="schedule-off-card holiday">
+                            <div className="schedule-off-icon">🌺</div>
+                            <h3>Official Holiday</h3>
+                            <p className="holiday-name">{isHoliday}</p>
+                            <p>Enjoy your day off.</p>
+                        </div>
+                    ) : todaySchedule.length === 0 ? (
+                        <div className="schedule-off-card">
+                            <div className="schedule-off-icon">📭</div>
+                            <h3>No Classes Today</h3>
+                            <p>Nothing scheduled — enjoy the free day!</p>
+                        </div>
+                    ) : (
+                        <div className="schedule-timeline">
+                            {buildRows().map((row, idx) => {
+                                if (row.type === 'break') {
+                                    return (
+                                        <div key={`break-${idx}`} className="timeline-break">
+                                            <Coffee size={14} />
+                                            <span>Break · {row.minutes} min  ({formatTime(row.from)} – {formatTime(row.to)})</span>
+                                        </div>
+                                    );
+                                }
+                                const item = row.data;
+                                const status = getLiveStatus(item);
+                                return (
+                                    <div key={`class-${idx}`} className={`timeline-class-card status-${status}`}>
+                                        {status === 'live' && (
+                                            <div className="live-pill">
+                                                <span className="live-dot" />
+                                                LIVE NOW
+                                            </div>
+                                        )}
+                                        <div className="timeline-time">
+                                            <Clock size={14} />
+                                            <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
+                                        </div>
+                                        <div className="timeline-details">
+                                            <h4 className="timeline-subject">{item.subject}</h4>
+                                            <div className="timeline-meta">
+                                                <span className="timeline-prof">👨‍🏫 {item.prof}</span>
+                                                <span className="timeline-room">📍 {item.room}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                    <Link to="/routine" className="ds-view-more-btn">
+                        Full Weekly Routine <ChevronRight size={16} />
+                    </Link>
+                </section>
+
+                {/* --- Quick Links --- */}
+                <section className="ds-section">
+                    <div className="ds-section-header">
+                        <div className="ds-section-label">
+                            <Zap size={18} />
+                            <span>Quick Links</span>
+                        </div>
+                    </div>
+                    <div className="quick-links-grid">
+                        {[
+                            { to: '/study', icon: <BookOpen size={22} />, label: 'Study Hub', color: '#0ea5e9' },
+                            { to: '/routine', icon: <Calendar size={22} />, label: 'Routine', color: '#8b5cf6' },
+                            { to: '/notices', icon: <Bell size={22} />, label: 'Notices', color: '#f59e0b' },
+                            { to: '/chat', icon: <MessageSquare size={22} />, label: 'Batch Chat', color: '#10b981' },
+                            { to: '/syllabus', icon: <FileText size={22} />, label: 'Syllabus', color: '#ec4899' },
+                            { to: '/memories', icon: <Heart size={22} />, label: 'Memories', color: '#ef4444' },
+                            { to: '/events', icon: <PartyPopper size={22} />, label: 'Events', color: '#14b8a6' },
+                            { to: '/holidays', icon: <Sun size={22} />, label: 'Holidays', color: '#f97316' },
+                            { to: '/explore', icon: <Globe size={22} />, label: 'Explore', color: '#6366f1' },
+                            { to: '/support', icon: <Landmark size={22} />, label: 'Support Us', color: '#d946ef' },
+                        ].map((link) => (
+                            <Link key={link.to} to={link.to} className="quick-link-item" style={{ '--ql-color': link.color }}>
+                                <div className="ql-icon">{link.icon}</div>
+                                <span className="ql-label">{link.label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+
+                {/* --- Top Contributors & Donators --- */}
+                <div className="community-leaderboards">
+                    {/* Top Contributors */}
+                    <section className="ds-section leaderboard-card">
+                        <div className="ds-section-header">
+                            <div className="ds-section-label">
+                                <Upload size={18} />
+                                <span>Top Contributors</span>
+                            </div>
+                        </div>
+                        {communityLoading ? (
+                            <div className="schedule-skeleton-list">
+                                {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
+                            </div>
+                        ) : contributors.length === 0 ? (
+                            <p className="lb-empty">No contributors yet. Upload files to rank!</p>
+                        ) : (
+                            <div className="lb-list">
+                                {contributors.map((user, idx) => (
+                                    <div key={user.id} className="lb-row">
+                                        <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
+                                        <div className="lb-avatar" style={{ background: `hsl(${idx * 80}, 60%, 40%)` }}>
+                                            {user.avatar_url ? <img src={user.avatar_url} alt={user.name} /> : user.name.charAt(0)}
+                                        </div>
+                                        <div className="lb-info">
+                                            <span className="lb-name">{user.name}</span>
+                                            <span className="lb-sub">{user.class_roll_no}</span>
+                                        </div>
+                                        <div className="lb-score">
+                                            <Upload size={13} />
+                                            <span>{user.files_count}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <Link to="/contributors" className="lb-see-all-btn">
+                            See All Contributors <ChevronRight size={15} />
+                        </Link>
+                    </section>
+
+                    {/* Top Donators */}
+                    <section className="ds-section leaderboard-card">
+                        <div className="ds-section-header">
+                            <div className="ds-section-label">
+                                <Coins size={18} />
+                                <span>Top Donators</span>
+                            </div>
+                        </div>
+                        {communityLoading ? (
+                            <div className="schedule-skeleton-list">
+                                {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
+                            </div>
+                        ) : donators.length === 0 ? (
+                            <p className="lb-empty">No donators yet. Be the first!</p>
+                        ) : (
+                            <div className="lb-list">
+                                {donators.map((d, idx) => (
+                                    <div key={d.id} className="lb-row">
+                                        <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
+                                        <div className="lb-avatar" style={{ background: `hsl(${30 + idx * 60}, 70%, 40%)` }}>
+                                            {d.avatar_url ? <img src={d.avatar_url} alt={d.name} /> : d.name.charAt(0)}
+                                        </div>
+                                        <div className="lb-info">
+                                            <span className="lb-name">{d.name}</span>
+                                            <span className="lb-sub">{d.class_roll_no}</span>
+                                        </div>
+                                        <div className="lb-score donation">
+                                            <span>₹{d.donation}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <Link to="/donators" className="lb-see-all-btn">
+                            See All Donators <ChevronRight size={15} />
+                        </Link>
+                    </section>
+                </div>
+
+                {/* --- Featured Donator / Pioneer --- */}
+                <section className="pioneer-section">
+                    <div className="pioneer-header">
+                        <span className="pioneer-badge">Legacy Support</span>
+                        <h2>Pioneer Hall of Fame</h2>
+                        <p>The visionaries whose contributions powered the EEvolution.</p>
+                    </div>
+
+                    <div className="pioneer-grid">
+                        <div className="pioneer-card top-contributor">
+                            <div className="tier-tag"><Heart size={14} fill="currentColor" /> Top Contributor</div>
+
+                            <div className="pioneer-image-container">
+                                <img
+                                    src="https://res.cloudinary.com/dytmgybqm/image/upload/v1772395818/Untitled_design_1_edptux.jpg"
+                                    alt="Sambuddha Samanta"
+                                    className="pioneer-img"
+                                />
+                                <div className="verified-crown">
+                                    <TrendingUp size={20} />
+                                </div>
+                            </div>
+
+                            <div className="pioneer-info">
+                                <h3 className="premium-name">Sambuddha Samanta</h3>
+                                <p className="pioneer-tagline">"A valued supporter whose contribution fuels the growth of our departmental ecosystem."</p>
+
+                                <div className="pioneer-stats">
+                                    <div className="p-stat">
+                                        <span>Batch Supporter</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pioneer-mission-note">
+                        <div className="mission-icon"><ShieldCheck size={28} /></div>
+                        <p>
+                            EEvolution 2.0 is a <strong>100% Student-funded</strong> and <strong>Developer-supported</strong> project.
+                            While we feature our top supporters, the development and maintenance are sustained by the dev team to keep these resources free for everyone.
+                        </p>
+                    </div>
+                </section>
+
+                {/* --- Student Reviews --- */}
+                <section className="voices-section">
+                    <div className="section-header center">
+                        <span className="section-badge">Student Feedback</span>
+                        <h2>Voices from the Batch</h2>
+                        <p>Real experiences from students who are evolving their study workflow.</p>
+                    </div>
+
+                    <div className="voices-container">
+                        <div className="voice-card">
+                            <div className="quote-icon"><Quote size={32} /></div>
+                            <div className="voice-rating">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <Star key={i} size={14} fill="#fbbf24" stroke="none" />
+                                ))}
+                            </div>
+                            <p className="voice-text">
+                                "I really loved EEVOLUTION 2.0. It is very helpful, clean, and easy to use.
+                                The Upload Section allows everyone to share notes and resources, which makes learning
+                                collaborative and supportive."
+                            </p>
+                            <div className="voice-footer">
+                                <div className="voice-avatar">SM</div>
+                                <div className="voice-info">
+                                    <h4>Sathi Mondal</h4>
+                                    <div className="student-verify">
+                                        <ShieldCheck size={12} />
+                                        <span>25/EE/088 • Verified Student</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="voice-card">
+                            <div className="quote-icon"><Quote size={32} /></div>
+                            <div className="voice-rating">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <Star key={i} size={14} fill="#fbbf24" stroke="none" />
+                                ))}
+                            </div>
+                            <p className="voice-text">
+                                "Electrical Engineering is a gauntlet. EEvolution replaces the frantic WhatsApp hunt with
+                                a clean, no-nonsense hub that respects your sanity. It's a digital lifeline built for the batch."
+                            </p>
+                            <div className="voice-footer">
+                                <div className="voice-avatar secondary">SK</div>
+                                <div className="voice-info">
+                                    <h4>Sohan Kundu</h4>
+                                    <div className="student-verify">
+                                        <ShieldCheck size={12} />
+                                        <span>25/EE/106 • Verified Student</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div className="dashboard-footer-section">
+                    <p>© 2026 EEvolution 2.0 - Built by Students for Students</p>
+                </div>
+            </div>
+        );
+    };
+
+    return session ? <UserView /> : <GuestView />;
 };
 
 export default Home;

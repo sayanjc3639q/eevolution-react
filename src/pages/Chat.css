@@ -356,9 +356,19 @@
 
 @media (max-width: 768px) {
     .chat-container {
-        height: calc(100dvh - 64px - 70px);
-        margin-bottom: 70px;
-        /* Offset for bottom navigation bar */
+        position: fixed;
+        top: 64px;
+        bottom: 80px;
+        left: 0;
+        right: 0;
+        height: auto;
+        margin: 0;
+        z-index: 10;
+        /* Ensures smooth seamless layout below the header and above the navbar */
+    }
+
+    body.keyboard-open .chat-container {
+        bottom: 0 !important;
     }
 
     .chat-messages {

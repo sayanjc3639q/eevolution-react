@@ -37,6 +37,7 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState('modules');
     const [loading, setLoading] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [status, setStatus] = useState({ type: '', message: '' });
 
     // State for Lists
@@ -70,9 +71,24 @@ const Admin = () => {
     const checkAdmin = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { navigate('/login'); return; }
-        const { data, error } = await supabase.from('students').select('is_admin').eq('user_id', user.id).single();
-        if (error || !data?.is_admin) { navigate('/profile'); }
-        else { setIsAdmin(true); fetchAllData(); }
+
+        const { data, error } = await supabase.from('students').select('is_admin, class_roll_no, email').eq('user_id', user.id).single();
+
+        // Define SuperAdmin: Sayan (jcsayan7@gmail.com / 25/EE/092)
+        const superAdminEmail = 'jcsayan7@gmail.com';
+        const superAdminRoll = '25/EE/092';
+        const isUserSuperAdmin = user.email === superAdminEmail || data?.class_roll_no === superAdminRoll;
+
+        if (isUserSuperAdmin) {
+            setIsSuperAdmin(true);
+            setIsAdmin(true);
+            fetchAllData();
+        } else if (data?.is_admin) {
+            setIsAdmin(true);
+            fetchAllData();
+        } else {
+            navigate('/profile');
+        }
     };
 
     const fetchAllData = () => {
@@ -282,7 +298,10 @@ const Admin = () => {
             </button>
 
             <div className={`admin-sidebar ${isSidebarOpen ? 'show' : ''}`}>
-                <div className="admin-brand"><LayoutDashboard size={24} /> <span>Admin Panel</span></div>
+                <div className="admin-brand">
+                    <LayoutDashboard size={24} />
+                    <span>{isSuperAdmin ? 'Superadmin' : 'Admin Panel'}</span>
+                </div>
                 <nav className="admin-nav">
                     <button className={activeTab === 'modules' ? 'active' : ''} onClick={() => setActiveTab('modules')}><BookOpen size={20} /> <span>Modules</span></button>
                     <button className={activeTab === 'students' ? 'active' : ''} onClick={() => setActiveTab('students')}><Users size={20} /> <span>Students</span></button>

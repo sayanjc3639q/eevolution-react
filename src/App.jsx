@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -24,11 +24,38 @@ import Chat from './pages/Chat';
 import Support from './pages/Support';
 import MAR from './pages/MAR';
 import MOOCS from './pages/MOOCS';
+import About from './pages/About';
 
 // A wrapper component to access the current location
 const AppLayout = () => {
   const location = useLocation();
   const isAdminPage = /^\/admin/i.test(location.pathname);
+
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (window.innerWidth <= 768) {
+        const activeElem = document.activeElement;
+        const isInputFocused = activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'TEXTAREA');
+        if (isInputFocused) {
+          document.body.classList.add('keyboard-open');
+        } else {
+          document.body.classList.remove('keyboard-open');
+        }
+      } else {
+        document.body.classList.remove('keyboard-open');
+      }
+    };
+
+    window.addEventListener('resize', handleViewportChange);
+    document.addEventListener('focusin', handleViewportChange);
+    document.addEventListener('focusout', handleViewportChange);
+
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+      document.removeEventListener('focusin', handleViewportChange);
+      document.removeEventListener('focusout', handleViewportChange);
+    };
+  }, []);
 
   return (
     <div className="app-container">
@@ -56,6 +83,7 @@ const AppLayout = () => {
           <Route path="/support" element={<Support />} />
           <Route path="/tracker/mar" element={<MAR />} />
           <Route path="/tracker/moocs" element={<MOOCS />} />
+          <Route path="/about" element={<About />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/settings/theme" element={<Appearance />} />
           <Route path="/settings/password" element={<Security />} />
