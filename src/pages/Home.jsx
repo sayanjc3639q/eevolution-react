@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import {
     Zap, BookOpen, MessageSquare, Bell, ShieldCheck,
-    TrendingUp, Globe, Heart, Star, Quote, ArrowRight,
-    Clock, Calendar, Upload, Coins,
+    TrendingUp, Award, Globe, Heart, Star, Quote, ArrowRight,
+    Users, Clock, Calendar, Upload, Coins,
     Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight,
     FileText, Landmark
 } from 'lucide-react';
