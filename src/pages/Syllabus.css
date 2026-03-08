@@ -1,0 +1,360 @@
+.syllabus-container {
+    padding: 2rem 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.syllabus-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.back-btn-header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.back-btn-header:hover {
+    background: var(--bg-tertiary);
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--accent-color);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.syllabus-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+}
+
+.syllabus-meta-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.meta-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+    box-shadow: var(--card-shadow);
+}
+
+.meta-card .icon {
+    padding: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.meta-card .icon.gold {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.meta-card .icon.blue {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.meta-card .icon.green {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.meta-info span {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.meta-info strong {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+/* Tabs */
+.syllabus-type-tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    padding: 0.4rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    gap: 0.4rem;
+    border: 1px solid var(--border-color);
+}
+
+.syllabus-type-tabs button {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s;
+}
+
+.syllabus-type-tabs button.active {
+    background: var(--bg-tertiary);
+    color: var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Accordion */
+.subject-accordion {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subject-accordion.expanded {
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.accordion-header {
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.accordion-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.subject-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+}
+
+.subject-titles h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+}
+
+.subject-titles span {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.lecture-count {
+    background: var(--bg-tertiary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+/* Accordion Body */
+.accordion-body {
+    padding: 0 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.module-item {
+    margin-top: 2rem;
+}
+
+.module-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.mod-number {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #fff;
+    background: var(--accent-color);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.module-header h4 {
+    font-size: 1rem;
+    flex: 1;
+}
+
+.mod-lectures {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.chapter-item {
+    background: var(--bg-primary);
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.chapter-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.chapter-name-row h5 {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.chapter-name-row .accent {
+    color: var(--accent-color);
+}
+
+.subtopics-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.subtopics-list li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 0.3rem 0.7rem;
+    border-radius: 7px;
+    border: 1px solid var(--border-color);
+}
+
+.syllabus-footer-info {
+    margin-top: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.syllabus-loading {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    color: var(--accent-color);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .syllabus-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .back-btn-header {
+        position: relative;
+        margin-bottom: 1.5rem;
+        display: inline-flex;
+    }
+
+    .header-right .lecture-count {
+        display: none;
+    }
+
+    .subject-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .subject-titles h3 {
+        font-size: 1rem;
+    }
+}

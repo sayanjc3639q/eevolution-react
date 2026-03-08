@@ -1,0 +1,301 @@
+.moocs-container {
+    padding: 2rem 1.5rem 6rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+}
+
+.moocs-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding-top: 3.5rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.moocs-header h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.moocs-header p {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.8;
+}
+
+.moocs-metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.moocs-meta-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.moocs-meta-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.meta-icon-box {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 210, 255, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00d2ff;
+    margin-bottom: 1rem;
+}
+
+.moocs-meta-card h3 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.moocs-meta-card p,
+.moocs-meta-card li {
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.moocs-meta-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.moocs-meta-card li {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.moocs-meta-card li::before {
+    content: "•";
+    color: #00d2ff;
+    font-weight: bold;
+}
+
+.credits-badge-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.credit-badge {
+    background: rgba(0, 210, 255, 0.1);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.credit-badge span {
+    display: block;
+    color: #00d2ff;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.credit-badge label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.moocs-section-title {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 3rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.moocs-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.moocs-buckets-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.bucket-info h2 {
+    color: #00d2ff;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.course-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #00d2ff;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.course-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(0, 210, 255, 0.3);
+}
+
+.course-card:hover::before {
+    opacity: 1;
+}
+
+.course-provider {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #00d2ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+    display: block;
+}
+
+.course-name {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.course-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 1rem;
+}
+
+.course-duration {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.course-credits {
+    background: rgba(58, 123, 213, 0.2);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.moocs-notes {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    border-left: 4px solid #f39c12;
+}
+
+.moocs-notes h3 {
+    color: #f39c12;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-btn-pill {
+    position: absolute;
+    top: 2rem;
+    left: 1.5rem;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-btn-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 210, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .moocs-header h1 {
+        font-size: 2rem;
+    }
+
+    .moocs-container {
+        padding: 90px 15px 30px;
+    }
+
+    .back-btn-pill {
+        top: 20px;
+        left: 15px;
+    }
+}

@@ -1,0 +1,176 @@
+.explore-container.compact {
+    padding: 2rem 1rem 6rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.explore-mini-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+}
+
+.explore-mini-header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.explore-mini-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.explore-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+}
+
+.group-label {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 1.5rem;
+    padding-left: 0.75rem;
+    border-left: 4px solid var(--accent-color);
+    display: block;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1rem;
+}
+
+.highlight-coffee {
+    color: #f59e0b !important;
+}
+
+.feature-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-primary);
+    gap: 1.25rem;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.feature-card:hover {
+    border-color: var(--accent-color);
+    background: var(--glass-bg);
+    box-shadow: var(--card-shadow);
+}
+
+.feature-card.featured {
+    border-color: var(--accent-color);
+    background: linear-gradient(90deg, rgba(var(--accent-color-rgb), 0.05), transparent);
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color);
+    color: var(--accent-color);
+    transition: all 0.2s ease;
+}
+
+.feature-card:hover .icon-wrapper {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.mini-badge-inline {
+    display: inline-block;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+    width: fit-content;
+}
+
+.arrow-icon {
+    color: var(--border-color);
+    transition: color 0.2s ease;
+}
+
+.feature-card:hover .arrow-icon {
+    color: var(--accent-color);
+}
+
+.feature-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Admin Card Special Styling */
+.admin-card {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.admin-card .icon-wrapper {
+    color: #ef4444;
+}
+
+.admin-card:hover .icon-wrapper {
+    background: #ef4444;
+}
+
+.text-admin {
+    color: #ef4444;
+}
+
+@media (max-width: 600px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .explore-mini-header h1 {
+        font-size: 2rem;
+    }
+
+    .feature-card {
+        padding: 0.85rem 1rem;
+    }
+}

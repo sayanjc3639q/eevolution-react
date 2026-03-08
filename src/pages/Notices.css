@@ -1,0 +1,127 @@
+.notices-page {
+    padding: 2rem 1rem 6rem;
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    position: relative;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.notices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.notice-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 1.5rem 2rem;
+    transition: all 0.2s ease;
+}
+
+.notice-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--card-shadow);
+}
+
+.notice-header {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.notice-type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.notice-meta h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.date-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.notice-body {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.notice-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+}
+
+.attachment-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 700;
+    width: fit-content;
+    transition: all 0.2s ease;
+}
+
+.attachment-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.empty-notices {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--text-secondary);
+}
+
+.muted-icon {
+    opacity: 0.2;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+    .notice-card {
+        padding: 1.5rem;
+    }
+
+    .notice-header {
+        gap: 1rem;
+    }
+
+    .notice-meta h3 {
+        font-size: 1.1rem;
+    }
+}

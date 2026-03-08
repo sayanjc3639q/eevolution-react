@@ -1,0 +1,242 @@
+:root {
+  /* Initial Theme: Dark Mode */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --accent-color: #0ea5e9;
+  --accent-light: #7dd3fc;
+  --accent-color-rgb: 14, 165, 233;
+  --accent-glow: rgba(14, 165, 233, 0.4);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --accent-color: #0ea5e9;
+  --accent-light: #38bdf8;
+  --accent-color-rgb: 14, 165, 233;
+  --accent-glow: rgba(14, 165, 233, 0.2);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(248, 250, 252, 0.8);
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  flex: 1;
+  width: 100%;
+  padding-top: 80px;
+  /* Space for fixed desktop header */
+}
+
+.content-wrapper.admin-mode {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Global Card Component Styles */
+.card {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Home-Specific Hero Styles (Kept here till refined further) */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5rem 1.5rem;
+  background: radial-gradient(circle at top, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.hero-content {
+  max-width: 900px;
+  z-index: 10;
+}
+
+.title .highlight {
+  color: var(--accent-color);
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.15rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.welcome-message {
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--glass-bg);
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  display: inline-block;
+}
+
+.main-content {
+  padding: 2.5rem 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.about-section h2 {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 1.25rem;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.features-list li {
+  background: var(--bg-primary);
+  padding: 1.25rem 1.5rem;
+  border-radius: 15px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.features-list li:hover {
+  border-color: var(--accent-color);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding-top: 64px;
+    /* Added for mobile-header */
+    padding-bottom: 80px;
+    /* Added for bottom-navbar */
+  }
+
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .main-content {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* Global Skeleton Loader System */
+.skeleton-pulse {
+  background: linear-gradient(90deg,
+      transparent 25%,
+      var(--bg-tertiary) 50%,
+      transparent 75%);
+  background-size: 200% 100%;
+  animation: pulse-skeleton 1.5s infinite linear;
+}
+
+@keyframes pulse-skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-loading {
+  pointer-events: none;
+  user-select: none;
+}
+
+.skeleton-item {
+  background: var(--bg-tertiary) !important;
+  opacity: 0.6;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-line.title {
+  height: 24px;
+  width: 60%;
+}
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-avatar {
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+}
+
+.skeleton-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
