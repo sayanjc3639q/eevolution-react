@@ -380,3 +380,262 @@
         max-width: 90%;
     }
 }
+
+/* ==============================
+   MESSAGE DELETE / EDIT MENU
+   ============================== */
+
+/* Wrapper anchors the popup */
+.msg-bubble-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Own-message pointer */
+.own-clickable {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.own-clickable:active {
+    filter: brightness(0.9);
+}
+
+/* Highlight when menu is open */
+.message-bubble.menu-open {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35),
+        0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    filter: brightness(1.05);
+}
+
+/* Fading while delete in progress */
+.message-bubble.deleting {
+    opacity: 0.4;
+    pointer-events: none;
+    transform: scale(0.97);
+    transition: all 0.3s ease;
+}
+
+/* --- "edited" tag + time row --- */
+.bubble-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.edited-tag {
+    font-size: 0.6rem;
+    font-style: italic;
+    opacity: 0.65;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Override old standalone time style to sit in footer */
+.bubble-footer .message-time {
+    margin-top: 0;
+    display: inline;
+    text-align: right;
+}
+
+/* --- Inline edit box --- */
+.edit-inline-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--accent-color);
+    border-radius: 1.2rem;
+    border-top-right-radius: 4px;
+    padding: 0.75rem 1rem;
+    min-width: 200px;
+    max-width: 340px;
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 14, 165, 233), 0.15),
+        0 8px 24px rgba(0, 0, 0, 0.25);
+    animation: editBoxIn 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes editBoxIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.edit-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: none;
+    font-family: inherit;
+    min-height: 36px;
+    max-height: 120px;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+.edit-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.edit-cancel-btn,
+.edit-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s ease;
+}
+
+.edit-cancel-btn {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.edit-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+.edit-save-btn {
+    background: var(--accent-color);
+    color: white;
+}
+
+.edit-save-btn:hover:not(:disabled) {
+    opacity: 0.88;
+    transform: scale(1.03);
+}
+
+.edit-save-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* --- Context popup --- */
+.msg-context-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-secondary, #1e293b);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 0.4rem;
+    min-width: 190px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 999;
+    animation: menuPop 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform-origin: bottom right;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+@keyframes menuPop {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Shared button base */
+.ctx-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+    position: relative;
+}
+
+/* Edit button */
+.ctx-edit-btn {
+    color: var(--text-primary);
+}
+
+.ctx-edit-btn:hover:not(.ctx-btn-disabled) {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Disabled edit (expired) */
+.ctx-btn-disabled {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ctx-expired-tag {
+    margin-left: auto;
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* Divider */
+.ctx-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 0.25rem 0.55rem;
+}
+
+/* Delete button */
+.ctx-delete-btn {
+    color: #f87171;
+}
+
+.ctx-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.ctx-delete-btn:active {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.ctx-btn svg {
+    flex-shrink: 0;
+}
