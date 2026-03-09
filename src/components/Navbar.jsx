@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Zap, BookOpen, Home, MessageSquare, User, LayoutGrid, Bell, Search, Camera, Lock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Navbar.css';
+
+const LAST_SEEN_KEY = 'chat_last_seen';
 
 const Navbar = () => {
     const [session, setSession] = useState(null);
     const [userName, setUserName] = useState('');
     const [showGuestModal, setShowGuestModal] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const location = useLocation();
 
+    // ─── Auth ─────────────────────────────────────────────────────────────
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
@@ -29,6 +34,59 @@ const Navbar = () => {
         return () => subscription.unsubscribe();
     }, []);
 
+    // ─── Unread chat count ─────────────────────────────────────────────────
+    const fetchUnread = useCallback(async () => {
+        if (!session) { setUnreadCount(0); return; }
+
+        const lastSeen = localStorage.getItem(LAST_SEEN_KEY) || new Date(0).toISOString();
+
+        const { count, error } = await supabase
+            .from('chat_messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('room_id', 'global')
+            .neq('user_id', session.user.id) // don't count own messages
+            .gt('created_at', lastSeen);
+
+        if (!error) setUnreadCount(count ?? 0);
+    }, [session]);
+
+    // Fetch on mount and whenever session changes
+    useEffect(() => { fetchUnread(); }, [fetchUnread]);
+
+    // When user navigates TO /chat → mark as seen
+    useEffect(() => {
+        if (location.pathname === '/chat') {
+            const now = new Date().toISOString();
+            localStorage.setItem(LAST_SEEN_KEY, now);
+            setUnreadCount(0);
+        }
+    }, [location.pathname]);
+
+    // Real-time: increment badge when new messages arrive (only while NOT on chat page)
+    useEffect(() => {
+        if (!session) return;
+
+        const channel = supabase
+            .channel('navbar-chat-watch')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: 'room_id=eq.global' },
+                (payload) => {
+                    // Only increment if the message is from someone else AND user isn't on chat page
+                    if (
+                        payload.new.user_id !== session.user.id &&
+                        window.location.pathname !== '/chat'
+                    ) {
+                        setUnreadCount(prev => prev + 1);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => supabase.removeChannel(channel);
+    }, [session]);
+
+    // ─── Helpers ───────────────────────────────────────────────────────────
     const handleRestrictedClick = (e) => {
         if (!session) {
             e.preventDefault();
@@ -36,9 +94,11 @@ const Navbar = () => {
         }
     };
 
+    const badgeLabel = unreadCount > 99 ? '99+' : unreadCount;
+
     return (
         <>
-            {/* Mobile Top Header - Only visible on small screens */}
+            {/* Mobile Top Header */}
             <div className="mobile-header">
                 <Link to="/" className="mobile-logo">
                     <Zap size={24} className="logo-icon" />
@@ -73,7 +133,7 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                {/* Desktop Search Bar (Hidden on Mobile) */}
+                {/* Desktop Search Bar */}
                 <div className="desktop-search">
                     <Search size={18} className="search-icon" />
                     <input type="text" placeholder="Search resources..." className="search-input" />
@@ -92,10 +152,18 @@ const Navbar = () => {
                         <LayoutGrid size={24} className="explore-btn-icon" />
                         <span>Explore</span>
                     </NavLink>
-                    <NavLink to="/chat" className="nav-link" onClick={handleRestrictedClick}>
-                        <MessageSquare size={20} />
+
+                    {/* Chat link with unread badge */}
+                    <NavLink to="/chat" className="nav-link chat-nav-link" onClick={handleRestrictedClick}>
+                        <div className="chat-icon-wrap">
+                            <MessageSquare size={20} />
+                            {session && unreadCount > 0 && (
+                                <span className="chat-unread-badge">{badgeLabel}</span>
+                            )}
+                        </div>
                         <span>Chat</span>
                     </NavLink>
+
                     <NavLink to="/memories" className="nav-link" onClick={handleRestrictedClick}>
                         <Camera size={20} />
                         <span>Memories</span>

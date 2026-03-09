@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, Loader2, MessageSquare, Trash2, Smile, Pencil, Check, X } from 'lucide-react';
+import EmojiPicker from 'emoji-picker-react';
 import { supabase } from '../supabaseClient';
 import './Chat.css';
 
@@ -25,9 +26,14 @@ const Chat = () => {
     // Ticker to re-evaluate 10-min window every 30s
     const [tick, setTick] = useState(0);
 
+    // Emoji picker
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
     const messagesEndRef = useRef(null);
     const menuRef = useRef(null);
     const editInputRef = useRef(null);
+    const emojiPickerRef = useRef(null);
+    const inputRef = useRef(null);
 
     // ─── Auth + real-time ────────────────────────────────────────────────
     useEffect(() => {
@@ -79,6 +85,28 @@ const Chat = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [activeMenu]);
 
+    // Close emoji picker on outside click
+    useEffect(() => {
+        const handleOutside = (e) => {
+            if (
+                emojiPickerRef.current && !emojiPickerRef.current.contains(e.target) &&
+                e.target.closest('.emoji-btn') === null
+            ) {
+                setShowEmojiPicker(false);
+            }
+        };
+        if (showEmojiPicker) document.addEventListener('mousedown', handleOutside);
+        return () => document.removeEventListener('mousedown', handleOutside);
+    }, [showEmojiPicker]);
+
+    // Append emoji to message and re-focus input
+    const handleEmojiClick = (emojiData) => {
+        setNewMessage(prev => prev + emojiData.emoji);
+        setShowEmojiPicker(false);
+        // Slight delay so state update flushes before focusing
+        setTimeout(() => inputRef.current?.focus(), 50);
+    };
+
     // Focus edit input when editing starts
     useEffect(() => {
         if (editingId && editInputRef.current) {
@@ -87,6 +115,7 @@ const Chat = () => {
             editInputRef.current.setSelectionRange(len, len);
         }
     }, [editingId]);
+
 
     // ─── Data fetching ───────────────────────────────────────────────────
     const fetchUserProfile = async (userId) => {
@@ -254,10 +283,19 @@ const Chat = () => {
                                                     rows={1}
                                                 />
                                                 <div className="edit-actions">
-                                                    <button className="edit-cancel-btn" onClick={cancelEdit} title="Cancel (Esc)">
+                                                    <button
+                                                        className="edit-cancel-btn"
+                                                        onPointerDown={(e) => { e.preventDefault(); cancelEdit(); }}
+                                                        title="Cancel (Esc)"
+                                                    >
                                                         <X size={14} /> Cancel
                                                     </button>
-                                                    <button className="edit-save-btn" onClick={saveEdit} disabled={!editText.trim() || savingEdit} title="Save (Enter)">
+                                                    <button
+                                                        className="edit-save-btn"
+                                                        onPointerDown={(e) => { e.preventDefault(); saveEdit(); }}
+                                                        disabled={!editText.trim() || savingEdit}
+                                                        title="Save (Enter)"
+                                                    >
                                                         {savingEdit ? <Loader2 size={14} className="spinner" /> : <Check size={14} />} Save
                                                     </button>
                                                 </div>
@@ -324,31 +362,70 @@ const Chat = () => {
                         <p>Please <a href="/login">Sign In</a> to join the conversation</p>
                     </div>
                 ) : (
-                    <div className="chat-form">
-                        <button type="button" className="emoji-btn"><Smile size={22} /></button>
-                        <input
-                            type="text"
-                            name="chatMessage"
-                            id="chatMessageInput"
-                            placeholder="Type a message..."
-                            value={newMessage}
-                            onChange={e => setNewMessage(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(e); }}
-                            maxLength={500}
-                            autoComplete="off"
-                            data-lpignore="true"
-                            data-1p-ignore="true"
-                            data-form-type="other"
-                            autoCorrect="on"
-                            spellCheck="true"
-                            enterKeyHint="send"
-                        />
-                        <button type="button" onClick={handleSendMessage} className="send-btn" disabled={!newMessage.trim() || sending}>
-                            {sending ? <Loader2 size={18} className="spinner" /> : <Send size={18} />}
-                        </button>
+                    <div className="input-area-wrapper">
+                        {/* Emoji Picker — floats above the input bar */}
+                        {showEmojiPicker && (
+                            <div className="emoji-picker-container" ref={emojiPickerRef}>
+                                <EmojiPicker
+                                    onEmojiClick={handleEmojiClick}
+                                    theme="dark"
+                                    skinTonesDisabled
+                                    searchDisabled
+                                    width="100%"
+                                    height={320}
+                                    previewConfig={{ showPreview: false }}
+                                    lazyLoadEmojis
+                                />
+                            </div>
+                        )}
+
+                        <div className="chat-form">
+                            <button
+                                type="button"
+                                className={`emoji-btn ${showEmojiPicker ? 'active' : ''}`}
+                                onPointerDown={(e) => {
+                                    e.preventDefault();
+                                    setShowEmojiPicker(prev => !prev);
+                                }}
+                                title="Emoji"
+                            >
+                                <Smile size={22} />
+                            </button>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                name="chatMessage"
+                                id="chatMessageInput"
+                                placeholder="Type a message..."
+                                value={newMessage}
+                                onChange={e => setNewMessage(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(e); }}
+                                maxLength={500}
+                                autoComplete="off"
+                                data-lpignore="true"
+                                data-1p-ignore="true"
+                                data-form-type="other"
+                                autoCorrect="on"
+                                spellCheck="true"
+                                enterKeyHint="send"
+                            />
+                            <button
+                                type="button"
+                                className="send-btn"
+                                disabled={!newMessage.trim() || sending}
+                                onPointerDown={(e) => {
+                                    e.preventDefault();
+                                    setShowEmojiPicker(false);
+                                    handleSendMessage();
+                                }}
+                            >
+                                {sending ? <Loader2 size={18} className="spinner" /> : <Send size={18} />}
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
+
         </div>
     );
 };

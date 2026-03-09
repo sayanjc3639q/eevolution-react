@@ -247,7 +247,51 @@
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--border-color);
     background: var(--bg-primary);
+    position: relative;
 }
+
+/* Wraps the picker + form row */
+.input-area-wrapper {
+    position: relative;
+}
+
+/* Emoji picker floats above the input bar */
+.emoji-picker-container {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 500;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.07);
+    animation: pickerSlideUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pickerSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Override emoji-picker-react theme to match our app */
+.emoji-picker-container .EmojiPickerReact {
+    --epr-bg-color: var(--bg-secondary, #1e293b) !important;
+    --epr-category-label-bg-color: var(--bg-secondary, #1e293b) !important;
+    --epr-hover-bg-color: rgba(255, 255, 255, 0.07) !important;
+    --epr-search-border-color: var(--border-color) !important;
+    --epr-text-color: var(--text-primary) !important;
+    border: none !important;
+    border-radius: 16px !important;
+}
+
 
 .login-prompt {
     text-align: center;
@@ -288,12 +332,21 @@
     align-items: center;
     justify-content: center;
     padding: 0.5rem;
-    transition: color 0.2s;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
 }
 
 .emoji-btn:hover {
     color: var(--accent-color);
+    background: rgba(var(--accent-rgb, 14, 165, 233), 0.1);
 }
+
+.emoji-btn.active {
+    color: var(--accent-color);
+    background: rgba(var(--accent-rgb, 14, 165, 233), 0.15);
+}
+
 
 .chat-input-area input {
     flex: 1;
