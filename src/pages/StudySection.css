@@ -5,8 +5,95 @@
 }
 
 .cascade-view {
-    opacity: 1;
+    animation: cascadeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity, filter;
 }
+
+@keyframes cascadeReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.97);
+        filter: blur(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Staggered reveal for children items */
+.category-card,
+.subject-item-card,
+.list-item,
+.file-card {
+    opacity: 0;
+    animation: itemReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes itemReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger delays */
+.category-card:nth-child(1),
+.subject-item-card:nth-child(1),
+.list-item:nth-child(1),
+.file-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.category-card:nth-child(2),
+.subject-item-card:nth-child(2),
+.list-item:nth-child(2),
+.file-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.category-card:nth-child(3),
+.subject-item-card:nth-child(3),
+.list-item:nth-child(3),
+.file-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.category-card:nth-child(4),
+.subject-item-card:nth-child(4),
+.list-item:nth-child(4),
+.file-card:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.category-card:nth-child(5),
+.subject-item-card:nth-child(5),
+.list-item:nth-child(5),
+.file-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.category-card:nth-child(6),
+.subject-item-card:nth-child(6),
+.list-item:nth-child(6),
+.file-card:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.category-card:nth-child(n+7),
+.subject-item-card:nth-child(n+7),
+.list-item:nth-child(n+7),
+.file-card:nth-child(n+7) {
+    animation-delay: 0.35s;
+}
+
 
 /* Breadcrumb Navigation - New Integrated Style */
 .breadcrumb-new {

@@ -28,13 +28,30 @@ const Home = () => {
         return () => subscription.unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (status !== 'ready') return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
+        revealElements.forEach(el => observer.observe(el));
+
+        return () => observer.disconnect();
+    }, [status, session]);
+
     if (status === 'loading') return null;
 
     // Guest Landing Page View
     const GuestView = () => (
         <div className="guest-home">
             {/* Hero Section */}
-            <section className="guest-hero">
+            <section className="guest-hero reveal">
                 <h1>EEvolution <span style={{ color: 'var(--accent-color)' }}>2.0</span></h1>
                 <p>The pioneering digital ecosystem for Electrical Engineering Batch 2. Built for excellence, designed for evolution.</p>
                 <div className="hero-btns">
@@ -47,7 +64,7 @@ const Home = () => {
             </section>
 
             {/* Redesigned Features Section */}
-            <section className="features-section">
+            <section className="features-section reveal">
                 <div className="features-header">
                     <span className="badge">Platform Features</span>
                     <h2>Evolving the way you study</h2>
@@ -394,7 +411,7 @@ const Home = () => {
         return (
             <div className="user-dashboard">
                 {/* --- Welcome Hero --- */}
-                <div className="dashboard-hero">
+                <div className="dashboard-hero reveal">
                     <div className="dashboard-hero-content">
                         <div className="greeting-badge">
                             <GreetIcon size={16} /> {greeting}
@@ -405,7 +422,7 @@ const Home = () => {
                 </div>
 
                 {/* --- Today's Schedule --- */}
-                <section className="ds-section">
+                <section className="ds-section reveal">
                     <div className="ds-section-header">
                         <div className="ds-section-label">
                             <Calendar size={18} />
@@ -508,7 +525,7 @@ const Home = () => {
                 </section>
 
                 {/* --- Quick Links --- */}
-                <section className="ds-section">
+                <section className="ds-section reveal">
                     <div className="ds-section-header">
                         <div className="ds-section-label">
                             <Zap size={18} />
@@ -537,7 +554,7 @@ const Home = () => {
                 </section>
 
                 {/* --- Top Contributors & Donators --- */}
-                <div className="community-leaderboards">
+                <div className="community-leaderboards reveal">
                     {/* Top Contributors */}
                     <section className="ds-section leaderboard-card">
                         <div className="ds-section-header">
@@ -662,7 +679,7 @@ const Home = () => {
                 </section>
 
                 {/* --- Student Reviews --- */}
-                <section className="voices-section">
+                <section className="voices-section reveal-stagger">
                     <div className="section-header center">
                         <span className="section-badge">Student Feedback</span>
                         <h2>Voices from the Batch</h2>

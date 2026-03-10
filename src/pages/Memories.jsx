@@ -18,6 +18,14 @@ const Memories = () => {
     const [actionCooldowns, setActionCooldowns] = useState({});
     const [showScrollTop, setShowScrollTop] = useState(false);
 
+    useEffect(() => {
+        if (isCommentModalOpen || isUploadModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [isCommentModalOpen, isUploadModalOpen]);
+
     // Form states
     const [caption, setCaption] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -538,7 +546,15 @@ const Memories = () => {
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                             />
-                            <button type="submit" disabled={!newComment} className="comment-submit-btn">
+                            <button
+                                type="submit"
+                                disabled={!newComment}
+                                className="comment-submit-btn"
+                                onPointerDown={(e) => {
+                                    // CRITICAL: Prevent input blur before submit
+                                    if (newComment) e.preventDefault();
+                                }}
+                            >
                                 <Send size={20} />
                             </button>
                         </form>

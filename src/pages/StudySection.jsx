@@ -191,7 +191,7 @@ const StudySection = () => {
 
     // --- RENDERERS ---
     const renderCategories = () => (
-        <div className="cascade-view">
+        <div className="cascade-view" key="categories">
             <div className="section-intro">
                 <h2>Choose <span className="highlight">Resource Type</span></h2>
                 <p>Select the kind of study material you are looking for.</p>
@@ -213,7 +213,7 @@ const StudySection = () => {
     );
 
     const renderSubjects = () => (
-        <div className="cascade-view">
+        <div className="cascade-view" key={`subjects-${categoryId}`}>
             <div className="section-intro">
                 <div className="section-title-row">
                     <button onClick={goBack} className="back-btn-square">
@@ -265,7 +265,7 @@ const StudySection = () => {
     );
 
     const renderChapters = () => (
-        <div className="cascade-view">
+        <div className="cascade-view" key={`chapters-${subjectId}`}>
             <div className="section-intro">
                 <div className="section-title-row">
                     <button onClick={goBack} className="back-btn-square">
@@ -300,7 +300,7 @@ const StudySection = () => {
     );
 
     const renderFiles = () => (
-        <div className="cascade-view">
+        <div className="cascade-view" key={`files-${chapterId}`}>
             <div className="section-intro">
                 <div className="section-title-row">
                     <button onClick={goBack} className="back-btn-square">
