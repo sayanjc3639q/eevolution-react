@@ -25,6 +25,7 @@ import Support from './pages/Support';
 import MAR from './pages/MAR';
 import MOOCS from './pages/MOOCS';
 import About from './pages/About';
+import Payment from './pages/Payment';
 
 // A wrapper component to access the current location
 const AppLayout = () => {
@@ -96,6 +97,7 @@ const AppLayout = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/settings/theme" element={<Appearance />} />
           <Route path="/settings/password" element={<Security />} />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
       </main>
     </div>

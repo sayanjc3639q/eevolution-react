@@ -177,15 +177,15 @@ const Support = () => {
                     <h2>Become a Proud Supporter</h2>
                     <p>Every contribution, big or small, plays a vital role in keeping this platform alive and thriving for everyone.</p>
 
-                    <button className="payment-trigger" onClick={() => window.open('https://upilinks.in/EEvolutionDonate', '_blank')}>
+                    <button className="payment-trigger" onClick={() => navigate('/payment')}>
                         <CreditCard size={20} />
                         Contribute Now
                     </button>
 
                     <div className="payment-methods">
-                        <span>Highly secure payment via UPI</span>
+                        <span>Pay securely via UPI, Card or Net Banking</span>
                         <div className="upi-icons">
-                            <Smartphone size={16} /> GPay • PhonePe • Paytm
+                            <Smartphone size={16} /> GPay • PhonePe • Paytm • Cards
                         </div>
                     </div>
                 </div>

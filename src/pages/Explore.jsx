@@ -29,6 +29,23 @@ const Explore = () => {
         return () => subscription.unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (loading) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const revealElements = document.querySelectorAll('.reveal');
+        revealElements.forEach(el => observer.observe(el));
+
+        return () => observer.disconnect();
+    }, [loading]);
+
     const handleCardClick = (e, item) => {
         if (!session && !item.isPublic) {
             e.preventDefault();
@@ -84,7 +101,7 @@ const Explore = () => {
         <div className="explore-container compact">
             <div className="explore-content">
                 {featureGroups.map((group, gIdx) => (
-                    <div key={gIdx} className="feature-group">
+                    <div key={gIdx} className="feature-group reveal">
                         <div className="group-header">
                             <span className="mini-badge">{group.badge}</span>
                             <h2 className="group-label-modern">{group.group}</h2>

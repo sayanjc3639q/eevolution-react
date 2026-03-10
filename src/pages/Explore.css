@@ -6,10 +6,78 @@
     width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
-    /* Prevent horizontal scroll on this container */
+    animation: cascadeReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Global Reset for Explore Page to prevent overflow issues */
+@keyframes cascadeReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.98);
+        filter: blur(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Staggered reveal for feature cards */
+.feature-card {
+    opacity: 0;
+    animation: itemReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes itemReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger delays for explore cards */
+.feature-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 0.25s;
+}
+
+.feature-card:nth-child(5) {
+    animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(n+6) {
+    animation-delay: 0.35s;
+}
+
+/* Scroll Reveal Classes */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .explore-container * {
     box-sizing: border-box;
     max-width: 100%;
