@@ -1,33 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard,
-    BookOpen,
-    Bell,
-    Calendar,
-    Users,
-    Plus,
-    Save,
-    Trash2,
-    Search,
-    ChevronRight,
-    Loader2,
-    CheckCircle,
-    AlertCircle,
-    ArrowLeft,
-    Clock,
-    Link as LinkIcon,
-    FileText,
-    Image as ImageIcon,
-    MessageCircle,
-    Menu,
-    X,
-    Monitor,
-    Smartphone,
-    Info,
-    Coins,
-    Award,
-    GraduationCap
+    LayoutDashboard, BookOpen, Bell, Calendar, Users, Plus, Save, Trash2,
+    Search, Loader2, CheckCircle, AlertCircle, ArrowLeft, Clock, FileText,
+    MessageCircle, X, Monitor, Coins, GraduationCap, ChevronRight,
+    Link as LinkIcon, Image as ImageIcon, Edit2, FolderOpen, Hash,
+    Zap, BookMarked
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Admin.css';
@@ -40,7 +18,6 @@ const Admin = () => {
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [status, setStatus] = useState({ type: '', message: '' });
 
-    // State for Lists
     const [materials, setMaterials] = useState([]);
     const [notices, setNotices] = useState([]);
     const [events, setEvents] = useState([]);
@@ -50,9 +27,7 @@ const Admin = () => {
     const [expenses, setExpenses] = useState([]);
     const [students, setStudents] = useState([]);
     const [syllabus, setSyllabus] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    // Form States
     const [studentSearch, setStudentSearch] = useState('');
     const [editingStudent, setEditingStudent] = useState(null);
 
@@ -64,114 +39,76 @@ const Admin = () => {
     const [eventForm, setEventForm] = useState({ title: '', description: '', event_date: '', registration_link: '', photo_url: '' });
     const [expenseForm, setExpenseForm] = useState({ name: '', amount: '' });
 
-    useEffect(() => {
-        checkAdmin();
-    }, []);
+    useEffect(() => { checkAdmin(); }, []);
 
     const checkAdmin = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { navigate('/login'); return; }
-
-        const { data, error } = await supabase.from('students').select('is_admin, class_roll_no, email').eq('user_id', user.id).single();
-
-        // Define SuperAdmin: Sayan (jcsayan7@gmail.com / 25/EE/092)
+        const { data } = await supabase.from('students').select('is_admin, class_roll_no, email').eq('user_id', user.id).single();
         const superAdminEmail = 'jcsayan7@gmail.com';
         const superAdminRoll = '25/EE/092';
         const isUserSuperAdmin = user.email === superAdminEmail || data?.class_roll_no === superAdminRoll;
-
-        if (isUserSuperAdmin) {
-            setIsSuperAdmin(true);
-            setIsAdmin(true);
-            fetchAllData();
-        } else if (data?.is_admin) {
-            setIsAdmin(true);
-            fetchAllData();
-        } else {
-            navigate('/profile');
-        }
+        if (isUserSuperAdmin) { setIsSuperAdmin(true); setIsAdmin(true); fetchAllData(); }
+        else if (data?.is_admin) { setIsAdmin(true); fetchAllData(); }
+        else { navigate('/profile'); }
     };
 
     const fetchAllData = () => {
-        fetchStudents();
-        fetchMaterials();
-        fetchNotices();
-        fetchEvents();
-        fetchRoutines();
-        fetchHolidays();
-        fetchWhatsappGroups();
-        fetchSyllabus();
-        fetchExpenses();
+        fetchStudents(); fetchMaterials(); fetchNotices(); fetchEvents();
+        fetchRoutines(); fetchHolidays(); fetchWhatsappGroups(); fetchSyllabus(); fetchExpenses();
     };
 
     const fetchSyllabus = async () => {
         const { data, error } = await supabase.from('syllabus').select('data').single();
         if (!error && data) setSyllabus(data.data);
     };
-
     const fetchStudents = async () => {
         const { data, error } = await supabase.from('students').select('*').order('class_roll_no', { ascending: true });
         if (!error) setStudents(data);
     };
-
     const fetchMaterials = async () => {
         const { data, error } = await supabase.from('study_materials').select('*').order('created_at', { ascending: false });
         if (!error) setMaterials(data);
     };
-
     const fetchNotices = async () => {
         const { data, error } = await supabase.from('notices').select('*').order('notice_date', { ascending: false });
         if (!error) setNotices(data);
     };
-
     const fetchEvents = async () => {
         const { data, error } = await supabase.from('events').select('*').order('event_date', { ascending: false });
         if (!error) setEvents(data);
     };
-
     const fetchRoutines = async () => {
         const { data, error } = await supabase.from('routines').select('*').order('day', { ascending: true }).order('start_time', { ascending: true });
         if (!error) setRoutines(data);
     };
-
     const fetchHolidays = async () => {
         const { data, error } = await supabase.from('holidays').select('*').order('date', { ascending: true });
         if (!error) setHolidays(data);
     };
-
     const fetchWhatsappGroups = async () => {
         const { data, error } = await supabase.from('whatsapp_groups').select('*').order('created_at', { ascending: false });
         if (!error) setWhatsappGroups(data);
     };
-
     const fetchExpenses = async () => {
         const { data, error } = await supabase.from('site_expenses').select('*').order('amount', { ascending: false });
         if (!error) setExpenses(data);
     };
 
-
-
     const showAlert = (type, message) => {
         setStatus({ type, message });
-        setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+        setTimeout(() => setStatus({ type: '', message: '' }), 3500);
     };
 
     const handleModuleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+        e.preventDefault(); setLoading(true);
         const submitData = { ...moduleForm };
-        if (submitData.section_id === 'practice-set') {
-            submitData.chapter_name = 'General'; // Default placeholder for non-chapter items
-        }
+        if (submitData.section_id === 'practice-set') submitData.chapter_name = 'General';
         const { error } = await supabase.from('study_materials').insert([submitData]);
         if (error) showAlert('error', error.message);
-        else {
-            showAlert('success', 'Module added!');
-            setModuleForm({ section_id: 'class-notes', subject_name: '', chapter_name: '', file_name: '', file_description: '', drive_link: '' });
-            fetchMaterials();
-        }
+        else { showAlert('success', 'Study material added successfully!'); setModuleForm({ section_id: 'class-notes', subject_name: '', chapter_name: '', file_name: '', file_description: '', drive_link: '' }); fetchMaterials(); }
         setLoading(false);
     };
-
     const handleNoticeSubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('notices').insert([noticeForm]);
@@ -179,7 +116,6 @@ const Admin = () => {
         else { showAlert('success', 'Notice posted!'); setNoticeForm({ title: '', content: '', attachment_link: '', attachment_type: 'pdf', notice_date: new Date().toISOString().split('T')[0] }); fetchNotices(); }
         setLoading(false);
     };
-
     const handleEventSubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('events').insert([eventForm]);
@@ -187,58 +123,45 @@ const Admin = () => {
         else { showAlert('success', 'Event created!'); setEventForm({ title: '', description: '', event_date: '', registration_link: '', photo_url: '' }); fetchEvents(); }
         setLoading(false);
     };
-
     const handleRoutineSubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('routines').insert([routineForm]);
         if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Routine updated!'); setRoutineForm({ day: 'Monday', start_time: '', end_time: '', subject: '', prof: '', room: '' }); fetchRoutines(); }
+        else { showAlert('success', 'Class added to routine!'); setRoutineForm({ day: 'Monday', start_time: '', end_time: '', subject: '', prof: '', room: '' }); fetchRoutines(); }
         setLoading(false);
     };
-
     const handleHolidaySubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('holidays').insert([holidayForm]);
         if (error) showAlert('error', error.message);
-        else {
-            showAlert('success', 'Holiday added!');
-            setHolidayForm({ date: '', name: '', type: 'official' });
-            fetchHolidays();
-        }
+        else { showAlert('success', 'Holiday added!'); setHolidayForm({ date: '', name: '', type: 'official' }); fetchHolidays(); }
         setLoading(false);
     };
-
     const handleWhatsappSubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('whatsapp_groups').insert([whatsappForm]);
         if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Group added!'); setWhatsappForm({ name: '', description: '', link: '' }); fetchWhatsappGroups(); }
+        else { showAlert('success', 'WhatsApp group added!'); setWhatsappForm({ name: '', description: '', link: '' }); fetchWhatsappGroups(); }
         setLoading(false);
     };
-
     const handleExpenseSubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('site_expenses').insert([expenseForm]);
         if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Expense added!'); setExpenseForm({ name: '', amount: '' }); fetchExpenses(); }
+        else { showAlert('success', 'Expense recorded!'); setExpenseForm({ name: '', amount: '' }); fetchExpenses(); }
         setLoading(false);
     };
-
     const handleDelete = async (table, id) => {
         if (table === 'holidays') {
             const h = holidays.find(i => i.id === id);
-            if (h && h.type === 'official' && !isSuperAdmin) {
-                showAlert('error', 'Official holidays are fixed and cannot be deleted.');
-                return;
-            }
+            if (h && h.type === 'official' && !isSuperAdmin) { showAlert('error', 'Official holidays are fixed and cannot be deleted.'); return; }
         }
-
-        if (!window.confirm('Delete this item?')) return;
+        if (!window.confirm('Delete this item? This action cannot be undone.')) return;
         setLoading(true);
         const { error } = await supabase.from(table).delete().eq('id', id);
         if (error) showAlert('error', error.message);
         else {
-            showAlert('success', 'Deleted!');
+            showAlert('success', 'Deleted successfully!');
             if (table === 'study_materials') fetchMaterials();
             else if (table === 'notices') fetchNotices();
             else if (table === 'events') fetchEvents();
@@ -249,7 +172,6 @@ const Admin = () => {
         }
         setLoading(false);
     };
-
     const handleUpdateStudent = async (studentId) => {
         setLoading(true);
         const { error } = await supabase.from('students').update({ donation: editingStudent.donation, files_count: editingStudent.files_count }).eq('id', studentId);
@@ -260,42 +182,44 @@ const Admin = () => {
 
     const getSubjectsList = (sectionId) => {
         if (!syllabus) return [];
-        if (sectionId === 'lab-notes') {
-            return (syllabus.practical_subjects || []).map(s => s.subject);
-        }
+        if (sectionId === 'lab-notes') return (syllabus.practical_subjects || []).map(s => s.subject);
         return [...(syllabus.theory_subjects || []), ...(syllabus.practical_subjects || [])].map(s => s.subject);
     };
-
     const getChaptersList = (subjectName) => {
         if (!syllabus || !subjectName) return [];
-        const allSyllabusSubjects = [...(syllabus.theory_subjects || []), ...(syllabus.practical_subjects || [])];
-        const sub = allSyllabusSubjects.find(s => s.subject === subjectName);
+        const all = [...(syllabus.theory_subjects || []), ...(syllabus.practical_subjects || [])];
+        const sub = all.find(s => s.subject === subjectName);
         if (!sub) return [];
-
-        const chaptersList = [];
-        (sub.modules || sub.experiments || []).forEach(mod => {
-            mod.chapters?.forEach((ch) => {
-                chaptersList.push(ch.name);
-            });
-        });
-        return chaptersList;
+        const list = [];
+        (sub.modules || sub.experiments || []).forEach(mod => { mod.chapters?.forEach(ch => list.push(ch.name)); });
+        return list;
     };
 
-    if (!isAdmin) return <div className="admin-loading"><Loader2 className="spinner" /></div>;
+    if (!isAdmin) return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem', background: 'var(--bg-primary)' }}>
+            <Loader2 size={40} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent-color)' }} />
+            <p style={{ color: 'var(--text-secondary)' }}>Verifying admin access...</p>
+        </div>
+    );
 
     const filteredStudents = students.filter(s => s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.class_roll_no.includes(studentSearch));
     const availableSubjects = getSubjectsList(moduleForm.section_id);
     const availableChapters = getChaptersList(moduleForm.subject_name);
 
-    return (
-        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-            {status.message && (
-                <div className={`status-toast ${status.type}`}>
-                    {status.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-                    <span>{status.message}</span>
-                </div>
-            )}
+    const navItems = [
+        { id: 'modules', icon: <BookOpen size={18} />, label: 'Study Materials', count: materials.length, color: '#3b82f6' },
+        { id: 'students', icon: <Users size={18} />, label: 'Students', count: students.length, color: '#8b5cf6' },
+        { id: 'notices', icon: <Bell size={18} />, label: 'Notices', count: notices.length, color: '#f59e0b' },
+        { id: 'events', icon: <Calendar size={18} />, label: 'Events', count: events.length, color: '#10b981' },
+        { id: 'routine', icon: <Clock size={18} />, label: 'Class Routine', count: routines.length, color: '#06b6d4' },
+        { id: 'holidays', icon: <GraduationCap size={18} />, label: 'Holidays', count: holidays.length, color: '#ec4899' },
+        { id: 'whatsapp', icon: <MessageCircle size={18} />, label: 'WhatsApp Groups', count: whatsappGroups.length, color: '#22c55e' },
+        { id: 'finances', icon: <Coins size={18} />, label: 'Finances', count: expenses.length, color: '#f97316' },
+    ];
 
+    return (
+        <div className="admin-v2-layout">
+            {/* Desktop restriction for mobile */}
             <div className="mobile-admin-restriction">
                 <div className="restriction-content">
                     <Monitor size={48} />
@@ -305,239 +229,217 @@ const Admin = () => {
                 </div>
             </div>
 
-            <button className="mobile-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
-            <div className={`admin-sidebar ${isSidebarOpen ? 'show' : ''}`}>
-                <div className="admin-brand">
-                    <LayoutDashboard size={24} />
-                    <span>{isSuperAdmin ? 'Superadmin' : 'Admin Panel'}</span>
+            {/* Toast */}
+            {status.message && (
+                <div className={`admin-toast ${status.type}`}>
+                    {status.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+                    <span>{status.message}</span>
                 </div>
-                <nav className="admin-nav">
-                    <button className={activeTab === 'modules' ? 'active' : ''} onClick={() => setActiveTab('modules')}><BookOpen size={20} /> <span>Modules</span></button>
-                    <button className={activeTab === 'students' ? 'active' : ''} onClick={() => setActiveTab('students')}><Users size={20} /> <span>Students</span></button>
-                    <button className={activeTab === 'notices' ? 'active' : ''} onClick={() => setActiveTab('notices')}><Bell size={20} /> <span>Notices</span></button>
-                    <button className={activeTab === 'events' ? 'active' : ''} onClick={() => setActiveTab('events')}><Calendar size={20} /> <span>Events</span></button>
-                    <button className={activeTab === 'routine' ? 'active' : ''} onClick={() => setActiveTab('routine')}><Clock size={20} /> <span>Routine</span></button>
-                    <button className={activeTab === 'holidays' ? 'active' : ''} onClick={() => setActiveTab('holidays')}><Calendar size={20} /> <span>Holidays</span></button>
-                    <button className={activeTab === 'whatsapp' ? 'active' : ''} onClick={() => setActiveTab('whatsapp')}><MessageCircle size={20} /> <span>WhatsApp</span></button>
-                    <button className={activeTab === 'finances' ? 'active' : ''} onClick={() => setActiveTab('finances')}><Coins size={20} /> <span>Finances</span></button>
-                    <button className="exit-btn-nav" onClick={() => navigate('/profile')}><ArrowLeft size={20} /> <span>Exit</span></button>
-                </nav>
-            </div>
+            )}
 
-            <main className="admin-main">
+            {/* Sidebar */}
+            <aside className="admin-v2-sidebar">
+                <div className="admin-v2-brand">
+                    <div className="brand-icon"><Zap size={20} /></div>
+                    <div>
+                        <div className="brand-name">{isSuperAdmin ? 'Superadmin' : 'Admin Panel'}</div>
+                        <div className="brand-sub">EEvolution CMS</div>
+                    </div>
+                </div>
+
+                <div className="admin-v2-nav-label">MANAGEMENT</div>
+                <nav className="admin-v2-nav">
+                    {navItems.map(item => (
+                        <button
+                            key={item.id}
+                            className={`admin-v2-nav-btn ${activeTab === item.id ? 'active' : ''}`}
+                            onClick={() => setActiveTab(item.id)}
+                            style={{ '--nav-color': item.color }}
+                        >
+                            <span className="nav-btn-icon">{item.icon}</span>
+                            <span className="nav-btn-label">{item.label}</span>
+                            <span className="nav-btn-count">{item.count}</span>
+                        </button>
+                    ))}
+                </nav>
+
+                <button className="admin-v2-exit-btn" onClick={() => navigate('/profile')}>
+                    <ArrowLeft size={18} /> Exit to App
+                </button>
+            </aside>
+
+            {/* Main Content */}
+            <main className="admin-v2-main">
+                {/* ========== MODULES ========== */}
                 {activeTab === 'modules' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Material</span></h2>
-                            <form onSubmit={handleModuleSubmit} className="admin-form">
-                                <div className="form-grid">
-                                    <div className="form-group"><label>Section</label><select value={moduleForm.section_id} onChange={(e) => setModuleForm({ ...moduleForm, section_id: e.target.value })}><option value="class-notes">Class Notes</option><option value="practice-set">Practice Sets</option><option value="books">Books</option><option value="handwritten">Handwritten & PPTs</option><option value="lab-notes">Lab Notes</option></select></div>
-                                    <div className="form-group">
-                                        <label>Subject</label>
-                                        <select value={moduleForm.subject_name} onChange={(e) => setModuleForm({ ...moduleForm, subject_name: e.target.value, chapter_name: '' })} required>
-                                            <option value="">Select Subject</option>
-                                            {availableSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
-                                        </select>
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><BookOpen size={24} /> Study Materials</h1>
+                                <p>Upload lecture notes, books, practice sets and lab files.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{materials.length}</div>
+                                <div className="stat-lbl">Total Files</div>
+                            </div>
+                        </div>
+
+                        <div className="admin-v2-two-col">
+                            {/* Add Form */}
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header">
+                                    <Plus size={18} /> <span>Upload New Material</span>
+                                </div>
+                                <form onSubmit={handleModuleSubmit} className="admin-v2-form">
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label><FolderOpen size={14} /> Section</label>
+                                            <select value={moduleForm.section_id} onChange={e => setModuleForm({ ...moduleForm, section_id: e.target.value, subject_name: '', chapter_name: '' })}>
+                                                <option value="class-notes">📝 Class Notes</option>
+                                                <option value="practice-set">📋 Practice Sets</option>
+                                                <option value="books">📚 Books</option>
+                                                <option value="handwritten">✏️ Handwritten & PPTs</option>
+                                                <option value="lab-notes">🧪 Lab Notes</option>
+                                            </select>
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label><BookMarked size={14} /> Subject</label>
+                                            <select value={moduleForm.subject_name} onChange={e => setModuleForm({ ...moduleForm, subject_name: e.target.value, chapter_name: '' })} required>
+                                                <option value="">Select Subject</option>
+                                                {availableSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
+                                            </select>
+                                        </div>
                                     </div>
                                     {moduleForm.section_id !== 'practice-set' && (
-                                        <div className="form-group">
-                                            <label>Chapter Name</label>
-                                            <select value={moduleForm.chapter_name} onChange={(e) => setModuleForm({ ...moduleForm, chapter_name: e.target.value })} required>
+                                        <div className="fv2-group">
+                                            <label><Hash size={14} /> Chapter</label>
+                                            <select value={moduleForm.chapter_name} onChange={e => setModuleForm({ ...moduleForm, chapter_name: e.target.value })} required>
                                                 <option value="">Select Chapter</option>
                                                 {availableChapters.map(ch => <option key={ch} value={ch}>{ch}</option>)}
                                             </select>
                                         </div>
                                     )}
-                                    <div className="form-group"><label>File Name</label><input value={moduleForm.file_name} onChange={(e) => setModuleForm({ ...moduleForm, file_name: e.target.value })} required /></div>
-                                    <div className="form-group"><label>File Description</label><input value={moduleForm.file_description} onChange={(e) => setModuleForm({ ...moduleForm, file_description: e.target.value })} required /></div>
-                                    <div className="form-group full"><label>Drive Link</label><input value={moduleForm.drive_link} onChange={(e) => setModuleForm({ ...moduleForm, drive_link: e.target.value })} required /></div>
-                                </div>
-                                <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add</button>
-                            </form>
-                        </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Materials</span></h2>
-                            <div className="management-list">
-                                {materials.map(m => (
-                                    <div key={m.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{m.subject_name} - {m.chapter_name}</h4>
-                                            <span>{m.file_name}</span>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label><FileText size={14} /> File Name</label>
+                                            <input placeholder="e.g., Unit 1 Lecture Notes" value={moduleForm.file_name} onChange={e => setModuleForm({ ...moduleForm, file_name: e.target.value })} required />
                                         </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('study_materials', m.id)}><Trash2 size={16} /></button>
+                                        <div className="fv2-group">
+                                            <label><Edit2 size={14} /> Description</label>
+                                            <input placeholder="Short description of the file" value={moduleForm.file_description} onChange={e => setModuleForm({ ...moduleForm, file_description: e.target.value })} required />
+                                        </div>
                                     </div>
-                                ))}
+                                    <div className="fv2-group">
+                                        <label><LinkIcon size={14} /> Google Drive Link</label>
+                                        <input placeholder="https://drive.google.com/..." value={moduleForm.drive_link} onChange={e => setModuleForm({ ...moduleForm, drive_link: e.target.value })} required />
+                                    </div>
+                                    <button type="submit" className="admin-v2-submit-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Plus size={16} />}
+                                        Upload Material
+                                    </button>
+                                </form>
+                            </div>
+
+                            {/* List */}
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header">
+                                    <FileText size={18} /> <span>All Materials</span>
+                                    <span className="header-count">{materials.length}</span>
+                                </div>
+                                <div className="admin-v2-list">
+                                    {materials.map(m => (
+                                        <div key={m.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}><FileText size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{m.file_name}</div>
+                                                <div className="list-item-sub">{m.subject_name} · {m.chapter_name} · <span className="section-badge-mini">{m.section_id}</span></div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('study_materials', m.id)}><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    {materials.length === 0 && <div className="empty-list-msg">No materials uploaded yet.</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
+                {/* ========== STUDENTS ========== */}
                 {activeTab === 'students' && (
-                    <div className="admin-card-section">
-                        <h2>Manage <span className="highlight">Students</span></h2>
-                        <div className="mini-search" style={{ marginBottom: '1.5rem' }}>
-                            <Search size={18} />
-                            <input placeholder="Search..." value={studentSearch} onChange={(e) => setStudentSearch(e.target.value)} style={{ width: '100%' }} />
-                        </div>
-                        <div className="students-list-admin">
-                            {filteredStudents.map(student => (
-                                <div key={student.id} className="student-admin-card">
-                                    <div className="student-base-info">
-                                        <h4>{student.name}</h4>
-                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{student.class_roll_no}</p>
-                                    </div>
-                                    {editingStudent?.id === student.id ? (
-                                        <div className="student-edit-fields">
-                                            <div className="input-with-label">
-                                                <label>Donation</label>
-                                                <input type="number" value={editingStudent.donation || 0} onChange={(e) => setEditingStudent({ ...editingStudent, donation: parseInt(e.target.value) })} />
-                                            </div>
-                                            <div className="input-with-label">
-                                                <label>Files</label>
-                                                <input type="number" value={editingStudent.files_count || 0} onChange={(e) => setEditingStudent({ ...editingStudent, files_count: parseInt(e.target.value) })} />
-                                            </div>
-                                            <button className="save-mini-btn" onClick={() => handleUpdateStudent(student.id)} disabled={loading}><Save size={18} /></button>
-                                            <button className="delete-btn" onClick={() => setEditingStudent(null)}><X size={18} /></button>
-                                        </div>
-                                    ) : (
-                                        <div className="student-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <span style={{ fontSize: '0.9rem' }}>₹{student.donation || 0} | {student.files_count || 0} Files</span>
-                                            <button className="submit-btn" style={{ margin: 0, padding: '0.5rem 1rem', minWidth: 'auto', WebkitTextFillColor: 'white' }} onClick={() => setEditingStudent(student)}>Edit</button>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'notices' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Notice</span></h2>
-                            <form onSubmit={handleNoticeSubmit} className="admin-form">
-                                <div className="form-group"><label>Title</label><input value={noticeForm.title} onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })} required /></div>
-                                <div className="form-group"><label>Content</label><textarea value={noticeForm.content} onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })} rows="4" required /></div>
-                                <div className="form-group"><label>Attachment URL (Optional)</label><input value={noticeForm.attachment_link} onChange={(e) => setNoticeForm({ ...noticeForm, attachment_link: e.target.value })} /></div>
-                                <div className="form-group"><label>Date</label><input type="date" value={noticeForm.notice_date} onChange={(e) => setNoticeForm({ ...noticeForm, notice_date: e.target.value })} required /></div>
-                                <button type="submit" className="submit-btn notice" disabled={loading}><Plus /> Add Notice</button>
-                            </form>
-                        </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Notices</span></h2>
-                            <div className="management-list">
-                                {notices.map(notice => (
-                                    <div key={notice.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{notice.title}</h4>
-                                            <span>{new Date(notice.notice_date).toLocaleDateString()}</span>
-                                        </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('notices', notice.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                ))}
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><Users size={24} /> Students</h1>
+                                <p>View and edit student donation amounts and file contribution counts.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{students.length}</div>
+                                <div className="stat-lbl">Total Students</div>
                             </div>
                         </div>
-                    </div>
-                )}
-
-                {activeTab === 'events' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Event</span></h2>
-                            <form onSubmit={handleEventSubmit} className="admin-form">
-                                <div className="form-group"><label>Title</label><input value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} required /></div>
-                                <div className="form-group"><label>Description</label><textarea value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows="3" required /></div>
-                                <div className="form-group"><label>Date (Time format)</label><input type="datetime-local" value={eventForm.event_date} onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })} required /></div>
-                                <div className="form-group"><label>Registration Link</label><input value={eventForm.registration_link} onChange={(e) => setEventForm({ ...eventForm, registration_link: e.target.value })} required /></div>
-                                <div className="form-group"><label>Photo URL (Optional)</label><input value={eventForm.photo_url} onChange={(e) => setEventForm({ ...eventForm, photo_url: e.target.value })} /></div>
-                                <button type="submit" className="submit-btn event" disabled={loading}><Plus /> Create Event</button>
-                            </form>
-                        </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Events</span></h2>
-                            <div className="management-list">
-                                {events.map(ev => (
-                                    <div key={ev.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{ev.title}</h4>
-                                            <span>{new Date(ev.event_date).toLocaleDateString()}</span>
-                                        </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('events', ev.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'routine' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Class</span></h2>
-                            <form onSubmit={handleRoutineSubmit} className="admin-form">
-                                <div className="form-grid">
-                                    <div className="form-group"><label>Day</label><select value={routineForm.day} onChange={(e) => setRoutineForm({ ...routineForm, day: e.target.value })}><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select></div>
-                                    <div className="form-group"><label>Subject</label><input value={routineForm.subject} onChange={(e) => setRoutineForm({ ...routineForm, subject: e.target.value })} required /></div>
-                                    <div className="form-group"><label>Start Time</label><input type="time" value={routineForm.start_time} onChange={(e) => setRoutineForm({ ...routineForm, start_time: e.target.value })} required /></div>
-                                    <div className="form-group"><label>End Time</label><input type="time" value={routineForm.end_time} onChange={(e) => setRoutineForm({ ...routineForm, end_time: e.target.value })} required /></div>
-                                    <div className="form-group"><label>Professor</label><input value={routineForm.prof} onChange={(e) => setRoutineForm({ ...routineForm, prof: e.target.value })} required /></div>
-                                    <div className="form-group"><label>Room</label><input value={routineForm.room} onChange={(e) => setRoutineForm({ ...routineForm, room: e.target.value })} required /></div>
+                        <div className="admin-v2-card full-width">
+                            <div className="card-v2-header">
+                                <Users size={18} /> <span>Student Records</span>
+                                <div className="header-search">
+                                    <Search size={15} />
+                                    <input placeholder="Search by name or roll no..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
                                 </div>
-                                <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add Class</button>
-                            </form>
-                        </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Routine</span></h2>
-                            <div className="management-list">
-                                {routines.map(r => (
-                                    <div key={r.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{r.subject} ({r.day})</h4>
-                                            <span>{r.start_time} - {r.end_time} | {r.prof}</span>
-                                        </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('routines', r.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                ))}
                             </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'holidays' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Holiday</span></h2>
-                            <form onSubmit={handleHolidaySubmit} className="admin-form">
-                                <div className="form-group"><label>Name</label><input value={holidayForm.name} onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })} placeholder="e.g., Exam Prep Break" required /></div>
-                                <div className="form-group"><label>Date</label><input type="date" value={holidayForm.date} onChange={(e) => setHolidayForm({ ...holidayForm, date: e.target.value })} required /></div>
-                                <div className="form-group">
-                                    <label>Holiday Type</label>
-                                    <select value={holidayForm.type} onChange={(e) => setHolidayForm({ ...holidayForm, type: e.target.value })}>
-                                        <option value="official">Official Holiday (Fixed)</option>
-                                        <option value="unofficial">Unofficial / Prep Holiday</option>
-                                        <option value="event">Extra-curricular Event Day</option>
-                                    </select>
-                                </div>
-                                <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add</button>
-                            </form>
-                        </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Holidays</span></h2>
-                            <div className="management-list">
-                                {holidays.map(h => (
-                                    <div key={h.id} className="management-item">
-                                        <div className="item-info">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <h4>{h.name}</h4>
-                                                <span className={`type-badge-mini ${h.type || 'official'}`}>{h.type || 'official'}</span>
+                            <div className="students-v2-grid">
+                                {filteredStudents.map(student => (
+                                    <div key={student.id} className={`student-v2-card ${editingStudent?.id === student.id ? 'is-editing' : ''}`}>
+                                        {/* Top row: avatar + info + edit btn */}
+                                        <div className="student-v2-top-row">
+                                            <div className="student-v2-avatar">{student.name?.charAt(0).toUpperCase()}</div>
+                                            <div className="student-v2-info">
+                                                <div className="student-v2-name">{student.name}</div>
+                                                <div className="student-v2-roll">{student.class_roll_no}</div>
+                                                <div className="student-v2-stats">
+                                                    <span className="stat-pill">
+                                                        <Coins size={12} /> ₹{student.donation || 0}
+                                                    </span>
+                                                    <span className="stat-pill">
+                                                        <FileText size={12} /> {student.files_count || 0} files
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <span>{h.date}</span>
+                                            {editingStudent?.id === student.id ? (
+                                                <button className="cancel-v2-btn" onClick={() => setEditingStudent(null)} title="Cancel"><X size={15} /></button>
+                                            ) : (
+                                                <button className="edit-v2-btn" onClick={() => setEditingStudent(student)}>
+                                                    <Edit2 size={13} /> Edit
+                                                </button>
+                                            )}
                                         </div>
-                                        {(h.type !== 'official' || isSuperAdmin) && (
-                                            <button className="delete-btn" onClick={() => handleDelete('holidays', h.id)}><Trash2 size={16} /></button>
+
+                                        {/* Edit Panel - expands below when editing */}
+                                        {editingStudent?.id === student.id && (
+                                            <div className="student-v2-edit-panel">
+                                                <div className="edit-panel-fields">
+                                                    <div className="edit-panel-field">
+                                                        <label><Coins size={13} /> Donation (₹)</label>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            value={editingStudent.donation || 0}
+                                                            onChange={e => setEditingStudent({ ...editingStudent, donation: parseInt(e.target.value) || 0 })}
+                                                        />
+                                                    </div>
+                                                    <div className="edit-panel-field">
+                                                        <label><FileText size={13} /> Files Uploaded</label>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            value={editingStudent.files_count || 0}
+                                                            onChange={e => setEditingStudent({ ...editingStudent, files_count: parseInt(e.target.value) || 0 })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <button className="save-v2-btn" onClick={() => handleUpdateStudent(student.id)} disabled={loading}>
+                                                    {loading ? <Loader2 size={14} className="spin" /> : <Save size={14} />}
+                                                    Save Changes
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 ))}
@@ -546,61 +448,319 @@ const Admin = () => {
                     </div>
                 )}
 
+                {/* ========== NOTICES ========== */}
+                {activeTab === 'notices' && (
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><Bell size={24} /> Notices</h1>
+                                <p>Post important announcements to the batch.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{notices.length}</div>
+                                <div className="stat-lbl">Active Notices</div>
+                            </div>
+                        </div>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Post New Notice</span></div>
+                                <form onSubmit={handleNoticeSubmit} className="admin-v2-form">
+                                    <div className="fv2-group">
+                                        <label>Notice Title</label>
+                                        <input placeholder="e.g., Lab Exam Reschedule" value={noticeForm.title} onChange={e => setNoticeForm({ ...noticeForm, title: e.target.value })} required />
+                                    </div>
+                                    <div className="fv2-group">
+                                        <label>Content / Details</label>
+                                        <textarea placeholder="Write the full notice content here..." value={noticeForm.content} onChange={e => setNoticeForm({ ...noticeForm, content: e.target.value })} rows={5} required />
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label>Date</label>
+                                            <input type="date" value={noticeForm.notice_date} onChange={e => setNoticeForm({ ...noticeForm, notice_date: e.target.value })} required />
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label>Attachment URL (Optional)</label>
+                                            <input placeholder="https://..." value={noticeForm.attachment_link} onChange={e => setNoticeForm({ ...noticeForm, attachment_link: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <button type="submit" className="admin-v2-submit-btn notices-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Bell size={16} />} Post Notice
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Bell size={18} /> <span>All Notices</span><span className="header-count">{notices.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {notices.map(n => (
+                                        <div key={n.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}><Bell size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{n.title}</div>
+                                                <div className="list-item-sub">{new Date(n.notice_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('notices', n.id)}><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    {notices.length === 0 && <div className="empty-list-msg">No notices posted yet.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== EVENTS ========== */}
+                {activeTab === 'events' && (
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><Calendar size={24} /> Events</h1>
+                                <p>Create and manage college events and workshops.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{events.length}</div>
+                                <div className="stat-lbl">Total Events</div>
+                            </div>
+                        </div>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Create New Event</span></div>
+                                <form onSubmit={handleEventSubmit} className="admin-v2-form">
+                                    <div className="fv2-group"><label>Event Title</label><input placeholder="e.g., Annual Tech Fest 2026" value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })} required /></div>
+                                    <div className="fv2-group"><label>Description</label><textarea placeholder="Describe the event..." value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} rows={3} required /></div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group"><label>Date & Time</label><input type="datetime-local" value={eventForm.event_date} onChange={e => setEventForm({ ...eventForm, event_date: e.target.value })} required /></div>
+                                        <div className="fv2-group"><label>Registration Link</label><input placeholder="https://forms.gle/..." value={eventForm.registration_link} onChange={e => setEventForm({ ...eventForm, registration_link: e.target.value })} required /></div>
+                                    </div>
+                                    <div className="fv2-group"><label>Photo URL (Optional)</label><input placeholder="https://..." value={eventForm.photo_url} onChange={e => setEventForm({ ...eventForm, photo_url: e.target.value })} /></div>
+                                    <button type="submit" className="admin-v2-submit-btn events-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Calendar size={16} />} Create Event
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Calendar size={18} /> <span>All Events</span><span className="header-count">{events.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {events.map(ev => (
+                                        <div key={ev.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}><Calendar size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{ev.title}</div>
+                                                <div className="list-item-sub">{new Date(ev.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('events', ev.id)}><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    {events.length === 0 && <div className="empty-list-msg">No events yet.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== ROUTINE ========== */}
+                {activeTab === 'routine' && (
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><Clock size={24} /> Class Routine</h1>
+                                <p>Add and remove classes from the weekly schedule.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{routines.length}</div>
+                                <div className="stat-lbl">Scheduled Classes</div>
+                            </div>
+                        </div>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Add New Class</span></div>
+                                <form onSubmit={handleRoutineSubmit} className="admin-v2-form">
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label>Day</label>
+                                            <select value={routineForm.day} onChange={e => setRoutineForm({ ...routineForm, day: e.target.value })}>
+                                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => <option key={d}>{d}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="fv2-group"><label>Subject</label><input placeholder="e.g., Mathematics-II" value={routineForm.subject} onChange={e => setRoutineForm({ ...routineForm, subject: e.target.value })} required /></div>
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group"><label>Start Time</label><input type="time" value={routineForm.start_time} onChange={e => setRoutineForm({ ...routineForm, start_time: e.target.value })} required /></div>
+                                        <div className="fv2-group"><label>End Time</label><input type="time" value={routineForm.end_time} onChange={e => setRoutineForm({ ...routineForm, end_time: e.target.value })} required /></div>
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group"><label>Professor</label><input placeholder="Prof. Name" value={routineForm.prof} onChange={e => setRoutineForm({ ...routineForm, prof: e.target.value })} required /></div>
+                                        <div className="fv2-group"><label>Room / Lab</label><input placeholder="e.g., Room 301" value={routineForm.room} onChange={e => setRoutineForm({ ...routineForm, room: e.target.value })} required /></div>
+                                    </div>
+                                    <button type="submit" className="admin-v2-submit-btn routine-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Clock size={16} />} Add to Routine
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Clock size={18} /> <span>Scheduled Classes</span><span className="header-count">{routines.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {routines.map(r => (
+                                        <div key={r.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}><Clock size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{r.subject} <span className="day-chip">{r.day}</span></div>
+                                                <div className="list-item-sub">{r.start_time} – {r.end_time} · {r.prof} · {r.room}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('routines', r.id)}><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    {routines.length === 0 && <div className="empty-list-msg">No classes scheduled.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== HOLIDAYS ========== */}
+                {activeTab === 'holidays' && (
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><GraduationCap size={24} /> Holidays</h1>
+                                <p>Manage official and unofficial holidays for the academic calendar.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{holidays.length}</div>
+                                <div className="stat-lbl">Total Holidays</div>
+                            </div>
+                        </div>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Add Holiday</span></div>
+                                <form onSubmit={handleHolidaySubmit} className="admin-v2-form">
+                                    <div className="fv2-group"><label>Holiday Name</label><input placeholder="e.g., Durga Puja" value={holidayForm.name} onChange={e => setHolidayForm({ ...holidayForm, name: e.target.value })} required /></div>
+                                    <div className="fv2-group"><label>Date</label><input type="date" value={holidayForm.date} onChange={e => setHolidayForm({ ...holidayForm, date: e.target.value })} required /></div>
+                                    <div className="fv2-group">
+                                        <label>Type</label>
+                                        <select value={holidayForm.type} onChange={e => setHolidayForm({ ...holidayForm, type: e.target.value })}>
+                                            <option value="official">🏛️ Official Holiday (Fixed)</option>
+                                            <option value="unofficial">📅 Unofficial / Prep Holiday</option>
+                                            <option value="event">🎉 Extra-curricular Event Day</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" className="admin-v2-submit-btn holiday-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Plus size={16} />} Add Holiday
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><GraduationCap size={18} /> <span>All Holidays</span><span className="header-count">{holidays.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {holidays.map(h => (
+                                        <div key={h.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(236,72,153,0.1)', color: '#ec4899' }}><GraduationCap size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">
+                                                    {h.name}
+                                                    <span className={`type-badge-v2 ${h.type || 'official'}`}>{h.type || 'official'}</span>
+                                                </div>
+                                                <div className="list-item-sub">{h.date}</div>
+                                            </div>
+                                            {(h.type !== 'official' || isSuperAdmin) && (
+                                                <button className="list-delete-btn" onClick={() => handleDelete('holidays', h.id)}><Trash2 size={14} /></button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {holidays.length === 0 && <div className="empty-list-msg">No holidays added.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== WHATSAPP ========== */}
                 {activeTab === 'whatsapp' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Group</span></h2>
-                            <form onSubmit={handleWhatsappSubmit} className="admin-form">
-                                <div className="form-group"><label>Name</label><input value={whatsappForm.name} onChange={(e) => setWhatsappForm({ ...whatsappForm, name: e.target.value })} required /></div>
-                                <div className="form-group"><label>Description</label><input value={whatsappForm.description} onChange={(e) => setWhatsappForm({ ...whatsappForm, description: e.target.value })} required /></div>
-                                <div className="form-group"><label>Link URL</label><input value={whatsappForm.link} onChange={(e) => setWhatsappForm({ ...whatsappForm, link: e.target.value })} required /></div>
-                                <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add</button>
-                            </form>
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><MessageCircle size={24} /> WhatsApp Groups</h1>
+                                <p>Add subject-specific group links for student connectivity.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{whatsappGroups.length}</div>
+                                <div className="stat-lbl">Active Groups</div>
+                            </div>
                         </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Groups</span></h2>
-                            <div className="management-list">
-                                {whatsappGroups.map(wg => (
-                                    <div key={wg.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{wg.name}</h4>
-                                            <span>{wg.description}</span>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Add Group</span></div>
+                                <form onSubmit={handleWhatsappSubmit} className="admin-v2-form">
+                                    <div className="fv2-group"><label>Group Name</label><input placeholder="e.g., Maths - 2 Study Group" value={whatsappForm.name} onChange={e => setWhatsappForm({ ...whatsappForm, name: e.target.value })} required /></div>
+                                    <div className="fv2-group"><label>Description</label><input placeholder="What this group is for" value={whatsappForm.description} onChange={e => setWhatsappForm({ ...whatsappForm, description: e.target.value })} required /></div>
+                                    <div className="fv2-group"><label>WhatsApp Invite Link</label><input placeholder="https://chat.whatsapp.com/..." value={whatsappForm.link} onChange={e => setWhatsappForm({ ...whatsappForm, link: e.target.value })} required /></div>
+                                    <button type="submit" className="admin-v2-submit-btn whatsapp-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <MessageCircle size={16} />} Add Group
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><MessageCircle size={18} /> <span>All Groups</span><span className="header-count">{whatsappGroups.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {whatsappGroups.map(wg => (
+                                        <div key={wg.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}><MessageCircle size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{wg.name}</div>
+                                                <div className="list-item-sub">{wg.description}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('whatsapp_groups', wg.id)}><Trash2 size={14} /></button>
                                         </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('whatsapp_groups', wg.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                ))}
+                                    ))}
+                                    {whatsappGroups.length === 0 && <div className="empty-list-msg">No groups added.</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
+                {/* ========== FINANCES ========== */}
                 {activeTab === 'finances' && (
-                    <div className="admin-content-split">
-                        <div className="admin-card-section">
-                            <h2>Add <span className="highlight">Expense</span></h2>
-                            <form onSubmit={handleExpenseSubmit} className="admin-form">
-                                <div className="form-group"><label>Expense Name</label><input value={expenseForm.name} onChange={(e) => setExpenseForm({ ...expenseForm, name: e.target.value })} required /></div>
-                                <div className="form-group"><label>Amount (₹)</label><input type="number" value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} required /></div>
-                                <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add</button>
-                            </form>
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><Coins size={24} /> Finances</h1>
+                                <p>Track platform expenses. Donations are auto-pulled from student records.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">₹{expenses.reduce((s, e) => s + Number(e.amount || 0), 0)}</div>
+                                <div className="stat-lbl">Total Expenses</div>
+                            </div>
                         </div>
-                        <div className="admin-card-section manage-section">
-                            <h2>Manage <span className="highlight">Expenses</span></h2>
-                            <div className="management-list">
-                                {expenses.map(exp => (
-                                    <div key={exp.id} className="management-item">
-                                        <div className="item-info">
-                                            <h4>{exp.name}</h4>
-                                            <span style={{ color: '#10b981', fontWeight: 'bold' }}>₹{exp.amount}</span>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Log New Expense</span></div>
+                                <form onSubmit={handleExpenseSubmit} className="admin-v2-form">
+                                    <div className="fv2-group"><label>Expense Name</label><input placeholder="e.g., Domain Renewal" value={expenseForm.name} onChange={e => setExpenseForm({ ...expenseForm, name: e.target.value })} required /></div>
+                                    <div className="fv2-group"><label>Amount (₹)</label><input type="number" placeholder="e.g., 2000" value={expenseForm.amount} onChange={e => setExpenseForm({ ...expenseForm, amount: e.target.value })} required /></div>
+                                    <button type="submit" className="admin-v2-submit-btn finances-btn" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Coins size={16} />} Log Expense
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Coins size={18} /> <span>All Expenses</span><span className="header-count">{expenses.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {expenses.map(exp => (
+                                        <div key={exp.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(249,115,22,0.1)', color: '#f97316' }}><Coins size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">{exp.name}</div>
+                                                <div className="list-item-sub" style={{ color: '#f97316', fontWeight: '700' }}>₹{exp.amount}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('site_expenses', exp.id)}><Trash2 size={14} /></button>
                                         </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('site_expenses', exp.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                ))}
+                                    ))}
+                                    {expenses.length === 0 && <div className="empty-list-msg">No expenses logged.</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
-
             </main>
         </div>
     );
