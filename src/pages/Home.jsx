@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import {
@@ -6,7 +6,7 @@ import {
     TrendingUp, Award, Globe, Heart, Star, Quote, ArrowRight,
     Users, Clock, Calendar, Upload, Coins,
     Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight,
-    FileText, Landmark
+    FileText, Landmark, CheckCircle2
 } from 'lucide-react';
 import './Home.css';
 
@@ -276,7 +276,15 @@ const Home = () => {
     // Logged In User View - with schedule, leaderboards, community
     const UserView = () => {
         const userName = session?.user?.user_metadata?.full_name?.split(' ')[0] || 'Student';
-        const hour = new Date().getHours();
+        const carouselRef = useRef(null);
+        const [currentTime, setCurrentTime] = useState(new Date());
+
+        useEffect(() => {
+            const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+            return () => clearInterval(timer);
+        }, []);
+
+        const hour = currentTime.getHours();
         const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
         const GreetIcon = hour < 6 ? Moon : hour < 12 ? Sunrise : hour < 18 ? Sun : Moon;
 
@@ -288,7 +296,7 @@ const Home = () => {
         const [donators, setDonators] = useState([]);
         const [communityLoading, setCommunityLoading] = useState(true);
 
-        const today = new Date();
+        const today = currentTime;
         const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
         const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
         const isWeekend = dayName === 'Saturday' || dayName === 'Sunday';
@@ -305,7 +313,7 @@ const Home = () => {
                 ]);
 
                 if (!routineRes.error) setTodaySchedule(routineRes.data || []);
-                setIsHoliday(holidayRes.data?.length > 0 ? holidayRes.data[0].name : false);
+                setIsHoliday(holidayRes.data?.length > 0 ? holidayRes.data[0] : false);
                 setScheduleLoading(false);
 
                 if (!contribRes.error) setContributors(contribRes.data || []);
@@ -313,7 +321,7 @@ const Home = () => {
                 setCommunityLoading(false);
             };
             loadAll();
-        }, []);
+        }, [dayName, dateStr]);
 
         // Parse "HH:MM" time string to minutes from midnight
         const toMin = (t) => {
@@ -330,9 +338,9 @@ const Home = () => {
             return `${hr}:${String(m).padStart(2, '0')} ${ampm}`;
         };
 
-        const getLiveStatus = (item) => {
-            const start = toMin(item.start_time);
-            const end = toMin(item.end_time);
+        const getRowStatus = (item, type) => {
+            const start = toMin(type === 'class' ? item.start_time : item.from);
+            const end = toMin(type === 'class' ? item.end_time : item.to);
             if (now >= start && now < end) return 'live';
             if (now < start) return 'upcoming';
             return 'done';
@@ -354,6 +362,32 @@ const Home = () => {
             }
             return rows;
         };
+
+        const rows = buildRows();
+        const activeIdx = rows.findIndex(r => getRowStatus(r.type === 'class' ? r.data : r, r.type) === 'live');
+
+        // Calculate fallbacks for activeIdx
+        let finalActiveIdx = activeIdx;
+        if (finalActiveIdx === -1 && rows.length > 0) {
+            const firstStart = rows[0].type === 'class' ? toMin(rows[0].data.start_time) : toMin(rows[0].from);
+            if (now < firstStart) {
+                finalActiveIdx = 0; // Highlight first class if none started
+            } else {
+                finalActiveIdx = rows.length - 1; // Highlight last if all done
+            }
+        }
+
+        useEffect(() => {
+            if (carouselRef.current && finalActiveIdx !== -1) {
+                const container = carouselRef.current;
+                const items = container.querySelectorAll('.timeline-item');
+                if (items[finalActiveIdx]) {
+                    const item = items[finalActiveIdx];
+                    const scrollLeft = item.offsetLeft - (container.offsetWidth / 2) + (item.offsetWidth / 2);
+                    container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                }
+            }
+        }, [finalActiveIdx, scheduleLoading]);
 
         const rankLabels = ['🥇', '🥈', '🥉'];
 
@@ -393,54 +427,80 @@ const Home = () => {
                             <p>Kick back, relax. No classes today.</p>
                         </div>
                     ) : isHoliday ? (
-                        <div className="schedule-off-card holiday">
-                            <div className="schedule-off-icon">🌺</div>
-                            <h3>Official Holiday</h3>
-                            <p className="holiday-name">{isHoliday}</p>
-                            <p>Enjoy your day off.</p>
+                        <div className={`schedule-off-card holiday-type-${isHoliday.type || 'official'}`}>
+                            <div className="schedule-off-icon">
+                                {isHoliday.type === 'unofficial' ? <BookOpen size={48} /> :
+                                    isHoliday.type === 'event' ? <Award size={48} /> :
+                                        <Sunrise size={48} />}
+                            </div>
+                            <div className="holiday-card-content">
+                                <h3>
+                                    {isHoliday.type === 'unofficial' ? 'Prep Day (Stay Home)' :
+                                        isHoliday.type === 'event' ? 'Event Day (No Classes)' : 'Official Holiday'}
+                                </h3>
+                                <p className="holiday-name">{isHoliday.name}</p>
+                                <p className="holiday-description">
+                                    {isHoliday.type === 'unofficial' ? 'Self-study is advised. Classes are officially off-record.' :
+                                        isHoliday.type === 'event' ? 'Engage in extracurriculars! No academic sessions scheduled.' : 'Enjoy your well-deserved break.'}
+                                </p>
+                            </div>
                         </div>
                     ) : todaySchedule.length === 0 ? (
-                        <div className="schedule-off-card">
-                            <div className="schedule-off-icon">📭</div>
-                            <h3>No Classes Today</h3>
-                            <p>Nothing scheduled — enjoy the free day!</p>
-                        </div>
+                    <div className="schedule-off-card">
+                        <div className="schedule-off-icon">📭</div>
+                        <h3>No Classes Today</h3>
+                        <p>Nothing scheduled — enjoy the free day!</p>
+                    </div>
                     ) : (
-                        <div className="schedule-timeline">
-                            {buildRows().map((row, idx) => {
-                                if (row.type === 'break') {
-                                    return (
-                                        <div key={`break-${idx}`} className="timeline-break">
-                                            <Coffee size={14} />
-                                            <span>Break · {row.minutes} min  ({formatTime(row.from)} – {formatTime(row.to)})</span>
-                                        </div>
-                                    );
-                                }
-                                const item = row.data;
-                                const status = getLiveStatus(item);
+                    <div className="schedule-timeline carousel" ref={carouselRef}>
+                        {rows.map((row, idx) => {
+                            const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
+                            if (row.type === 'break') {
                                 return (
-                                    <div key={`class-${idx}`} className={`timeline-class-card status-${status}`}>
+                                    <div key={`break-${idx}`} className={`timeline-item timeline-break status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
+                                        <div className="break-label">
+                                            <Coffee size={14} />
+                                            <span>Break Time</span>
+                                        </div>
+                                        <div className="break-meta">
+                                            <span>{row.minutes} min · {formatTime(row.from)} – {formatTime(row.to)}</span>
+                                        </div>
+                                        {idx === finalActiveIdx && <div className="active-glow" />}
+                                    </div>
+                                );
+                            }
+                            const item = row.data;
+                            return (
+                                <div key={`class-${idx}`} className={`timeline-item timeline-class-card status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
+                                    <div className="card-top">
                                         {status === 'live' && (
                                             <div className="live-pill">
                                                 <span className="live-dot" />
                                                 LIVE NOW
                                             </div>
                                         )}
-                                        <div className="timeline-time">
-                                            <Clock size={14} />
-                                            <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
-                                        </div>
-                                        <div className="timeline-details">
-                                            <h4 className="timeline-subject">{item.subject}</h4>
-                                            <div className="timeline-meta">
-                                                <span className="timeline-prof">👨‍🏫 {item.prof}</span>
-                                                <span className="timeline-room">📍 {item.room}</span>
+                                        {status === 'done' && (
+                                            <div className="done-mark">
+                                                <CheckCircle2 size={18} />
                                             </div>
+                                        )}
+                                    </div>
+                                    <div className="timeline-time">
+                                        <Clock size={14} />
+                                        <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
+                                    </div>
+                                    <div className="timeline-details">
+                                        <h4 className="timeline-subject">{item.subject}</h4>
+                                        <div className="timeline-meta">
+                                            <span className="timeline-prof">👨‍🏫 {item.prof}</span>
+                                            <span className="timeline-room">📍 {item.room}</span>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    {idx === finalActiveIdx && <div className="active-glow" />}
+                                </div>
+                            );
+                        })}
+                    </div>
                     )}
                     <Link to="/routine" className="ds-view-more-btn">
                         Full Weekly Routine <ChevronRight size={16} />

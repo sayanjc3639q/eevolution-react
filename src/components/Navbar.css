@@ -80,16 +80,16 @@
     position: relative;
 }
 
-/* Wrapper for the chat icon + badge so badge positions relative to icon */
-.chat-icon-wrap {
+/* Wrapper that anchors badges relative to the icon */
+.nav-icon-wrap {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Unread count badge */
-.chat-unread-badge {
+/* Shared unread count badge — used by both Chat and Notices */
+.nav-unread-badge {
     position: absolute;
     top: -7px;
     right: -9px;
@@ -108,6 +108,7 @@
     line-height: 1;
     animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none;
+    white-space: nowrap;
 }
 
 @keyframes badgePop {

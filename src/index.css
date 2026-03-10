@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  /* Removes the blue tap highlight on mobile */
 }
 
 html,
@@ -9,6 +11,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
   /* Hide scrollbar for Chrome, Safari and Opera */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -39,6 +42,18 @@ body {
 ::selection {
   background-color: var(--accent-color);
   color: white;
+}
+
+a,
+button,
+input,
+textarea,
+select,
+.feature-card,
+.quick-link-item,
+.timeline-item {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 a {

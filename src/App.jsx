@@ -57,6 +57,15 @@ const AppLayout = () => {
     };
   }, []);
 
+  // ── Scroll to top on every page navigation ──
+  // Chat is excluded: it uses a fixed inner scroll container, not window scroll.
+  useEffect(() => {
+    if (location.pathname !== '/chat') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [location.pathname]);
+
+
   return (
     <div className="app-container">
       {!isAdminPage && <Navbar />}

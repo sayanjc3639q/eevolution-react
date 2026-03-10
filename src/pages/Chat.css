@@ -96,7 +96,7 @@
     flex-direction: column;
     gap: 1.2rem;
     background: rgba(var(--bg-rgb), 0.3);
-    scroll-behavior: smooth;
+    /* scroll-behavior is controlled per-call via JS (instant vs smooth) */
 }
 
 /* Scrollbar Styles */
@@ -106,6 +106,36 @@
 
 .chat-messages::-webkit-scrollbar-track {
     background: transparent;
+}
+
+/* ── Unread messages divider ── */
+.unread-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0;
+    flex-shrink: 0;
+}
+
+.unread-divider::before,
+.unread-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(239, 68, 68, 0.35);
+}
+
+.unread-divider span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ef4444;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 0.2rem 0.7rem;
+    border-radius: 100px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .chat-messages::-webkit-scrollbar-thumb {

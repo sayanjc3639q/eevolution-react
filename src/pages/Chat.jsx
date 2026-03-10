@@ -5,6 +5,7 @@ import { supabase } from '../supabaseClient';
 import './Chat.css';
 
 const EDIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes in ms
+const CHAT_LAST_SEEN_KEY = 'chat_last_seen';
 
 const Chat = () => {
     const [messages, setMessages] = useState([]);
@@ -29,11 +30,17 @@ const Chat = () => {
     // Emoji picker
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+    // Unread tracking
+    const [firstUnreadId, setFirstUnreadId] = useState(null); // id of first unread msg
+    const initialScrollDone = useRef(false);  // guard: only scroll-to-unread once
+
     const messagesEndRef = useRef(null);
+    const firstUnreadRef = useRef(null); // scrolled-to on first open
     const menuRef = useRef(null);
     const editInputRef = useRef(null);
     const emojiPickerRef = useRef(null);
     const inputRef = useRef(null);
+    const messagesBoxRef = useRef(null); // the scrollable container
 
     // ─── Auth + real-time ────────────────────────────────────────────────
     useEffect(() => {
@@ -131,13 +138,45 @@ const Chat = () => {
             .eq('room_id', 'global')
             .order('created_at', { ascending: true })
             .limit(100);
-        if (!error) setMessages(data || []);
+
+        if (!error && data) {
+            // Determine first unread message (from others, after last-seen)
+            const lastSeen = localStorage.getItem(CHAT_LAST_SEEN_KEY) || new Date(0).toISOString();
+            const firstUnread = data.find(
+                m => m.created_at > lastSeen
+                // note: session may not be set yet; we just need the id to ref the element
+            );
+            setFirstUnreadId(firstUnread?.id ?? null);
+            setMessages(data);
+        }
         setLoading(false);
-        scrollToBottom();
     };
 
-    useEffect(() => { scrollToBottom(); }, [messages]);
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // After messages render: do the one-time initial scroll, then track new ones
+    useEffect(() => {
+        if (messages.length === 0) return;
+
+        if (!initialScrollDone.current) {
+            // First render: jump instantly to first unread (or bottom)
+            initialScrollDone.current = true;
+            if (firstUnreadRef.current) {
+                firstUnreadRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
+            } else {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+            }
+            return;
+        }
+
+        // Subsequent renders (new message arrived): only auto-scroll if
+        // the user is already near the bottom (within 120px)
+        const box = messagesBoxRef.current;
+        if (box) {
+            const distFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+            if (distFromBottom < 120) {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [messages]);
 
     // ─── Send ────────────────────────────────────────────────────────────
     const handleSendMessage = async (e) => {
@@ -236,7 +275,7 @@ const Chat = () => {
 
     return (
         <div className="chat-container" onClick={() => setActiveMenu(null)}>
-            <div className="chat-messages">
+            <div className="chat-messages" ref={messagesBoxRef}>
                 {messages.length === 0 ? (
                     <div className="empty-chat">
                         <MessageSquare size={48} className="empty-icon" />
@@ -250,105 +289,114 @@ const Chat = () => {
                         const isDeleting = deletingId === msg.id;
                         const isEditing = editingId === msg.id;
                         const editable = canEdit(msg);
+                        const isFirstUnread = msg.id === firstUnreadId;
 
                         return (
-                            <div key={msg.id} className={`message-wrapper ${isOwn ? 'own' : ''}`}>
-                                {!isOwn && (
-                                    <div className="sender-avatar">
-                                        {msg.students?.avatar_url
-                                            ? <img src={msg.students.avatar_url} alt="" />
-                                            : <div className="avatar-placeholder"><User size={16} /></div>
-                                        }
+                            <React.Fragment key={msg.id}>
+                                {/* ── Unread divider above first unread message ── */}
+                                {isFirstUnread && (
+                                    <div className="unread-divider" ref={firstUnreadRef}>
+                                        <span>Unread Messages</span>
                                     </div>
                                 )}
+                                <div className={`message-wrapper ${isOwn ? 'own' : ''}`}>
+                                    {!isOwn && (
+                                        <div className="sender-avatar">
+                                            {msg.students?.avatar_url
+                                                ? <img src={msg.students.avatar_url} alt="" />
+                                                : <div className="avatar-placeholder"><User size={16} /></div>
+                                            }
+                                        </div>
+                                    )}
 
-                                <div className="message-content">
-                                    {!isOwn && <span className="sender-name">{msg.students?.name || 'Anonymous User'}</span>}
+                                    <div className="message-content">
+                                        {!isOwn && <span className="sender-name">{msg.students?.name || 'Anonymous User'}</span>}
 
-                                    <div className="msg-bubble-wrapper">
+                                        <div className="msg-bubble-wrapper">
 
-                                        {/* ── Inline Edit Mode ── */}
-                                        {isOwn && isEditing ? (
-                                            <div className="edit-inline-box">
-                                                <textarea
-                                                    ref={editInputRef}
-                                                    className="edit-textarea"
-                                                    value={editText}
-                                                    onChange={e => setEditText(e.target.value)}
-                                                    onKeyDown={e => {
-                                                        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(); }
-                                                        if (e.key === 'Escape') cancelEdit();
-                                                    }}
-                                                    maxLength={500}
-                                                    rows={1}
-                                                />
-                                                <div className="edit-actions">
-                                                    <button
-                                                        className="edit-cancel-btn"
-                                                        onPointerDown={(e) => { e.preventDefault(); cancelEdit(); }}
-                                                        title="Cancel (Esc)"
-                                                    >
-                                                        <X size={14} /> Cancel
-                                                    </button>
-                                                    <button
-                                                        className="edit-save-btn"
-                                                        onPointerDown={(e) => { e.preventDefault(); saveEdit(); }}
-                                                        disabled={!editText.trim() || savingEdit}
-                                                        title="Save (Enter)"
-                                                    >
-                                                        {savingEdit ? <Loader2 size={14} className="spinner" /> : <Check size={14} />} Save
-                                                    </button>
+                                            {/* ── Inline Edit Mode ── */}
+                                            {isOwn && isEditing ? (
+                                                <div className="edit-inline-box">
+                                                    <textarea
+                                                        ref={editInputRef}
+                                                        className="edit-textarea"
+                                                        value={editText}
+                                                        onChange={e => setEditText(e.target.value)}
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(); }
+                                                            if (e.key === 'Escape') cancelEdit();
+                                                        }}
+                                                        maxLength={500}
+                                                        rows={1}
+                                                    />
+                                                    <div className="edit-actions">
+                                                        <button
+                                                            className="edit-cancel-btn"
+                                                            onPointerDown={(e) => { e.preventDefault(); cancelEdit(); }}
+                                                            title="Cancel (Esc)"
+                                                        >
+                                                            <X size={14} /> Cancel
+                                                        </button>
+                                                        <button
+                                                            className="edit-save-btn"
+                                                            onPointerDown={(e) => { e.preventDefault(); saveEdit(); }}
+                                                            disabled={!editText.trim() || savingEdit}
+                                                            title="Save (Enter)"
+                                                        >
+                                                            {savingEdit ? <Loader2 size={14} className="spinner" /> : <Check size={14} />} Save
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            /* ── Normal Bubble ── */
-                                            <div
-                                                className={`message-bubble ${isOwn ? 'own-clickable' : ''} ${isDeleting ? 'deleting' : ''} ${isMenuOpen ? 'menu-open' : ''}`}
-                                                onClick={(e) => handleBubbleClick(e, msg, isOwn)}
-                                            >
-                                                <p>{msg.content}</p>
-                                                <div className="bubble-footer">
-                                                    {msg.is_edited && (
-                                                        <span className="edited-tag">edited</span>
-                                                    )}
-                                                    <span className="message-time">
-                                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* ── Context Menu ── */}
-                                        {isOwn && isMenuOpen && !isEditing && (
-                                            <div
-                                                className="msg-context-menu"
-                                                ref={menuRef}
-                                                onClick={e => e.stopPropagation()}
-                                            >
-                                                {/* Edit option */}
-                                                <button
-                                                    className={`ctx-btn ctx-edit-btn ${!editable ? 'ctx-btn-disabled' : ''}`}
-                                                    onClick={() => editable && startEdit(msg)}
-                                                    disabled={!editable}
-                                                    title={editTimeLeft(msg)}
+                                            ) : (
+                                                /* ── Normal Bubble ── */
+                                                <div
+                                                    className={`message-bubble ${isOwn ? 'own-clickable' : ''} ${isDeleting ? 'deleting' : ''} ${isMenuOpen ? 'menu-open' : ''}`}
+                                                    onClick={(e) => handleBubbleClick(e, msg, isOwn)}
                                                 >
-                                                    <Pencil size={14} />
-                                                    <span>Edit Message</span>
-                                                    {!editable && <span className="ctx-expired-tag">Expired</span>}
-                                                </button>
+                                                    <p>{msg.content}</p>
+                                                    <div className="bubble-footer">
+                                                        {msg.is_edited && (
+                                                            <span className="edited-tag">edited</span>
+                                                        )}
+                                                        <span className="message-time">
+                                                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
 
-                                                <div className="ctx-divider" />
+                                            {/* ── Context Menu ── */}
+                                            {isOwn && isMenuOpen && !isEditing && (
+                                                <div
+                                                    className="msg-context-menu"
+                                                    ref={menuRef}
+                                                    onClick={e => e.stopPropagation()}
+                                                >
+                                                    {/* Edit option */}
+                                                    <button
+                                                        className={`ctx-btn ctx-edit-btn ${!editable ? 'ctx-btn-disabled' : ''}`}
+                                                        onClick={() => editable && startEdit(msg)}
+                                                        disabled={!editable}
+                                                        title={editTimeLeft(msg)}
+                                                    >
+                                                        <Pencil size={14} />
+                                                        <span>Edit Message</span>
+                                                        {!editable && <span className="ctx-expired-tag">Expired</span>}
+                                                    </button>
 
-                                                {/* Delete option */}
-                                                <button className="ctx-btn ctx-delete-btn" onClick={handleDelete}>
-                                                    <Trash2 size={14} />
-                                                    <span>Delete Message</span>
-                                                </button>
-                                            </div>
-                                        )}
+                                                    <div className="ctx-divider" />
+
+                                                    {/* Delete option */}
+                                                    <button className="ctx-btn ctx-delete-btn" onClick={handleDelete}>
+                                                        <Trash2 size={14} />
+                                                        <span>Delete Message</span>
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </React.Fragment>
                         );
                     })
                 )}

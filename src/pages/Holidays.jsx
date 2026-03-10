@@ -89,7 +89,12 @@ const Holidays = () => {
                                                 <span className="weekday">{weekday}</span>
                                             </div>
                                             <div className="holiday-name">
-                                                <h3>{holiday.name}</h3>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                                    <h3>{holiday.name}</h3>
+                                                    <span className={`holiday-type-label ${holiday.type || 'official'}`}>
+                                                        {holiday.type || 'official'}
+                                                    </span>
+                                                </div>
                                                 {upcoming && <span className="upcoming-tag">Upcoming</span>}
                                             </div>
                                         </div>

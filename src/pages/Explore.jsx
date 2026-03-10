@@ -4,7 +4,7 @@ import { supabase } from '../supabaseClient';
 import {
     Zap, BookOpen, MessageSquare, Image, Bell,
     Calendar, Heart, ShieldCheck, ArrowRight, LayoutGrid, FileText,
-    TreePalm, Coffee, Landmark, Info, Lock
+    TreePalm, Coffee, Landmark, Info, Lock, Star, ChevronRight
 } from 'lucide-react';
 import './Explore.css';
 
@@ -35,37 +35,36 @@ const Explore = () => {
             setShowGuestModal(true);
         }
     };
-
     const featureGroups = [
         {
             group: "Learning & Academic",
             badge: "Academics",
             items: [
-                { title: "Study Hub", icon: <BookOpen />, className: "f-icon", link: "/study", badge: "Core", size: "large" },
-                { title: "Class Notes", icon: <Zap />, className: "f-icon gold", link: "/study/class-notes", highlight: true, size: "wide" },
-                { title: "Class Routine", icon: <Calendar />, className: "f-icon", link: "/routine" },
-                { title: "Syllabus", icon: <FileText />, className: "f-icon", link: "/syllabus", isPublic: true },
+                { title: "Study Hub", icon: <BookOpen />, description: "Central repository for all subject notes and syllabus.", link: "/study", badge: "Core" },
+                { title: "Class Notes", icon: <Zap />, description: "Subject-wise class notes updated by the batch.", link: "/study/class-notes", highlight: true },
+                { title: "Class Routine", icon: <Calendar />, description: "Weekly schedule for classes and lab sessions.", link: "/routine" },
+                { title: "Syllabus", icon: <FileText />, description: "Detailed module structure for current semester.", link: "/syllabus", isPublic: true },
             ]
         },
         {
             group: "Resources & Utility",
             badge: "Utilities",
             items: [
-                { title: "Holiday Calendar", icon: <TreePalm />, className: "f-icon", link: "/holidays", isPublic: true },
-                { title: "WhatsApp Groups", icon: <MessageSquare />, className: "f-icon gold", link: "/whatsapp-links", highlight: true, badge: "Community", size: "wide" },
-                { title: "Official Notices", icon: <Bell />, className: "f-icon", link: "/notices" },
-                { title: "College Events", icon: <LayoutGrid />, className: "f-icon", link: "/events" },
+                { title: "Holiday Calendar", icon: <TreePalm />, description: "List of official and unofficial holidays.", link: "/holidays", isPublic: true },
+                { title: "WhatsApp Groups", icon: <MessageSquare />, description: "Connect with subject-specific discussion groups.", link: "/whatsapp-links", highlight: true, badge: "Community" },
+                { title: "Official Notices", icon: <Bell />, description: "Latest updates and announcements from college.", link: "/notices" },
+                { title: "College Events", icon: <LayoutGrid />, description: "Explore fests, workshops, and extracurriculars.", link: "/events" },
             ]
         },
         {
             group: "Support & Community",
             badge: "Ecosystem",
             items: [
-                { title: "Support Us", icon: <Coffee />, className: "f-icon highlight-coffee", link: "/support", badge: "Help", size: "large" },
-                { title: "Donators Hall", icon: <Landmark />, className: "f-icon", link: "/donators" },
-                { title: "Top Contributors", icon: <Heart />, className: "f-icon", link: "/contributors" },
-                { title: "Batch Memories", icon: <Image />, className: "f-icon", link: "/memories", size: "wide" },
-                { title: "About Us", icon: <Info />, className: "f-icon", link: "/about", isPublic: true },
+                { title: "Support Us", icon: <Coffee />, description: "Help maintain and grow the EEvolution platform.", link: "/support", badge: "Help" },
+                { title: "Donators Hall", icon: <Landmark />, description: "List of visionaries who powered the platform.", link: "/donators" },
+                { title: "Top Contributors", icon: <Heart />, description: "Recognition of students sharing study materials.", link: "/contributors" },
+                { title: "Batch Memories", icon: <Image />, description: "A digital album of our collective journey.", link: "/memories", badge: "New" },
+                { title: "About Us", icon: <Info />, description: "Know the team and mission behind EEvolution.", link: "/about", isPublic: true },
             ]
         }
     ];
@@ -96,14 +95,17 @@ const Explore = () => {
                                     key={iIdx}
                                     to={(!session && !item.isPublic) ? '#' : (item.status ? '#' : item.link)}
                                     onClick={(e) => handleCardClick(e, item)}
-                                    className={`feature-card ${item.status ? 'locked' : ''} ${(!session && !item.isPublic) ? 'guest-locked' : ''} ${item.highlight ? 'featured' : ''} ${item.size || ''}`}
+                                    className={`feature-card ${item.status ? 'locked' : ''} ${(!session && !item.isPublic) ? 'guest-locked' : ''} ${item.highlight ? 'featured' : ''}`}
                                 >
-                                    <div className="card-glow" />
                                     <div className="icon-wrapper">
-                                        {React.cloneElement(item.icon, { size: 28, className: item.className })}
+                                        {React.cloneElement(item.icon, { size: 24 })}
                                     </div>
                                     <div className="card-content">
-                                        <span className="card-title">{item.title}</span>
+                                        <div className="card-main-info">
+                                            <span className="card-title">{item.title}</span>
+                                            <p className="card-desc">{item.description}</p>
+                                        </div>
+                                        {item.badge && <span className="mini-badge-inline">{item.badge}</span>}
                                         {!session && !item.isPublic && (
                                             <span className="status-badge sign-in-alert">
                                                 <Lock size={12} style={{ marginRight: '4px' }} />
@@ -111,9 +113,9 @@ const Explore = () => {
                                             </span>
                                         )}
                                         {session && item.status && <span className="status-badge">{item.status}</span>}
-                                        {item.badge && <span className="mini-badge-inline">{item.badge}</span>}
                                     </div>
-                                    {session && !item.status && <ArrowRight size={20} className="arrow-icon" />}
+                                    <ChevronRight size={20} className="arrow-icon" />
+                                    {item.highlight && <div className="star-tag"><Star size={10} fill="white" /> HOT</div>}
                                 </Link>
                             ))}
                         </div>
@@ -127,13 +129,16 @@ const Explore = () => {
                         <div className="feature-grid" onMouseMove={handleMouseMove}>
                             <Link to="/admin" className="feature-card admin-card">
                                 <div className="icon-wrapper">
-                                    <ShieldCheck size={28} className="f-icon" />
+                                    <ShieldCheck size={24} />
                                 </div>
                                 <div className="card-content">
-                                    <span className="card-title text-admin">Admin Panel</span>
+                                    <div className="card-main-info">
+                                        <span className="card-title text-admin">Admin Panel</span>
+                                        <p className="card-desc">Restricted access for platform management.</p>
+                                    </div>
                                     <span className="status-badge">Restricted Access</span>
                                 </div>
-                                <ArrowRight size={20} className="arrow-icon" />
+                                <ChevronRight size={20} className="arrow-icon" />
                             </Link>
                         </div>
                     </div>

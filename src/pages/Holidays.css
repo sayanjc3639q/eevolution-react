@@ -127,6 +127,30 @@
     text-transform: uppercase;
 }
 
+.holiday-type-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+}
+
+.holiday-type-label.official {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.holiday-type-label.unofficial {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.holiday-type-label.event {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
 @media (max-width: 600px) {
     .holiday-grid {
         grid-template-columns: 1fr;

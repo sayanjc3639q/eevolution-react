@@ -57,7 +57,7 @@ const Admin = () => {
     const [editingStudent, setEditingStudent] = useState(null);
 
     const [routineForm, setRoutineForm] = useState({ day: 'Monday', start_time: '', end_time: '', subject: '', prof: '', room: '' });
-    const [holidayForm, setHolidayForm] = useState({ date: '', name: '' });
+    const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'official' });
     const [moduleForm, setModuleForm] = useState({ section_id: 'class-notes', subject_name: '', chapter_name: '', file_name: '', file_description: '', drive_link: '' });
     const [noticeForm, setNoticeForm] = useState({ title: '', content: '', attachment_link: '', attachment_type: 'pdf', notice_date: new Date().toISOString().split('T')[0] });
     const [whatsappForm, setWhatsappForm] = useState({ name: '', description: '', link: '' });
@@ -200,7 +200,11 @@ const Admin = () => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('holidays').insert([holidayForm]);
         if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Holiday added!'); setHolidayForm({ date: '', name: '' }); fetchHolidays(); }
+        else {
+            showAlert('success', 'Holiday added!');
+            setHolidayForm({ date: '', name: '', type: 'official' });
+            fetchHolidays();
+        }
         setLoading(false);
     };
 
@@ -221,6 +225,14 @@ const Admin = () => {
     };
 
     const handleDelete = async (table, id) => {
+        if (table === 'holidays') {
+            const h = holidays.find(i => i.id === id);
+            if (h && h.type === 'official' && !isSuperAdmin) {
+                showAlert('error', 'Official holidays are fixed and cannot be deleted.');
+                return;
+            }
+        }
+
         if (!window.confirm('Delete this item?')) return;
         setLoading(true);
         const { error } = await supabase.from(table).delete().eq('id', id);
@@ -499,8 +511,16 @@ const Admin = () => {
                         <div className="admin-card-section">
                             <h2>Add <span className="highlight">Holiday</span></h2>
                             <form onSubmit={handleHolidaySubmit} className="admin-form">
-                                <div className="form-group"><label>Name</label><input value={holidayForm.name} onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })} required /></div>
+                                <div className="form-group"><label>Name</label><input value={holidayForm.name} onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })} placeholder="e.g., Exam Prep Break" required /></div>
                                 <div className="form-group"><label>Date</label><input type="date" value={holidayForm.date} onChange={(e) => setHolidayForm({ ...holidayForm, date: e.target.value })} required /></div>
+                                <div className="form-group">
+                                    <label>Holiday Type</label>
+                                    <select value={holidayForm.type} onChange={(e) => setHolidayForm({ ...holidayForm, type: e.target.value })}>
+                                        <option value="official">Official Holiday (Fixed)</option>
+                                        <option value="unofficial">Unofficial / Prep Holiday</option>
+                                        <option value="event">Extra-curricular Event Day</option>
+                                    </select>
+                                </div>
                                 <button type="submit" className="submit-btn" disabled={loading}><Plus /> Add</button>
                             </form>
                         </div>
@@ -510,10 +530,15 @@ const Admin = () => {
                                 {holidays.map(h => (
                                     <div key={h.id} className="management-item">
                                         <div className="item-info">
-                                            <h4>{h.name}</h4>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <h4>{h.name}</h4>
+                                                <span className={`type-badge-mini ${h.type || 'official'}`}>{h.type || 'official'}</span>
+                                            </div>
                                             <span>{h.date}</span>
                                         </div>
-                                        <button className="delete-btn" onClick={() => handleDelete('holidays', h.id)}><Trash2 size={16} /></button>
+                                        {(h.type !== 'official' || isSuperAdmin) && (
+                                            <button className="delete-btn" onClick={() => handleDelete('holidays', h.id)}><Trash2 size={16} /></button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
