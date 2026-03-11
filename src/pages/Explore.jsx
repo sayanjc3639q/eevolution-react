@@ -113,7 +113,8 @@ const Explore = () => {
     };
 
     return (
-        <div className="explore-container compact">
+        <>
+            <div className="explore-container compact">
             <SEO 
                 title="Explore Features"
                 description="Discover the full range of EEvolution features: Study Hub, Class Notes, WhatsApp Groups, Batch Memories, and more."
@@ -181,28 +182,29 @@ const Explore = () => {
                     </div>
                 )}
             </div>
+        </div>
 
-            {/* Guest Access Modal */}
-            {showGuestModal && (
-                <div className="guest-modal-overlay" onClick={() => setShowGuestModal(false)}>
-                    <div className="guest-modal" onClick={e => e.stopPropagation()}>
-                        <div className="modal-icon">
-                            <Lock size={40} />
-                        </div>
-                        <h3>Access Restricted</h3>
-                        <p>
-                            Join the EEvolution community to access premium study resources,
-                            class notes, and batch-exclusive features.
-                        </p>
-                        <div className="modal-actions">
-                            <button className="secondary-btn" onClick={() => setShowGuestModal(false)}>Maybe Later</button>
-                            <Link to="/login" className="primary-btn">Sign In Now</Link>
-                        </div>
+        {/* Guest Access Modal */}
+        {showGuestModal && (
+            <div className="guest-modal-overlay" onClick={() => setShowGuestModal(false)}>
+                <div className="guest-modal" onClick={e => e.stopPropagation()}>
+                    <div className="modal-icon">
+                        <Lock size={40} />
+                    </div>
+                    <h3>Access Restricted</h3>
+                    <p>
+                        Join the EEvolution community to access premium study resources,
+                        class notes, and batch-exclusive features.
+                    </p>
+                    <div className="modal-actions">
+                        <button className="secondary-btn" onClick={() => setShowGuestModal(false)}>Maybe Later</button>
+                        <Link to="/login" className="primary-btn">Sign In Now</Link>
                     </div>
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        )}
+    </>
+);
 };
 
 export default Explore;

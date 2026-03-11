@@ -67,6 +67,7 @@ const Home = () => {
         <div className="guest-home">
             {/* Hero Section */}
             <section className="guest-hero reveal">
+                <div className="hero-badge-top">Batch 2 • 2029 Graduating</div>
                 <h1>EEvolution <span style={{ color: 'var(--accent-color)' }}>2.0</span></h1>
                 <p>The pioneering digital ecosystem for Electrical Engineering Batch 2. Built for excellence, designed for evolution.</p>
                 <div className="hero-btns">
@@ -89,7 +90,18 @@ const Home = () => {
                     <div className="showcase-card study-hub">
                         <div className="card-visual">
                             <div className="book-stack">
-                                <div className="book book-1"></div>
+                                <div className="book book-1">
+                                    <div className="book-cover-detail">
+                                        <div className="cover-line main-line"></div>
+                                        <div className="cover-line-group">
+                                            <div className="cover-line sub-line"></div>
+                                            <div className="cover-line sub-line"></div>
+                                        </div>
+                                        <div className="cover-insignia">
+                                            <Zap size={24} strokeWidth={3} />
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="book book-2"></div>
                                 <div className="book book-3"></div>
                             </div>

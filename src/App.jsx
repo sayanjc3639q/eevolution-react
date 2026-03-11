@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import StudySection from './pages/StudySection';
 import Explore from './pages/Explore';
+import EntryScreen from './components/EntryScreen';
 import './App.css';
 
 import Auth from './pages/Auth';
@@ -107,9 +108,15 @@ const AppLayout = () => {
 };
 
 function App() {
+  const [showEntry, setShowEntry] = React.useState(true);
+
   return (
     <Router>
-      <AppLayout />
+      {showEntry ? (
+        <EntryScreen onComplete={() => setShowEntry(false)} />
+      ) : (
+        <AppLayout />
+      )}
     </Router>
   );
 }

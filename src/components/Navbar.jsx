@@ -121,9 +121,20 @@ const Navbar = () => {
         return () => supabase.removeChannel(channel);
     }, []);
 
-    // ─── Helpers ──────────────────────────────────────────────────────────
-    const handleRestrictedClick = (e) => {
-        if (!session) { e.preventDefault(); setShowGuestModal(true); }
+    // ─── Link Interceptor ──────────────────────────────────────────────────
+    const handleNavbarClick = (path) => (e) => {
+        // 1. If currently on this page, disable click
+        if (location.pathname === path) {
+            e.preventDefault();
+            return;
+        }
+
+        // 2. Restricted path logic
+        const restrictedPaths = ['/chat', '/notices', '/study'];
+        if (restrictedPaths.includes(path) && !session) {
+            e.preventDefault();
+            setShowGuestModal(true);
+        }
     };
 
     const chatBadge = unreadChat > 99 ? '99+' : unreadChat;
@@ -133,7 +144,7 @@ const Navbar = () => {
         <>
             {/* ── Mobile Top Header ── */}
             <div className="mobile-header">
-                <Link to="/" className="mobile-logo">
+                <Link to="/" className="mobile-logo" onClick={handleNavbarClick('/')}>
                     <Zap size={24} className="logo-icon" />
                 </Link>
                 <div className="mobile-search-bar">
@@ -142,7 +153,7 @@ const Navbar = () => {
                 </div>
                 <div className="mobile-header-actions">
                     {/* Bell with unread notices badge */}
-                    <NavLink to="/notices" className="action-btn" onClick={handleRestrictedClick}>
+                    <NavLink to="/notices" className="action-btn" onClick={handleNavbarClick('/notices')}>
                         <div className="nav-icon-wrap">
                             <Bell size={22} />
                             {unreadNotices > 0 && (
@@ -151,12 +162,12 @@ const Navbar = () => {
                         </div>
                     </NavLink>
                     {session ? (
-                        <NavLink to="/profile" className="profile-btn-nav logged-in">
+                        <NavLink to="/profile" className="profile-btn-nav logged-in" onClick={handleNavbarClick('/profile')}>
                             <span className="user-firstname">{userName?.split(' ')[0] || 'Profile'}</span>
                             <User size={22} />
                         </NavLink>
                     ) : (
-                        <NavLink to="/login" className="mobile-signin-btn">Sign In</NavLink>
+                        <NavLink to="/login" className="mobile-signin-btn" onClick={handleNavbarClick('/login')}>Sign In</NavLink>
                     )}
                 </div>
             </div>
@@ -176,18 +187,18 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-links">
-                    <NavLink to="/" end className="nav-link">
+                    <NavLink to="/" end className="nav-link" onClick={handleNavbarClick('/')}>
                         <Home size={20} /><span>Home</span>
                     </NavLink>
-                    <NavLink to="/study" className="nav-link" onClick={handleRestrictedClick}>
+                    <NavLink to="/study" className="nav-link" onClick={handleNavbarClick('/study')}>
                         <BookOpen size={20} /><span>Study</span>
                     </NavLink>
-                    <NavLink to="/explore" className="nav-link">
+                    <NavLink to="/explore" className="nav-link" onClick={handleNavbarClick('/explore')}>
                         <LayoutGrid size={24} className="explore-btn-icon" /><span>Explore</span>
                     </NavLink>
 
                     {/* Chat with unread badge */}
-                    <NavLink to="/chat" className="nav-link" onClick={handleRestrictedClick}>
+                    <NavLink to="/chat" className="nav-link" onClick={handleNavbarClick('/chat')}>
                         <div className="nav-icon-wrap">
                             <MessageSquare size={20} />
                             {session && unreadChat > 0 && (
@@ -197,14 +208,14 @@ const Navbar = () => {
                         <span>Chat</span>
                     </NavLink>
 
-                    <NavLink to="/pricing" className="nav-link plan-nav-highlight">
+                    <NavLink to="/pricing" className="nav-link plan-nav-highlight" onClick={handleNavbarClick('/pricing')}>
                         <Crown size={20} /><span>Plans</span>
                     </NavLink>
 
                     {/* Desktop Actions */}
                     <div className="desktop-actions">
                         {/* Bell with unread notices badge */}
-                        <NavLink to="/notices" className="nav-action-btn desktop-notice" onClick={handleRestrictedClick}>
+                        <NavLink to="/notices" className="nav-action-btn desktop-notice" onClick={handleNavbarClick('/notices')}>
                             <div className="nav-icon-wrap">
                                 <Bell size={20} />
                                 {unreadNotices > 0 && (
@@ -212,7 +223,11 @@ const Navbar = () => {
                                 )}
                             </div>
                         </NavLink>
-                        <NavLink to={session ? '/profile' : '/login'} className="nav-profile-link">
+                        <NavLink 
+                            to={session ? '/profile' : '/login'} 
+                            className="nav-profile-link" 
+                            onClick={handleNavbarClick(session ? '/profile' : '/login')}
+                        >
                             <User size={20} />
                             <span>{session ? (userName?.split(' ')[0] || 'Profile') : 'Sign In'}</span>
                         </NavLink>

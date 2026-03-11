@@ -25,9 +25,9 @@ const Pricing = () => {
             id: 'plus',
             name: 'PLUS',
             price: '₹399',
-            subtitle: '/ month',
+            subtitle: 'per 3 months',
             icon: <Zap className="plan-icon-svg" />,
-            description: 'Level up your engineering journey with exclusive study resources.',
+            description: 'Level up your engineering journey with exclusive study resources. (Special Student Offer)',
             features: [
                 'Everything in Standard',
                 'GATE Preparation Resources',
@@ -43,9 +43,9 @@ const Pricing = () => {
             id: 'premium',
             name: 'Premium',
             price: '₹799',
-            subtitle: '/ month',
+            subtitle: 'per 3 months',
             icon: <Crown className="plan-icon-svg" />,
-            description: 'The ultimate EEvolution experience with premium perks and lifestyle benefits.',
+            description: 'The ultimate experience with premium perks and lifestyle benefits. (Student Discounted)',
             features: [
                 'Everything in PLUS',
                 'EEvolution Official Merchandise',

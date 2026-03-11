@@ -11,7 +11,7 @@ import './Payment.css';
 const UPI_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=eevolution@ybl%26pn=EEvolution%26cu=INR`;
 
 
-const AMOUNT_PRESETS = [49, 99, 199, 499];
+const AMOUNT_PRESETS = [99, 199, 399, 499, 799];
 const UPI_ID = 'eevolution@ybl';
 const UPI_NAME = 'EEvolution Platform';
 
@@ -65,7 +65,8 @@ const Payment = () => {
     ];
 
     return (
-        <div className="payment-page">
+        <>
+            <div className="payment-page">
             {/* Header */}
             <header className="payment-header">
                 <button className="pay-back-btn" onClick={() => navigate(-1)}>
@@ -337,35 +338,36 @@ const Payment = () => {
                     <div className="trust-item"><Smartphone size={14} /> UPI Secured</div>
                 </div>
             </div>
+        </div>
 
-            {/* Error Modal */}
-            {errorModal && (
-                <div className="payment-error-overlay" onClick={() => setErrorModal(false)}>
-                    <div className="payment-error-modal" onClick={e => e.stopPropagation()}>
-                        <button className="error-close-btn" onClick={() => setErrorModal(false)}><X size={20} /></button>
-                        <div className="error-icon-ring">
-                            <AlertCircle size={40} />
-                        </div>
-                        <h3>Payment Failed</h3>
-                        <p>We were unable to process your payment. This may be due to:</p>
-                        <ul className="error-reasons">
-                            <li>Insufficient funds or card limit exceeded</li>
-                            <li>Card not enabled for online transactions</li>
-                            <li>Incorrect card details entered</li>
-                            <li>Bank server timeout</li>
-                        </ul>
-                        <p className="error-suggestion">Please try <strong>UPI</strong> for instant, hassle-free payment.</p>
-                        <div className="error-modal-actions">
-                            <button className="try-upi-btn" onClick={() => { setErrorModal(false); setSelectedMethod('upi'); }}>
-                                <Smartphone size={18} /> Try UPI Instead
-                            </button>
-                            <button className="retry-btn" onClick={() => setErrorModal(false)}>Retry</button>
-                        </div>
+        {/* Error Modal */}
+        {errorModal && (
+            <div className="payment-error-overlay" onClick={() => setErrorModal(false)}>
+                <div className="payment-error-modal" onClick={e => e.stopPropagation()}>
+                    <button className="error-close-btn" onClick={() => setErrorModal(false)}><X size={20} /></button>
+                    <div className="error-icon-ring">
+                        <AlertCircle size={40} />
+                    </div>
+                    <h3>Payment Failed</h3>
+                    <p>We were unable to process your payment. This may be due to:</p>
+                    <ul className="error-reasons">
+                        <li>Insufficient funds or card limit exceeded</li>
+                        <li>Card not enabled for online transactions</li>
+                        <li>Incorrect card details entered</li>
+                        <li>Bank server timeout</li>
+                    </ul>
+                    <p className="error-suggestion">Please try <strong>UPI</strong> for instant, hassle-free payment.</p>
+                    <div className="error-modal-actions">
+                        <button className="try-upi-btn" onClick={() => { setErrorModal(false); setSelectedMethod('upi'); }}>
+                            <Smartphone size={18} /> Try UPI Instead
+                        </button>
+                        <button className="retry-btn" onClick={() => setErrorModal(false)}>Retry</button>
                     </div>
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        )}
+    </>
+);
 };
 
 export default Payment;
