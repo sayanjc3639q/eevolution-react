@@ -7,8 +7,8 @@ const Pricing = () => {
         {
             id: 'standard',
             name: 'Standard',
-            price: 'Free',
-            subtitle: 'For Approved Students',
+            price: 'Access',
+            subtitle: 'Batch Students',
             icon: <Star className="plan-icon-svg" />,
             description: 'All current platform features included as standard for our community.',
             features: [
@@ -98,7 +98,7 @@ const Pricing = () => {
 
                         <button className={`plan-btn ${plan.id}`}>
                             {plan.btnText}
-                            <ArrowRight size={18} />
+                            {plan.id === 'standard' ? <Check size={18} /> : <ArrowRight size={18} />}
                         </button>
                     </div>
                 ))}

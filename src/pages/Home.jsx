@@ -325,6 +325,10 @@ const Home = () => {
         const [isHoliday, setIsHoliday] = useState(null); // null=loading, false=workday, string=holiday name
         const [contributors, setContributors] = useState([]);
         const [donators, setDonators] = useState([]);
+        const [recentNotices, setRecentNotices] = useState([]);
+        const [recentEvents, setRecentEvents] = useState([]);
+        const [recentMaterials, setRecentMaterials] = useState([]);
+        const [recentMemory, setRecentMemory] = useState(null);
         const [communityLoading, setCommunityLoading] = useState(true);
 
         const today = currentTime;
@@ -336,11 +340,15 @@ const Home = () => {
         useEffect(() => {
             const loadAll = async () => {
                 // Load schedule + holidays + community in parallel
-                const [routineRes, holidayRes, contribRes, donatorRes] = await Promise.all([
+                const [routineRes, holidayRes, contribRes, donatorRes, noticeRes, eventRes, materialRes, memoryRes] = await Promise.all([
                     supabase.from('routines').select('*').eq('day', dayName).order('start_time', { ascending: true }),
                     supabase.from('holidays').select('*').eq('date', dateStr),
                     supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3),
                     supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3),
+                    supabase.from('notices').select('*').order('notice_date', { ascending: false }).limit(3),
+                    supabase.from('events').select('*').order('event_date', { ascending: false }).limit(3),
+                    supabase.from('study_materials').select('*').order('created_at', { ascending: false }).limit(3),
+                    supabase.from('memories').select('*').order('created_at', { ascending: false }).limit(1),
                 ]);
 
                 if (!routineRes.error) setTodaySchedule(routineRes.data || []);
@@ -349,6 +357,10 @@ const Home = () => {
 
                 if (!contribRes.error) setContributors(contribRes.data || []);
                 if (!donatorRes.error) setDonators(donatorRes.data || []);
+                if (!noticeRes.error) setRecentNotices(noticeRes.data || []);
+                if (!eventRes.error) setRecentEvents(eventRes.data || []);
+                if (!materialRes.error) setRecentMaterials(materialRes.data || []);
+                if (!memoryRes.error && memoryRes.data?.length > 0) setRecentMemory(memoryRes.data[0]);
                 setCommunityLoading(false);
             };
             loadAll();
@@ -642,6 +654,108 @@ const Home = () => {
                             )}
                             <Link to="/donators" className="lb-see-all-btn">
                                 See All <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 5. Recent Notices */}
+                        <section className="ds-section bento-item notices-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Bell size={18} />
+                                    <span>Recent Notices</span>
+                                </div>
+                            </div>
+                            <div className="recent-list">
+                                {recentNotices.length > 0 ? (
+                                    recentNotices.map((notice) => (
+                                        <Link key={notice.id} to="/notices" className="recent-item">
+                                            <div className="recent-icon notice"><Bell size={14} /></div>
+                                            <div className="recent-info">
+                                                <span className="recent-title">{notice.title}</span>
+                                                <span className="recent-date">{new Date(notice.notice_date).toLocaleDateString()}</span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : <p className="lb-empty">No recent notices.</p>}
+                            </div>
+                            <Link to="/notices" className="lb-see-all-btn">
+                                View Notices <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 6. Recent Events */}
+                        <section className="ds-section bento-item events-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Calendar size={18} />
+                                    <span>Recent Events</span>
+                                </div>
+                            </div>
+                            <div className="recent-list">
+                                {recentEvents.length > 0 ? (
+                                    recentEvents.map((event) => (
+                                        <Link key={event.id} to="/events" className="recent-item">
+                                            <div className="recent-icon event"><Calendar size={14} /></div>
+                                            <div className="recent-info">
+                                                <span className="recent-title">{event.title}</span>
+                                                <span className="recent-date">{new Date(event.event_date).toLocaleDateString()}</span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : <p className="lb-empty">No recent events.</p>}
+                            </div>
+                            <Link to="/events" className="lb-see-all-btn">
+                                View Events <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 7. Recently Uploaded Documents */}
+                        <section className="ds-section bento-item documents-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <FileText size={18} />
+                                    <span>Recent Documents</span>
+                                </div>
+                            </div>
+                            <div className="recent-list">
+                                {recentMaterials.length > 0 ? (
+                                    recentMaterials.map((doc) => (
+                                        <Link key={doc.id} to="/study" className="recent-item">
+                                            <div className="recent-icon doc"><FileText size={14} /></div>
+                                            <div className="recent-info">
+                                                <span className="recent-title">{doc.file_name}</span>
+                                                <span className="recent-date">{doc.subject_name}</span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : <p className="lb-empty">No recent uploads.</p>}
+                            </div>
+                            <Link to="/study" className="lb-see-all-btn">
+                                Go to Study Hub <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 8. Recent Memory Post */}
+                        <section className="ds-section bento-item memory-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Heart size={18} />
+                                    <span>Batch Memory</span>
+                                </div>
+                            </div>
+                            {recentMemory ? (
+                                <Link to="/memories" className="recent-memory-card">
+                                    {recentMemory.image_url && <img src={recentMemory.image_url} alt="Recent Memory" className="rem-img" />}
+                                    <div className="rem-overlay">
+                                        <span className="rem-caption">{recentMemory.caption || 'Shared a memory'}</span>
+                                        <span className="rem-author">Shared by {recentMemory.student_name || 'Anonymous'}</span>
+                                    </div>
+                                </Link>
+                            ) : (
+                                <p className="lb-empty">No memories shared yet.</p>
+                            )}
+                            <Link to="/memories" className="lb-see-all-btn" style={{marginTop: '1rem'}}>
+                                See All Memories <ChevronRight size={15} />
                             </Link>
                         </section>
 

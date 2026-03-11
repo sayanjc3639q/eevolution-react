@@ -2343,3 +2343,122 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ---- Recent Sections Styles ---- */
+.recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.recent-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.recent-item:hover {
+    background: rgba(var(--accent-color-rgb), 0.05);
+    border-color: rgba(var(--accent-color-rgb), 0.2);
+    transform: translateX(5px);
+}
+
+.recent-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.recent-icon.notice { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.recent-icon.event { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.recent-icon.doc { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+.recent-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.recent-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Recent Memory Card */
+.recent-memory-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 20px;
+    overflow: hidden;
+    display: block;
+    border: 1px solid var(--border-color);
+}
+
+.rem-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.recent-memory-card:hover .rem-img {
+    transform: scale(1.1);
+}
+
+.rem-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rem-caption {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rem-author {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Bento Grid Spans Updates */
+.notices-bento, .events-bento, .documents-bento, .memory-bento {
+    grid-column: span 1;
+}
+
+@media (max-width: 1100px) {
+    .notices-bento, .events-bento, .documents-bento, .memory-bento {
+        grid-column: span 1;
+    }
+}
