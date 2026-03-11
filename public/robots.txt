@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /login
+Disallow: /profile
+Disallow: /settings/*
+Disallow: /payment
+
+Sitemap: https://eevolution.in/sitemap.xml

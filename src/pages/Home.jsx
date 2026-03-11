@@ -8,6 +8,7 @@ import {
     Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight,
     FileText, Landmark, CheckCircle2
 } from 'lucide-react';
+import SEO from '../components/SEO';
 import './Home.css';
 
 const Home = () => {
@@ -847,7 +848,16 @@ const Home = () => {
         );
     };
 
-    return session ? <UserView /> : <GuestView />;
+    return (
+        <>
+            <SEO
+                title="Home"
+                description="EEvolution 2.0: The ultimate digital ecosystem for Electrical Engineering students. Centralizing resources, real-time alerts, and batch collaboration."
+                keywords="EEvolution, Electrical Engineering, study hub, HIT Haldia, Batch 2"
+            />
+            {status === 'loading' ? null : session ? <UserView /> : <GuestView />}
+        </>
+    );
 };
 
 export default Home;

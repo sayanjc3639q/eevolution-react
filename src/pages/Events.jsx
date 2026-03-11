@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, ArrowLeft, MapPin, ExternalLink, Ticket, LayoutGrid } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import SEO from '../components/SEO';
 import './Events.css';
 
 const Events = () => {
@@ -30,6 +31,11 @@ const Events = () => {
 
     return (
         <div className="events-page">
+            <SEO 
+                title="College Events"
+                description="Upcoming college fests, workshops, and extracurricular activities for HIT Haldia students. Don't miss out on campus life!"
+                keywords="college fests, workshops, campus activities, student events"
+            />
             <div className="page-header">
                 <button onClick={() => navigate(-1)} className="back-btn-pill">
                     <ArrowLeft size={18} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import SEO from '../components/SEO';
 import {
     Zap, BookOpen, MessageSquare, Image, Bell,
     Calendar, Heart, ShieldCheck, ArrowRight, LayoutGrid, FileText,
@@ -113,6 +114,11 @@ const Explore = () => {
 
     return (
         <div className="explore-container compact">
+            <SEO 
+                title="Explore Features"
+                description="Discover the full range of EEvolution features: Study Hub, Class Notes, WhatsApp Groups, Batch Memories, and more."
+                keywords="EEvolution features, study hub, class notes, engineering resources"
+            />
             <div className="explore-content">
                 {featureGroups.map((group, gIdx) => (
                     <div key={gIdx} className="feature-group reveal">

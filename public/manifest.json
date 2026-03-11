@@ -1,0 +1,17 @@
+{
+  "short_name": "EEvolution",
+  "name": "EEvolution - Electrical Engineering Study Hub",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f0f12",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#6e2cf2",
+  "description": "Premium study platform for Electrical Engineering students."
+}

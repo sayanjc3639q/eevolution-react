@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+<!-- Base URL -->
+<url>
+  <loc>https://eevolution.in/</loc>
+  <lastmod>2026-03-12T01:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>1.00</priority>
+</url>
+
+<!-- Main Sections -->
+<url>
+  <loc>https://eevolution.in/explore</loc>
+  <lastmod>2026-03-11T12:00:00+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/study</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.95</priority>
+</url>
+
+<!-- Study Categories -->
+<url>
+  <loc>https://eevolution.in/study/class-notes</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/study/practice-set</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/study/books</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/study/handwritten</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/study/lab-notes</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
+
+<!-- Vital Pages -->
+<url>
+  <loc>https://eevolution.in/notices</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/events</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/memories</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.85</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/routine</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/syllabus</loc>
+  <lastmod>2026-02-01T00:00:00+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/holidays</loc>
+  <lastmod>2026-01-01T00:00:00+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.70</priority>
+</url>
+
+<!-- Trackers -->
+<url>
+  <loc>https://eevolution.in/tracker/mar</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.75</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/tracker/moocs</loc>
+  <lastmod>2026-03-12T00:00:00+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.75</priority>
+</url>
+
+<!-- Info & Community -->
+<url>
+  <loc>https://eevolution.in/about</loc>
+  <lastmod>2026-03-10T00:00:00+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/support</loc>
+  <lastmod>2026-03-10T00:00:00+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/contributors</loc>
+  <lastmod>2026-03-10T00:00:00+00:00</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>https://eevolution.in/whatsapp-links</loc>
+  <lastmod>2026-03-11T00:00:00+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.70</priority>
+</url>
+
+</urlset>

@@ -13,6 +13,7 @@ import {
     Eye, X, ExternalLink, Share2
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import SEO from '../components/SEO';
 import './StudySection.css';
 
 const StudySection = () => {
@@ -367,8 +368,29 @@ const StudySection = () => {
         setSearchParams(searchParams);
     };
 
+    // --- SEO LOGIC ---
+    let seoTitle = 'Study Hub';
+    let seoDescription = 'Access a vast collection of study materials, books, and class notes for Electrical Engineering students.';
+    
+    if (previewFile) {
+        seoTitle = `${previewFile.file_name} | Study Hub`;
+        seoDescription = `View ${previewFile.file_name} in ${selectedCategory?.name || 'Study Hub'}. ${previewFile.file_description || ''}`;
+    } else if (selectedCategory) {
+        seoTitle = `${selectedCategory.name} | Study Hub`;
+        seoDescription = `Browse $^{selectedCategory.name} for Electrical Engineering students. ${selectedCategory.description}`;
+        if (selectedSubject) {
+            seoTitle = `${selectedSubject.name} | ${selectedCategory.name}`;
+            seoDescription = `Find ${selectedCategory.name} for ${selectedSubject.name} (${selectedSubject.code}).`;
+        }
+    }
+
     return (
         <>
+            <SEO 
+                title={seoTitle}
+                description={seoDescription}
+                canonical={`/study${categoryId ? `/${categoryId}` : ''}${subjectId ? `/${subjectId}` : ''}`}
+            />
             {renderContent()}
 
             {previewFile && (

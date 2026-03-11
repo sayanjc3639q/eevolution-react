@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Image as ImageIcon, Plus, Heart, MessageCircle, X, Loader2, Send, Trash2, ChevronUp, MoreHorizontal, Share2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import SEO from '../components/SEO';
 import './Memories.css';
 
 const Memories = () => {
@@ -308,6 +309,11 @@ const Memories = () => {
 
     return (
         <div className="memories-page">
+            <SEO 
+                title="Batch Memories"
+                description="Explore the digital album of our collective journey. Photos and memories shared by Electrical Engineering students."
+                keywords="EEvolution memories, batch photos, student life, memories"
+            />
             <div className="page-header sticky-header">
                 {session && (
                     <button className="add-memory-btn" onClick={() => setIsUploadModalOpen(true)}>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Info, Target, Users, Zap, BookOpen } from 'lucide-react';
+import SEO from '../components/SEO';
 import './About.css';
 
 const About = () => {
@@ -11,6 +12,11 @@ const About = () => {
 
     return (
         <div className="about-container">
+            <SEO 
+                title="About Us"
+                description="Learn about the mission, vision, and team behind EEvolution 2.0. A platform built by students for students."
+                keywords="EEvolution mission, student project, lead developer, about us"
+            />
             <div className="about-hero">
                 <div className="about-tag">
                     <Info size={14} />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, ArrowLeft, Download, ExternalLink, Calendar as CalendarIcon, FileText, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import SEO from '../components/SEO';
 import './Notices.css';
 
 const Notices = () => {
@@ -24,6 +25,11 @@ const Notices = () => {
 
     return (
         <div className="notices-page">
+            <SEO 
+                title="Official Notices"
+                description="Stay updated with the latest college notices, announcements, and important updates for Batch 2 Electrical Engineering students."
+                keywords="college notices, exam updates, results announcements, college news"
+            />
             <div className="page-header">
                 <h1>Official <span className="highlight">Notices</span></h1>
                 <p>Stay updated with the latest college announcements</p>
