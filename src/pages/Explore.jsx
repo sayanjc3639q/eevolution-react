@@ -17,10 +17,24 @@ const Explore = () => {
     const [showGuestModal, setShowGuestModal] = useState(false);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setLoading(false);
-        });
+        const checkSession = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                    }
+                    return;
+                }
+                setSession(session);
+                setLoading(false);
+            } catch (err) {
+                console.warn('Explore session check failed:', err);
+                setLoading(false);
+            }
+        };
+
+        checkSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);

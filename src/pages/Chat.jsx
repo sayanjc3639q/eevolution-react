@@ -44,10 +44,23 @@ const Chat = () => {
 
     // ─── Auth + real-time ────────────────────────────────────────────────
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            if (session) fetchUserProfile(session.user.id);
-        });
+        const checkSession = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                    }
+                    return;
+                }
+                setSession(session);
+                if (session) fetchUserProfile(session.user.id);
+            } catch (err) {
+                console.warn('Chat session check failed:', err);
+            }
+        };
+
+        checkSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);

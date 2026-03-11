@@ -5,7 +5,7 @@ import {
     User, LogOut, FileText, ShieldCheck, Mail, Hash,
     UserCircle, Eye, EyeOff, Calendar, Settings,
     ChevronRight, Palette, Lock, LayoutDashboard, AlertCircle,
-    Camera, Trash2, Loader2
+    Camera, Trash2, Loader2, Crown, Zap
 } from 'lucide-react';
 import './Profile.css';
 
@@ -29,9 +29,12 @@ const Profile = () => {
     const getProfile = async () => {
         try {
             setLoading(true);
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-            if (!user) {
+            if (authError || !user) {
+                if (authError?.message?.includes('refresh_token_not_found') || authError?.message?.includes('Refresh Token Not Found')) {
+                    await supabase.auth.signOut();
+                }
                 navigate('/login');
                 return;
             }
@@ -284,6 +287,9 @@ const Profile = () => {
                         <h1>{studentData.name}</h1>
                         <div className="badge-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                             <span className="roll-badge">{studentData.class_roll_no}</span>
+                            <span className={`plan-badge-profile ${studentData.subscription_plan || 'standard'}`}>
+                                {studentData.subscription_plan || 'Standard'} Plan
+                            </span>
                             {isSuperAdmin && <span className="admin-badge super" style={{ background: 'linear-gradient(90deg, #f59e0b, #ef4444)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>Superadmin & Developer</span>}
                             {!isSuperAdmin && studentData.is_admin && <span className="admin-badge" style={{ background: 'var(--accent-color)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>Admin</span>}
                         </div>
@@ -366,6 +372,16 @@ const Profile = () => {
 
                 {/* Right Column: Experience & Actions */}
                 <div className="actions-column">
+                    <div className="profile-card upgrade-access-card" onClick={() => navigate('/pricing')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))', border: '1px solid rgba(139, 92, 246, 0.2)', marginBottom: '1.5rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', borderRadius: '24px' }}>
+                        <div className="plan-icon-hex" style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Crown size={22} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '800' }}>Upgrade Experience</h4>
+                            <p style={{ margin: '0.1rem 0 0', fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.5)' }}>See PLUS & Premium benefits</p>
+                        </div>
+                        <ChevronRight size={18} style={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                    </div>
                     <div className="profile-card experience-card">
                         <h3>Customization & Security</h3>
                         <div className="menu-list">

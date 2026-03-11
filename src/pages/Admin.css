@@ -78,7 +78,6 @@
     font-weight: 600;
     z-index: 9999;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-    animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     min-width: 280px;
     max-width: 400px;
 }
@@ -93,18 +92,6 @@
     background: #2d0000;
     border: 1px solid #dc2626;
     color: #f87171;
-}
-
-@keyframes slideInToast {
-    from {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
 }
 
 /* ---- ROOT LAYOUT ---- */
@@ -279,19 +266,6 @@
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
-    animation: adminPageReveal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes adminPageReveal {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* Page Header */
@@ -432,7 +406,7 @@
 
 .fv2-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1rem;
 }
 
@@ -440,11 +414,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-}
-
-.fv2-group.mini input {
-    padding: 0.55rem 0.75rem;
-    font-size: 0.875rem;
+    min-width: 0; /* Prevents flex children from overflowing */
 }
 
 .fv2-group label {
@@ -456,6 +426,9 @@
     gap: 0.4rem;
     letter-spacing: 0.3px;
     text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .fv2-group input,
@@ -472,6 +445,8 @@
     transition: all 0.2s ease;
     resize: vertical;
     -webkit-text-fill-color: white;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .fv2-group input::placeholder,
@@ -716,14 +691,35 @@
    ============================================ */
 .students-v2-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
     padding: 1rem;
     max-height: 640px;
     overflow-y: auto;
+    overflow-x: hidden; /* Fix horizontal scroll overflow */
+    align-items: start;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-    align-items: start;
+}
+
+.student-v2-stats {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
 }
 
 /* Card is now a column — edit panel expands below the top row */
@@ -757,75 +753,187 @@
 }
 
 .student-v2-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: white;
     flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.student-v2-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.reg-badge {
+    font-size: 0.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.08);
+    color: #10b981;
+    padding: 0 0.45rem;
+    height: 17px;
+    border-radius: 4px;
+    margin-left: 0.65rem;
+    letter-spacing: 0.8px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Better alignment with uppercase student name */
+    transform: translateY(-0.5px);
+}
+
+.plan-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+}
+
+.plan-badge.standard {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.plan-badge.plus {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+}
+
+.plan-badge.premium {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+    color: #d8b4fe;
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+.plan-select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    padding: 0.6rem 0.85rem !important;
+    border-radius: 10px !important;
+    font-size: 0.85rem !important;
+    font-family: 'Inter', sans-serif !important;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.plan-select:focus {
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    background: rgba(59, 130, 246, 0.06) !important;
+}
+
+.plan-select option {
+    background: #13131f; /* Match card background */
+    color: white;
+    padding: 10px;
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 13px;
+    height: 13px;
+    background: #10b981;
+    border: 2.5px solid #13131f;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    z-index: 2;
 }
 
 .student-v2-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .student-v2-name {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: white;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    line-height: 1.4;
+    margin-bottom: 0.1rem;
+}
+
+.reg-badge, .plan-badge {
+    height: 18px;
+    padding: 0 0.5rem;
+    border-radius: 5px;
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0; /* Removing fixed margin-left to use flex gap */
+}
+
+/* Specific Badge Tweaks */
+.reg-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.plan-badge.standard {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .student-v2-roll {
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.35);
-    margin-top: 0.1rem;
-    font-family: monospace;
-}
-
-.student-v2-stats {
-    display: flex;
-    gap: 0.45rem;
-    margin-top: 0.45rem;
-    flex-wrap: wrap;
-}
-
-.stat-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.45);
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0.2rem 0.55rem;
-    border-radius: 100px;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
 }
 
 .edit-v2-btn {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
     background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.25);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     color: #60a5fa;
-    padding: 0.4rem 0.75rem;
+    padding: 0.45rem 0.85rem;
     border-radius: 9px;
     cursor: pointer;
     font-size: 0.75rem;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
 }
 
@@ -863,19 +971,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    animation: editPanelReveal 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes editPanelReveal {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .edit-panel-fields {
@@ -952,3 +1047,5 @@
     cursor: not-allowed;
     transform: none;
 }
+
+/* End of file */

@@ -59,10 +59,25 @@ const Security = () => {
             const { error } = await supabase.rpc('delete_user_session', { p_session_id: sessionId });
             if (error) throw error;
 
-            const currentSession = await supabase.auth.getSession();
+            let currentSessionId = null;
+            try {
+                const { data: { session }, error: authError } = await supabase.auth.getSession();
+                if (authError) {
+                    if (authError.message.includes('refresh_token_not_found') || authError.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                        navigate('/');
+                        return;
+                    }
+                    throw authError;
+                }
+                currentSessionId = session?.id;
+            } catch (err) {
+                console.error("Session check failed:", err);
+            }
+
             setSessions(sessions.filter(s => s.id !== sessionId));
 
-            if (currentSession.data?.session?.id === sessionId) {
+            if (currentSessionId === sessionId) {
                 await supabase.auth.signOut();
                 navigate('/');
             }

@@ -21,7 +21,6 @@ const Admin = () => {
     const [materials, setMaterials] = useState([]);
     const [notices, setNotices] = useState([]);
     const [events, setEvents] = useState([]);
-    const [routines, setRoutines] = useState([]);
     const [holidays, setHolidays] = useState([]);
     const [whatsappGroups, setWhatsappGroups] = useState([]);
     const [expenses, setExpenses] = useState([]);
@@ -31,7 +30,6 @@ const Admin = () => {
     const [studentSearch, setStudentSearch] = useState('');
     const [editingStudent, setEditingStudent] = useState(null);
 
-    const [routineForm, setRoutineForm] = useState({ day: 'Monday', start_time: '', end_time: '', subject: '', prof: '', room: '' });
     const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'official' });
     const [moduleForm, setModuleForm] = useState({ section_id: 'class-notes', subject_name: '', chapter_name: '', file_name: '', file_description: '', drive_link: '' });
     const [noticeForm, setNoticeForm] = useState({ title: '', content: '', attachment_link: '', attachment_type: 'pdf', notice_date: new Date().toISOString().split('T')[0] });
@@ -55,7 +53,7 @@ const Admin = () => {
 
     const fetchAllData = () => {
         fetchStudents(); fetchMaterials(); fetchNotices(); fetchEvents();
-        fetchRoutines(); fetchHolidays(); fetchWhatsappGroups(); fetchSyllabus(); fetchExpenses();
+        fetchHolidays(); fetchWhatsappGroups(); fetchSyllabus(); fetchExpenses();
     };
 
     const fetchSyllabus = async () => {
@@ -77,10 +75,6 @@ const Admin = () => {
     const fetchEvents = async () => {
         const { data, error } = await supabase.from('events').select('*').order('event_date', { ascending: false });
         if (!error) setEvents(data);
-    };
-    const fetchRoutines = async () => {
-        const { data, error } = await supabase.from('routines').select('*').order('day', { ascending: true }).order('start_time', { ascending: true });
-        if (!error) setRoutines(data);
     };
     const fetchHolidays = async () => {
         const { data, error } = await supabase.from('holidays').select('*').order('date', { ascending: true });
@@ -123,13 +117,6 @@ const Admin = () => {
         else { showAlert('success', 'Event created!'); setEventForm({ title: '', description: '', event_date: '', registration_link: '', photo_url: '' }); fetchEvents(); }
         setLoading(false);
     };
-    const handleRoutineSubmit = async (e) => {
-        e.preventDefault(); setLoading(true);
-        const { error } = await supabase.from('routines').insert([routineForm]);
-        if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Class added to routine!'); setRoutineForm({ day: 'Monday', start_time: '', end_time: '', subject: '', prof: '', room: '' }); fetchRoutines(); }
-        setLoading(false);
-    };
     const handleHolidaySubmit = async (e) => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('holidays').insert([holidayForm]);
@@ -165,7 +152,6 @@ const Admin = () => {
             if (table === 'study_materials') fetchMaterials();
             else if (table === 'notices') fetchNotices();
             else if (table === 'events') fetchEvents();
-            else if (table === 'routines') fetchRoutines();
             else if (table === 'holidays') fetchHolidays();
             else if (table === 'whatsapp_groups') fetchWhatsappGroups();
             else if (table === 'site_expenses') fetchExpenses();
@@ -174,7 +160,13 @@ const Admin = () => {
     };
     const handleUpdateStudent = async (studentId) => {
         setLoading(true);
-        const { error } = await supabase.from('students').update({ donation: editingStudent.donation, files_count: editingStudent.files_count }).eq('id', studentId);
+        const { error } = await supabase.from('students')
+            .update({ 
+                donation: editingStudent.donation, 
+                files_count: editingStudent.files_count,
+                subscription_plan: editingStudent.subscription_plan 
+            })
+            .eq('id', studentId);
         if (error) showAlert('error', error.message);
         else { showAlert('success', 'Student updated!'); setEditingStudent(null); fetchStudents(); }
         setLoading(false);
@@ -211,10 +203,9 @@ const Admin = () => {
         { id: 'students', icon: <Users size={18} />, label: 'Students', count: students.length, color: '#8b5cf6' },
         { id: 'notices', icon: <Bell size={18} />, label: 'Notices', count: notices.length, color: '#f59e0b' },
         { id: 'events', icon: <Calendar size={18} />, label: 'Events', count: events.length, color: '#10b981' },
-        { id: 'routine', icon: <Clock size={18} />, label: 'Class Routine', count: routines.length, color: '#06b6d4' },
         { id: 'holidays', icon: <GraduationCap size={18} />, label: 'Holidays', count: holidays.length, color: '#ec4899' },
         { id: 'whatsapp', icon: <MessageCircle size={18} />, label: 'WhatsApp Groups', count: whatsappGroups.length, color: '#22c55e' },
-        { id: 'finances', icon: <Coins size={18} />, label: 'Finances', count: expenses.length, color: '#f97316' },
+        { id: 'finances', icon: <Coins size={18} />, label: 'Finances', count: expenses.length, color: '#f97316' }
     ];
 
     return (
@@ -390,9 +381,22 @@ const Admin = () => {
                                     <div key={student.id} className={`student-v2-card ${editingStudent?.id === student.id ? 'is-editing' : ''}`}>
                                         {/* Top row: avatar + info + edit btn */}
                                         <div className="student-v2-top-row">
-                                            <div className="student-v2-avatar">{student.name?.charAt(0).toUpperCase()}</div>
+                                            <div className="student-v2-avatar">
+                                                {student.avatar_url ? (
+                                                    <img src={student.avatar_url} alt="" />
+                                                ) : (
+                                                    student.name?.charAt(0).toUpperCase()
+                                                )}
+                                                {student.user_id && <div className="online-indicator" title="Registered Student"></div>}
+                                            </div>
                                             <div className="student-v2-info">
-                                                <div className="student-v2-name">{student.name}</div>
+                                                <div className="student-v2-name">
+                                                    {student.name}
+                                                    {student.user_id && <span className="reg-badge">Registered</span>}
+                                                    <span className={`plan-badge ${student.subscription_plan || 'standard'}`}>
+                                                        {student.subscription_plan || 'standard'}
+                                                    </span>
+                                                </div>
                                                 <div className="student-v2-roll">{student.class_roll_no}</div>
                                                 <div className="student-v2-stats">
                                                     <span className="stat-pill">
@@ -433,6 +437,18 @@ const Admin = () => {
                                                             value={editingStudent.files_count || 0}
                                                             onChange={e => setEditingStudent({ ...editingStudent, files_count: parseInt(e.target.value) || 0 })}
                                                         />
+                                                    </div>
+                                                    <div className="edit-panel-field" style={{ gridColumn: 'span 2' }}>
+                                                        <label><Zap size={13} /> Subscription Plan</label>
+                                                        <select
+                                                            value={editingStudent.subscription_plan || 'standard'}
+                                                            onChange={e => setEditingStudent({ ...editingStudent, subscription_plan: e.target.value })}
+                                                            className="plan-select"
+                                                        >
+                                                            <option value="standard">Standard Plan (Basic)</option>
+                                                            <option value="plus">PLUS Plan (Gate + Sem Papers)</option>
+                                                            <option value="premium">PREMIUM Plan (Merch + Subscriptions)</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <button className="save-v2-btn" onClick={() => handleUpdateStudent(student.id)} disabled={loading}>
@@ -551,65 +567,6 @@ const Admin = () => {
                                         </div>
                                     ))}
                                     {events.length === 0 && <div className="empty-list-msg">No events yet.</div>}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* ========== ROUTINE ========== */}
-                {activeTab === 'routine' && (
-                    <div className="admin-v2-page">
-                        <div className="admin-v2-page-header">
-                            <div>
-                                <h1><Clock size={24} /> Class Routine</h1>
-                                <p>Add and remove classes from the weekly schedule.</p>
-                            </div>
-                            <div className="page-header-stat">
-                                <div className="stat-num">{routines.length}</div>
-                                <div className="stat-lbl">Scheduled Classes</div>
-                            </div>
-                        </div>
-                        <div className="admin-v2-two-col">
-                            <div className="admin-v2-card">
-                                <div className="card-v2-header"><Plus size={18} /> <span>Add New Class</span></div>
-                                <form onSubmit={handleRoutineSubmit} className="admin-v2-form">
-                                    <div className="fv2-row">
-                                        <div className="fv2-group">
-                                            <label>Day</label>
-                                            <select value={routineForm.day} onChange={e => setRoutineForm({ ...routineForm, day: e.target.value })}>
-                                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => <option key={d}>{d}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="fv2-group"><label>Subject</label><input placeholder="e.g., Mathematics-II" value={routineForm.subject} onChange={e => setRoutineForm({ ...routineForm, subject: e.target.value })} required /></div>
-                                    </div>
-                                    <div className="fv2-row">
-                                        <div className="fv2-group"><label>Start Time</label><input type="time" value={routineForm.start_time} onChange={e => setRoutineForm({ ...routineForm, start_time: e.target.value })} required /></div>
-                                        <div className="fv2-group"><label>End Time</label><input type="time" value={routineForm.end_time} onChange={e => setRoutineForm({ ...routineForm, end_time: e.target.value })} required /></div>
-                                    </div>
-                                    <div className="fv2-row">
-                                        <div className="fv2-group"><label>Professor</label><input placeholder="Prof. Name" value={routineForm.prof} onChange={e => setRoutineForm({ ...routineForm, prof: e.target.value })} required /></div>
-                                        <div className="fv2-group"><label>Room / Lab</label><input placeholder="e.g., Room 301" value={routineForm.room} onChange={e => setRoutineForm({ ...routineForm, room: e.target.value })} required /></div>
-                                    </div>
-                                    <button type="submit" className="admin-v2-submit-btn routine-btn" disabled={loading}>
-                                        {loading ? <Loader2 size={16} className="spin" /> : <Clock size={16} />} Add to Routine
-                                    </button>
-                                </form>
-                            </div>
-                            <div className="admin-v2-card">
-                                <div className="card-v2-header"><Clock size={18} /> <span>Scheduled Classes</span><span className="header-count">{routines.length}</span></div>
-                                <div className="admin-v2-list">
-                                    {routines.map(r => (
-                                        <div key={r.id} className="admin-v2-list-item">
-                                            <div className="list-item-icon" style={{ background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}><Clock size={16} /></div>
-                                            <div className="list-item-details">
-                                                <div className="list-item-title">{r.subject} <span className="day-chip">{r.day}</span></div>
-                                                <div className="list-item-sub">{r.start_time} – {r.end_time} · {r.prof} · {r.room}</div>
-                                            </div>
-                                            <button className="list-delete-btn" onClick={() => handleDelete('routines', r.id)}><Trash2 size={14} /></button>
-                                        </div>
-                                    ))}
-                                    {routines.length === 0 && <div className="empty-list-msg">No classes scheduled.</div>}
                                 </div>
                             </div>
                         </div>

@@ -23,7 +23,7 @@
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s ease;
-    z-index: 100;
+    z-index: 10;
 }
 
 .back-btn-whatsapp:hover {

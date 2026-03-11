@@ -85,8 +85,18 @@ const Auth = () => {
     // Check for existing session
     useEffect(() => {
         const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) navigate('/profile');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                    }
+                    return;
+                }
+                if (session) navigate('/profile', { replace: true });
+            } catch (err) {
+                console.error('Session check error:', err);
+            }
         };
         checkUser();
     }, [navigate]);

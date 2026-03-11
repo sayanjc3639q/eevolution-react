@@ -37,20 +37,30 @@ const Memories = () => {
 
     useEffect(() => {
         const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setSession(session);
-
-            if (session?.user) {
-                const { data: profile } = await supabase
-                    .from('students')
-                    .select('is_admin, class_roll_no')
-                    .eq('user_id', session.user.id)
-                    .single();
-
-                if (profile) {
-                    if (profile.is_admin) setIsAdmin(true);
-                    setUserRoll(profile.class_roll_no || 'N/A');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                    }
+                    return;
                 }
+                setSession(session);
+
+                if (session?.user) {
+                    const { data: profile } = await supabase
+                        .from('students')
+                        .select('is_admin, class_roll_no')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    if (profile) {
+                        if (profile.is_admin) setIsAdmin(true);
+                        setUserRoll(profile.class_roll_no || 'N/A');
+                    }
+                }
+            } catch (err) {
+                console.warn('Memories session check failed:', err);
             }
         };
 
@@ -96,8 +106,8 @@ const Memories = () => {
         setUploadError(''); // Clear previous errors
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 1024 * 1024) {
-                setUploadError('Image is too large. Please select a photo under 1MB.');
+            if (file.size > 3 * 1024 * 1024) {
+                setUploadError('Image is too large. Please select a photo under 3MB.');
                 setImageFile(null);
                 if (imagePreview) URL.revokeObjectURL(imagePreview);
                 setImagePreview(null);
@@ -462,7 +472,7 @@ const Memories = () => {
                             ) : (
                                 <div className="upload-placeholder">
                                     <ImageIcon size={40} />
-                                    <p>Click to select a photo (Max 1MB)</p>
+                                    <p>Click to select a photo (Max 3MB)</p>
                                 </div>
                             )}
                             <input id="fileInput" type="file" accept="image/*" hidden onChange={handleFileChange} />

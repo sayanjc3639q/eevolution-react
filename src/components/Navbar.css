@@ -140,6 +140,22 @@
     box-shadow: 0 0 10px var(--accent-glow);
 }
 
+.plan-nav-highlight {
+    color: #a855f7 !important;
+    font-weight: 700 !important;
+}
+
+.plan-nav-highlight:hover {
+    text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+    transform: translateY(-1px);
+}
+
+.plan-nav-highlight.active::after {
+    background: #a855f7 !important;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+}
+
+
 /* Desktop Actions Bar */
 .desktop-actions {
     display: flex;

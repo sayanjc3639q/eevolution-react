@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     ArrowLeft, CreditCard, Smartphone, Building2,
     ShieldCheck, Lock, ChevronRight, Copy, Check,
-    AlertCircle, X, QrCode, Wallet, CheckCircle2
+    AlertCircle, X, QrCode, Wallet, CheckCircle2, Landmark
 } from 'lucide-react';
 import './Payment.css';
 
@@ -56,12 +56,12 @@ const Payment = () => {
     };
 
     const banks = [
-        { id: 'sbi', name: 'State Bank of India', logo: '🏦' },
-        { id: 'hdfc', name: 'HDFC Bank', logo: '🏛️' },
-        { id: 'icici', name: 'ICICI Bank', logo: '🏢' },
-        { id: 'axis', name: 'Axis Bank', logo: '🏗️' },
-        { id: 'kotak', name: 'Kotak Mahindra Bank', logo: '🏠' },
-        { id: 'pnb', name: 'Punjab National Bank', logo: '🏦' },
+        { id: 'sbi', name: 'State Bank of India', icon: <Landmark size={20} /> },
+        { id: 'hdfc', name: 'HDFC Bank', icon: <Landmark size={20} /> },
+        { id: 'icici', name: 'ICICI Bank', icon: <Landmark size={20} /> },
+        { id: 'axis', name: 'Axis Bank', icon: <Landmark size={20} /> },
+        { id: 'kotak', name: 'Kotak Mahindra Bank', icon: <Landmark size={20} /> },
+        { id: 'pnb', name: 'Punjab National Bank', icon: <Landmark size={20} /> },
     ];
 
     return (
@@ -301,7 +301,7 @@ const Payment = () => {
                                             className={`bank-card ${selectedBank === bank.id ? 'selected' : ''}`}
                                             onClick={() => setSelectedBank(bank.id)}
                                         >
-                                            <span className="bank-logo">{bank.logo}</span>
+                                            <span className="bank-logo">{bank.icon}</span>
                                             <span className="bank-name">{bank.name}</span>
                                         </button>
                                     ))}

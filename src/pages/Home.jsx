@@ -16,10 +16,24 @@ const Home = () => {
 
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setStatus('ready');
-        });
+        const checkSession = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                    }
+                    return;
+                }
+                setSession(session);
+                setStatus('ready');
+            } catch (err) {
+                console.warn('Home session check failed:', err);
+                setStatus('ready'); // Still allow guest view
+            }
+        };
+
+        checkSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
@@ -421,269 +435,248 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* --- Today's Schedule --- */}
-                <section className="ds-section reveal">
-                    <div className="ds-section-header">
-                        <div className="ds-section-label">
-                            <Calendar size={18} />
-                            <span>Today's Schedule</span>
-                        </div>
-                        <div className="ds-section-date">
-                            {today.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
-                        </div>
-                    </div>
-
-                    {scheduleLoading ? (
-                        <div className="schedule-skeleton-list">
-                            {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" />)}
-                        </div>
-                    ) : isWeekend ? (
-                        <div className="schedule-off-card weekend">
-                            <div className="schedule-off-icon">🎉</div>
-                            <h3>Weekend — Day Off!</h3>
-                            <p>Kick back, relax. No classes today.</p>
-                        </div>
-                    ) : isHoliday ? (
-                        <div className={`schedule-off-card holiday-type-${isHoliday.type || 'official'}`}>
-                            <div className="schedule-off-icon">
-                                {isHoliday.type === 'unofficial' ? <BookOpen size={48} /> :
-                                    isHoliday.type === 'event' ? <Award size={48} /> :
-                                        <Sunrise size={48} />}
-                            </div>
-                            <div className="holiday-card-content">
-                                <h3>
-                                    {isHoliday.type === 'unofficial' ? 'Prep Day (Stay Home)' :
-                                        isHoliday.type === 'event' ? 'Event Day (No Classes)' : 'Official Holiday'}
-                                </h3>
-                                <p className="holiday-name">{isHoliday.name}</p>
-                                <p className="holiday-description">
-                                    {isHoliday.type === 'unofficial' ? 'Self-study is advised. Classes are officially off-record.' :
-                                        isHoliday.type === 'event' ? 'Engage in extracurriculars! No academic sessions scheduled.' : 'Enjoy your well-deserved break.'}
-                                </p>
-                            </div>
-                        </div>
-                    ) : todaySchedule.length === 0 ? (
-                    <div className="schedule-off-card">
-                        <div className="schedule-off-icon">📭</div>
-                        <h3>No Classes Today</h3>
-                        <p>Nothing scheduled — enjoy the free day!</p>
-                    </div>
-                    ) : (
-                    <div className="schedule-timeline carousel" ref={carouselRef}>
-                        {rows.map((row, idx) => {
-                            const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
-                            if (row.type === 'break') {
-                                return (
-                                    <div key={`break-${idx}`} className={`timeline-item timeline-break status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
-                                        <div className="break-label">
-                                            <Coffee size={14} />
-                                            <span>Break Time</span>
-                                        </div>
-                                        <div className="break-meta">
-                                            <span>{row.minutes} min · {formatTime(row.from)} – {formatTime(row.to)}</span>
-                                        </div>
-                                        {idx === finalActiveIdx && <div className="active-glow" />}
-                                    </div>
-                                );
-                            }
-                            const item = row.data;
-                            return (
-                                <div key={`class-${idx}`} className={`timeline-item timeline-class-card status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
-                                    <div className="card-top">
-                                        {status === 'live' && (
-                                            <div className="live-pill">
-                                                <span className="live-dot" />
-                                                LIVE NOW
-                                            </div>
-                                        )}
-                                        {status === 'done' && (
-                                            <div className="done-mark">
-                                                <CheckCircle2 size={18} />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="timeline-time">
-                                        <Clock size={14} />
-                                        <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
-                                    </div>
-                                    <div className="timeline-details">
-                                        <h4 className="timeline-subject">{item.subject}</h4>
-                                        <div className="timeline-meta">
-                                            <span className="timeline-prof">👨‍🏫 {item.prof}</span>
-                                            <span className="timeline-room">📍 {item.room}</span>
-                                        </div>
-                                    </div>
-                                    {idx === finalActiveIdx && <div className="active-glow" />}
+                {/* --- Bento Grid Layout --- */}
+                <div className="dashboard-content-wrapper">
+                    <div className="dashboard-bento-grid">
+                        {/* 1. Today's Schedule (Large) */}
+                        <section className="ds-section bento-item schedule-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Calendar size={18} />
+                                    <span>Today's Schedule</span>
                                 </div>
-                            );
-                        })}
-                    </div>
-                    )}
-                    <Link to="/routine" className="ds-view-more-btn">
-                        Full Weekly Routine <ChevronRight size={16} />
-                    </Link>
-                </section>
+                                <div className="ds-section-date">
+                                    {today.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
+                                </div>
+                            </div>
 
-                {/* --- Quick Links --- */}
-                <section className="ds-section reveal">
-                    <div className="ds-section-header">
-                        <div className="ds-section-label">
-                            <Zap size={18} />
-                            <span>Quick Links</span>
-                        </div>
-                    </div>
-                    <div className="quick-links-grid">
-                        {[
-                            { to: '/study', icon: <BookOpen size={22} />, label: 'Study Hub', color: '#0ea5e9' },
-                            { to: '/routine', icon: <Calendar size={22} />, label: 'Routine', color: '#8b5cf6' },
-                            { to: '/notices', icon: <Bell size={22} />, label: 'Notices', color: '#f59e0b' },
-                            { to: '/chat', icon: <MessageSquare size={22} />, label: 'Batch Chat', color: '#10b981' },
-                            { to: '/syllabus', icon: <FileText size={22} />, label: 'Syllabus', color: '#ec4899' },
-                            { to: '/memories', icon: <Heart size={22} />, label: 'Memories', color: '#ef4444' },
-                            { to: '/events', icon: <PartyPopper size={22} />, label: 'Events', color: '#14b8a6' },
-                            { to: '/holidays', icon: <Sun size={22} />, label: 'Holidays', color: '#f97316' },
-                            { to: '/explore', icon: <Globe size={22} />, label: 'Explore', color: '#6366f1' },
-                            { to: '/support', icon: <Landmark size={22} />, label: 'Support Us', color: '#d946ef' },
-                        ].map((link) => (
-                            <Link key={link.to} to={link.to} className="quick-link-item" style={{ '--ql-color': link.color }}>
-                                <div className="ql-icon">{link.icon}</div>
-                                <span className="ql-label">{link.label}</span>
+                            {scheduleLoading ? (
+                                <div className="schedule-skeleton-list">
+                                    {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" />)}
+                                </div>
+                            ) : isWeekend ? (
+                                <div className="schedule-off-card weekend">
+                                    <div className="schedule-off-icon">🎉</div>
+                                    <h3>Weekend — Day Off!</h3>
+                                    <p>Kick back, relax. No classes today.</p>
+                                </div>
+                            ) : isHoliday ? (
+                                <div className={`schedule-off-card holiday-type-${isHoliday.type || 'official'}`}>
+                                    <div className="schedule-off-icon">
+                                        {isHoliday.type === 'unofficial' ? <BookOpen size={48} /> :
+                                            isHoliday.type === 'event' ? <Award size={48} /> :
+                                                <Sunrise size={48} />}
+                                    </div>
+                                    <div className="holiday-card-content">
+                                        <h3>
+                                            {isHoliday.type === 'unofficial' ? 'Prep Day (Stay Home)' :
+                                                isHoliday.type === 'event' ? 'Event Day (No Classes)' : 'Official Holiday'}
+                                        </h3>
+                                        <p className="holiday-name">{isHoliday.name}</p>
+                                        <p className="holiday-description">
+                                            {isHoliday.type === 'unofficial' ? 'Self-study is advised. Classes are officially off-record.' :
+                                                isHoliday.type === 'event' ? 'Engage in extracurriculars! No academic sessions scheduled.' : 'Enjoy your well-deserved break.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : todaySchedule.length === 0 ? (
+                                <div className="schedule-off-card">
+                                    <div className="schedule-off-icon">📭</div>
+                                    <h3>No Classes Today</h3>
+                                    <p>Nothing scheduled — enjoy the free day!</p>
+                                </div>
+                            ) : (
+                                <div className="schedule-timeline carousel" ref={carouselRef}>
+                                    {rows.map((row, idx) => {
+                                        const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
+                                        if (row.type === 'break') {
+                                            return (
+                                                <div key={`break-${idx}`} className={`timeline-item timeline-break status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
+                                                    <div className="break-label">
+                                                        <Coffee size={14} />
+                                                        <span>Break Time</span>
+                                                    </div>
+                                                    <div className="break-meta">
+                                                        <span>{row.minutes} min · {formatTime(row.from)} – {formatTime(row.to)}</span>
+                                                    </div>
+                                                    {idx === finalActiveIdx && <div className="active-glow" />}
+                                                </div>
+                                            );
+                                        }
+                                        const item = row.data;
+                                        return (
+                                            <div key={`class-${idx}`} className={`timeline-item timeline-class-card status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
+                                                <div className="card-top">
+                                                    {status === 'live' && (
+                                                        <div className="live-pill">
+                                                            <span className="live-dot" />
+                                                            LIVE NOW
+                                                        </div>
+                                                    )}
+                                                    {status === 'done' && (
+                                                        <div className="done-mark">
+                                                            <CheckCircle2 size={18} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="timeline-time">
+                                                    <Clock size={14} />
+                                                    <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
+                                                </div>
+                                                <div className="timeline-details">
+                                                    <h4 className="timeline-subject">{item.subject}</h4>
+                                                    <div className="timeline-meta">
+                                                        <span className="timeline-prof">👨‍🏫 {item.prof}</span>
+                                                        <span className="timeline-room">📍 {item.room}</span>
+                                                    </div>
+                                                </div>
+                                                {idx === finalActiveIdx && <div className="active-glow" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            <Link to="/routine" className="ds-view-more-btn">
+                                Full Weekly Routine <ChevronRight size={16} />
                             </Link>
-                        ))}
+                        </section>
+
+                        {/* 2. Quick Links (Medium) */}
+                        <section className="ds-section bento-item links-bento reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Zap size={18} />
+                                    <span>Quick Links</span>
+                                </div>
+                            </div>
+                            <div className="quick-links-grid">
+                                {[
+                                    { to: '/study', icon: <BookOpen size={22} />, label: 'Study Hub', color: '#0ea5e9' },
+                                    { to: '/routine', icon: <Calendar size={22} />, label: 'Routine', color: '#8b5cf6' },
+                                    { to: '/notices', icon: <Bell size={22} />, label: 'Notices', color: '#f59e0b' },
+                                    { to: '/chat', icon: <MessageSquare size={22} />, label: 'Batch Chat', color: '#10b981' },
+                                    { to: '/syllabus', icon: <FileText size={22} />, label: 'Syllabus', color: '#ec4899' },
+                                    { to: '/memories', icon: <Heart size={22} />, label: 'Memories', color: '#ef4444' },
+                                    { to: '/explore', icon: <Globe size={22} />, label: 'Explore', color: '#6366f1' },
+                                    { to: '/support', icon: <Landmark size={22} />, label: 'Support Us', color: '#d946ef' },
+                                ].map((link) => (
+                                    <Link key={link.to} to={link.to} className="quick-link-item" style={{ '--ql-color': link.color }}>
+                                        <div className="ql-icon">{link.icon}</div>
+                                        <span className="ql-label">{link.label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 3. Top Contributors */}
+                        <section className="ds-section bento-item contributor-bento leaderboard-card reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Upload size={18} />
+                                    <span>Top Contributors</span>
+                                </div>
+                            </div>
+                            {communityLoading ? (
+                                <div className="schedule-skeleton-list">
+                                    {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
+                                </div>
+                            ) : contributors.length === 0 ? (
+                                <p className="lb-empty">No contributors yet. Upload files to rank!</p>
+                            ) : (
+                                <div className="lb-list">
+                                    {contributors.map((user, idx) => (
+                                        <div key={user.id} className="lb-row">
+                                            <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
+                                            <div className="lb-avatar" style={{ background: `hsl(${idx * 80}, 60%, 40%)` }}>
+                                                {user.avatar_url ? <img src={user.avatar_url} alt={user.name} /> : user.name.charAt(0)}
+                                            </div>
+                                            <div className="lb-info">
+                                                <span className="lb-name">{user.name}</span>
+                                                <span className="lb-sub">{user.class_roll_no}</span>
+                                            </div>
+                                            <div className="lb-score">
+                                                <Upload size={13} />
+                                                <span>{user.files_count}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <Link to="/contributors" className="lb-see-all-btn">
+                                See All <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 4. Top Donators */}
+                        <section className="ds-section bento-item donator-bento leaderboard-card reveal">
+                            <div className="ds-section-header">
+                                <div className="ds-section-label">
+                                    <Coins size={18} />
+                                    <span>Top Donators</span>
+                                </div>
+                            </div>
+                            {communityLoading ? (
+                                <div className="schedule-skeleton-list">
+                                    {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
+                                </div>
+                            ) : donators.length === 0 ? (
+                                <p className="lb-empty">No donators yet. Be the first!</p>
+                            ) : (
+                                <div className="lb-list">
+                                    {donators.map((d, idx) => (
+                                        <div key={d.id} className="lb-row">
+                                            <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
+                                            <div className="lb-avatar" style={{ background: `hsl(${30 + idx * 60}, 70%, 40%)` }}>
+                                                {d.avatar_url ? <img src={d.avatar_url} alt={d.name} /> : d.name.charAt(0)}
+                                            </div>
+                                            <div className="lb-info">
+                                                <span className="lb-name">{d.name}</span>
+                                                <span className="lb-sub">{d.class_roll_no}</span>
+                                            </div>
+                                            <div className="lb-score donation">
+                                                <span>₹{d.donation}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <Link to="/donators" className="lb-see-all-btn">
+                                See All <ChevronRight size={15} />
+                            </Link>
+                        </section>
+
+                        {/* 5. Pioneer Hall of Fame (Featured) */}
+                        <section className="pioneer-section bento-item pioneer-bento reveal">
+                            <div className="pioneer-header-bento">
+                                <span className="pioneer-badge">Legacy Support</span>
+                                <h3>Hall of Fame</h3>
+                            </div>
+
+                            <div className="pioneer-grid-bento">
+                                <div className="pioneer-card-bento top-contributor">
+                                    <div className="tier-tag-bento"><Heart size={12} fill="currentColor" /> Pioneer</div>
+                                    <div className="pioneer-image-container-bento">
+                                        <img
+                                            src="https://res.cloudinary.com/dytmgybqm/image/upload/v1772395818/Untitled_design_1_edptux.jpg"
+                                            alt="Sambuddha Samanta"
+                                            className="pioneer-img-bento"
+                                        />
+                                    </div>
+                                    <div className="pioneer-info-bento">
+                                        <h4 className="premium-name-bento">Sambuddha Samanta</h4>
+                                        <p className="pioneer-tagline-bento">"A valued supporter whose contribution fuels our growth."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                </section>
-
-                {/* --- Top Contributors & Donators --- */}
-                <div className="community-leaderboards reveal">
-                    {/* Top Contributors */}
-                    <section className="ds-section leaderboard-card">
-                        <div className="ds-section-header">
-                            <div className="ds-section-label">
-                                <Upload size={18} />
-                                <span>Top Contributors</span>
-                            </div>
-                        </div>
-                        {communityLoading ? (
-                            <div className="schedule-skeleton-list">
-                                {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
-                            </div>
-                        ) : contributors.length === 0 ? (
-                            <p className="lb-empty">No contributors yet. Upload files to rank!</p>
-                        ) : (
-                            <div className="lb-list">
-                                {contributors.map((user, idx) => (
-                                    <div key={user.id} className="lb-row">
-                                        <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
-                                        <div className="lb-avatar" style={{ background: `hsl(${idx * 80}, 60%, 40%)` }}>
-                                            {user.avatar_url ? <img src={user.avatar_url} alt={user.name} /> : user.name.charAt(0)}
-                                        </div>
-                                        <div className="lb-info">
-                                            <span className="lb-name">{user.name}</span>
-                                            <span className="lb-sub">{user.class_roll_no}</span>
-                                        </div>
-                                        <div className="lb-score">
-                                            <Upload size={13} />
-                                            <span>{user.files_count}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <Link to="/contributors" className="lb-see-all-btn">
-                            See All Contributors <ChevronRight size={15} />
-                        </Link>
-                    </section>
-
-                    {/* Top Donators */}
-                    <section className="ds-section leaderboard-card">
-                        <div className="ds-section-header">
-                            <div className="ds-section-label">
-                                <Coins size={18} />
-                                <span>Top Donators</span>
-                            </div>
-                        </div>
-                        {communityLoading ? (
-                            <div className="schedule-skeleton-list">
-                                {[1, 2, 3].map(n => <div key={n} className="sched-skeleton skeleton-pulse" style={{ height: '64px' }} />)}
-                            </div>
-                        ) : donators.length === 0 ? (
-                            <p className="lb-empty">No donators yet. Be the first!</p>
-                        ) : (
-                            <div className="lb-list">
-                                {donators.map((d, idx) => (
-                                    <div key={d.id} className="lb-row">
-                                        <span className="lb-rank">{rankLabels[idx] || `#${idx + 1}`}</span>
-                                        <div className="lb-avatar" style={{ background: `hsl(${30 + idx * 60}, 70%, 40%)` }}>
-                                            {d.avatar_url ? <img src={d.avatar_url} alt={d.name} /> : d.name.charAt(0)}
-                                        </div>
-                                        <div className="lb-info">
-                                            <span className="lb-name">{d.name}</span>
-                                            <span className="lb-sub">{d.class_roll_no}</span>
-                                        </div>
-                                        <div className="lb-score donation">
-                                            <span>₹{d.donation}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <Link to="/donators" className="lb-see-all-btn">
-                            See All Donators <ChevronRight size={15} />
-                        </Link>
-                    </section>
                 </div>
 
-                {/* --- Featured Donator / Pioneer --- */}
-                <section className="pioneer-section">
-                    <div className="pioneer-header">
-                        <span className="pioneer-badge">Legacy Support</span>
-                        <h2>Pioneer Hall of Fame</h2>
-                        <p>The visionaries whose contributions powered the EEvolution.</p>
-                    </div>
-
-                    <div className="pioneer-grid">
-                        <div className="pioneer-card top-contributor">
-                            <div className="tier-tag"><Heart size={14} fill="currentColor" /> Top Contributor</div>
-
-                            <div className="pioneer-image-container">
-                                <img
-                                    src="https://res.cloudinary.com/dytmgybqm/image/upload/v1772395818/Untitled_design_1_edptux.jpg"
-                                    alt="Sambuddha Samanta"
-                                    className="pioneer-img"
-                                />
-                                <div className="verified-crown">
-                                    <TrendingUp size={20} />
-                                </div>
-                            </div>
-
-                            <div className="pioneer-info">
-                                <h3 className="premium-name">Sambuddha Samanta</h3>
-                                <p className="pioneer-tagline">"A valued supporter whose contribution fuels the growth of our departmental ecosystem."</p>
-
-                                <div className="pioneer-stats">
-                                    <div className="p-stat">
-                                        <span>Batch Supporter</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="pioneer-mission-note">
-                        <div className="mission-icon"><ShieldCheck size={28} /></div>
-                        <p>
-                            EEvolution 2.0 is a <strong>100% Student-funded</strong> and <strong>Developer-supported</strong> project.
-                            While we feature our top supporters, the development and maintenance are sustained by the dev team to keep these resources free for everyone.
-                        </p>
-                    </div>
-                </section>
-
-                {/* --- Student Reviews --- */}
+                {/* --- Student Reviews (Full Width Below Bento) --- */}
                 <section className="voices-section reveal-stagger">
                     <div className="section-header center">
                         <span className="section-badge">Student Feedback</span>
                         <h2>Voices from the Batch</h2>
-                        <p>Real experiences from students who are evolving their study workflow.</p>
                     </div>
 
                     <div className="voices-container">
@@ -695,9 +688,7 @@ const Home = () => {
                                 ))}
                             </div>
                             <p className="voice-text">
-                                "I really loved EEVOLUTION 2.0. It is very helpful, clean, and easy to use.
-                                The Upload Section allows everyone to share notes and resources, which makes learning
-                                collaborative and supportive."
+                                "I really loved EEVOLUTION 2.0. It is very helpful, clean, and easy to use."
                             </p>
                             <div className="voice-footer">
                                 <div className="voice-avatar">SM</div>
@@ -705,7 +696,7 @@ const Home = () => {
                                     <h4>Sathi Mondal</h4>
                                     <div className="student-verify">
                                         <ShieldCheck size={12} />
-                                        <span>25/EE/088 • Verified Student</span>
+                                        <span>Verified Student</span>
                                     </div>
                                 </div>
                             </div>
@@ -719,8 +710,7 @@ const Home = () => {
                                 ))}
                             </div>
                             <p className="voice-text">
-                                "Electrical Engineering is a gauntlet. EEvolution replaces the frantic WhatsApp hunt with
-                                a clean, no-nonsense hub that respects your sanity. It's a digital lifeline built for the batch."
+                                "Electrical Engineering is a gauntlet. EEvolution respects your sanity. It's a digital lifeline."
                             </p>
                             <div className="voice-footer">
                                 <div className="voice-avatar secondary">SK</div>
@@ -728,7 +718,7 @@ const Home = () => {
                                     <h4>Sohan Kundu</h4>
                                     <div className="student-verify">
                                         <ShieldCheck size={12} />
-                                        <span>25/EE/106 • Verified Student</span>
+                                        <span>Verified Student</span>
                                     </div>
                                 </div>
                             </div>

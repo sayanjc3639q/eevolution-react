@@ -240,3 +240,14 @@ body {
   border-radius: 20px;
   padding: 1.5rem;
 }
+
+/* --- Navigation Fixes --- */
+/* Ensures navigation back buttons stay below the fixed Header/Navbar */
+.back-btn-pill, 
+.back-btn-header, 
+.back-btn-whatsapp, 
+.back-btn-square, 
+.pay-back-btn, 
+.back-btn {
+    z-index: 10 !important;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Zap, BookOpen, Home, MessageSquare, User, LayoutGrid, Bell, Search, Camera, Lock } from 'lucide-react';
+import { Zap, BookOpen, Home, MessageSquare, User, LayoutGrid, Bell, Search, Camera, Lock, Crown } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Navbar.css';
 
@@ -19,11 +19,27 @@ const Navbar = () => {
 
     // ─── Auth ────────────────────────────────────────────────────────────
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            if (session?.user?.user_metadata?.full_name)
-                setUserName(session.user.user_metadata.full_name);
-        });
+        const checkSession = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    // If refresh token is invalid, clear global session
+                    if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+                        await supabase.auth.signOut();
+                        return;
+                    }
+                    throw error;
+                }
+                setSession(session);
+                if (session?.user?.user_metadata?.full_name)
+                    setUserName(session.user.user_metadata.full_name);
+            } catch (err) {
+                console.warn('Auth session check failed:', err.message);
+                setSession(null);
+            }
+        };
+
+        checkSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
@@ -181,8 +197,8 @@ const Navbar = () => {
                         <span>Chat</span>
                     </NavLink>
 
-                    <NavLink to="/memories" className="nav-link" onClick={handleRestrictedClick}>
-                        <Camera size={20} /><span>Memories</span>
+                    <NavLink to="/pricing" className="nav-link plan-nav-highlight">
+                        <Crown size={20} /><span>Plans</span>
                     </NavLink>
 
                     {/* Desktop Actions */}
