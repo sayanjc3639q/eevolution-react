@@ -40,7 +40,7 @@ const EntryScreen = ({ onComplete }) => {
         <div className={`entry-overlay ${animationStage === 'fade-out' ? 'exit' : ''}`}>
             <div className="entry-content">
                 <div className={`logo-container ${animationStage}`}>
-                    <img src="assets/eevolution-2-electrical-engineering-logo.png" alt="EEvolution Logo" className="entry-logo" />
+                    <img src="https://res.cloudinary.com/dkcsgmfcw/image/upload/v1773265196/eevolution-2-electrical-engineering-logo_lwf2ba.png" alt="EEvolution Logo" className="entry-logo" />
                 </div>
                 <div className={`text-container ${animationStage}`}>
                     <h1 className="entry-brand">
