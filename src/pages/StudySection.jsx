@@ -186,38 +186,6 @@ const StudySection = () => {
         return diffInDays <= 7;
     };
 
-    const renderRecentShelf = (title, filesList) => {
-        if (!filesList || filesList.length === 0) return null;
-
-        // Filter for new files and sort by date
-        const recentFiles = [...filesList]
-            .filter(f => isNew(f.created_at))
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-            .slice(0, 6);
-
-        if (recentFiles.length === 0) return null;
-
-        return (
-            <div className="recent-shelf-container reveal">
-                <h3 className="section-label" style={{ marginBottom: '1.25rem' }}>{title}</h3>
-                <div className="shelf-items">
-                    {recentFiles.map(file => (
-                        <div key={file.id} className="shelf-card" onClick={() => setPreviewFile(file)}>
-                            <div className="badge-new">NEW</div>
-                            <div className="shelf-icon-box">
-                                <FileText size={20} />
-                            </div>
-                            <div className="shelf-details">
-                                <h4>{file.file_name}</h4>
-                                <span>{file.subject_name}</span>
-                            </div>
-                            <ChevronRight size={14} style={{ opacity: 0.3 }} />
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
 
     // Filter materials for the final file view - Sorted by recent first
     const filteredFiles = materials
@@ -236,7 +204,6 @@ const StudySection = () => {
     // --- RENDERERS ---
     const renderCategories = () => (
         <div className="cascade-view" key="categories">
-            {renderRecentShelf("Recently Uploaded Documents", materials)}
             <div className="section-intro">
                 <h2>Choose <span className="highlight">Resource Type</span></h2>
                 <p>Select the kind of study material you are looking for.</p>
@@ -271,7 +238,6 @@ const StudySection = () => {
                     <span>{selectedCategory?.name}</span>
                 </div>
             </div>
-            {renderRecentShelf(`Recent ${selectedCategory?.name}`, materials.filter(m => m.section_id === categoryId))}
             <div className="subject-grid-container">
                 {subjects.filter(s => s.type === 'Theory').length > 0 && (
                     <div className="subject-section">
@@ -324,7 +290,6 @@ const StudySection = () => {
                     <span>{selectedCategory?.name} <span className="path-sep">&gt;</span> {selectedSubject?.name}</span>
                 </div>
             </div>
-            {renderRecentShelf("Recently Added", materials.filter(m => m.subject_name === selectedSubject?.name))}
             <div className="chapter-list">
                 {dynamicChapters.length > 0 ? (
                     dynamicChapters.map(ch => (
