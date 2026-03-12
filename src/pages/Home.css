@@ -1707,113 +1707,406 @@
     margin-left: auto;
 }
 
-.live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #10b981;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    padding: 0.2rem 0.6rem;
-    border-radius: 100px;
-    animation: livePulseBg 2s ease-in-out infinite;
-}
-
-.timeline-time {
+/* --- Modern Schedule Refurbishment --- */
+/* Carousel Navigation Wrapper */
+.schedule-carousel-wrapper {
+    position: relative;
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
 }
 
-.timeline-time svg {
-    color: var(--accent-color);
+.carousel-nav-btn {
+    display: none; /* Hidden by default (mobile) */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    color: var(--accent-light);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
 }
 
-.timeline-details {
+@media (min-width: 1024px) {
+    .carousel-nav-btn {
+        display: flex;
+    }
+}
+
+.carousel-nav-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4);
+}
+
+.carousel-nav-btn.prev {
+    left: -22px;
+}
+
+.carousel-nav-btn.next {
+    right: -22px;
+}
+
+.schedule-timeline.carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 1.5rem 0.5rem;
+    margin-bottom: 1.5rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 1.25rem;
+    justify-content: flex-start;
+    flex: 1; /* Take all available space in wrapper */
+}
+
+/* If only one item, center it */
+.schedule-timeline.carousel:has(> :only-child) {
+    justify-content: center;
+}
+
+.timeline-item {
+    flex: 0 0 92%; /* Shows full card clearly */
+    scroll-snap-align: center;
+    min-height: 240px;
+    position: relative;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    padding: 2rem;
+    overflow: hidden;
 }
 
-.timeline-subject {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin: 0;
-    line-height: 1.2;
+@media (min-width: 1024px) {
+    .timeline-item {
+        flex: 0 0 480px;
+    }
 }
 
-.timeline-meta {
+.timeline-item.is-active {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(var(--accent-color-rgb), 0.4);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Status Badges */
+.class-card-header, 
+.break-info {
     display: flex;
-    gap: 0.75rem;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.timeline-prof,
-.timeline-room {
-    font-size: 0.8rem;
+.item-status-inline {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.status-badge.live {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    animation: livePulseGlow 2s infinite;
+}
+
+.status-badge.upcoming {
+    background: rgba(var(--accent-color-rgb), 0.15);
+    color: var(--accent-light);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+}
+
+.status-badge.done {
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
-    font-weight: 600;
 }
 
-/* Break indicator in carousel */
+/* Class Card Specifics */
+.class-card-header {
+    margin-bottom: 1.5rem;
+}
+
+.time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.class-card-body .subject-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0 0 1.5rem;
+    line-height: 1.1;
+    color: var(--text-primary);
+    background: linear-gradient(to right, #fff, var(--text-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Break Card Refinement - Modern Glass Strip */
 .timeline-break {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 1.25rem 1.5rem;
-    text-align: center;
+    background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.05), rgba(0, 0, 0, 0.2)) !important;
+    border-style: solid !important;
+}
+
+.break-glass-strip {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    backdrop-filter: blur(5px);
+    justify-content: space-between;
 }
 
-.timeline-break.status-live {
-    background: rgba(var(--accent-color-rgb), 0.1);
-    border: 1px solid var(--accent-color);
-    box-shadow: 0 10px 40px rgba(var(--accent-color-rgb), 0.15);
-}
-
-.timeline-break .break-label {
+.break-main-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 800;
-    color: var(--accent-light);
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
+    gap: 1.5rem;
+    margin-top: 1rem;
 }
 
-.timeline-break .break-meta {
+.break-icon-box {
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-light);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.break-text-stack h4 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.break-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.next-up-indicator {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.8rem 1.25rem;
+    border-radius: 100px;
     font-size: 0.8rem;
     color: var(--text-secondary);
-    font-weight: 600;
+    border: 1px solid var(--border-color);
 }
 
-/* Active Glow Effect */
-.is-active .active-glow {
+.next-up-indicator b {
+    color: var(--accent-light);
+}
+
+.metadata-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.meta-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    flex-shrink: 0;
+}
+
+.meta-text label {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+}
+
+.meta-text span {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+    line-height: 1.2;
+}
+
+/* --- Responsive Adaptations --- */
+@media (max-width: 768px) {
+    .schedule-timeline.carousel {
+        padding: 1rem 0.75rem 2rem;
+        gap: 1rem;
+    }
+
+    .timeline-item {
+        padding: 1.75rem;
+        min-height: auto;
+        border-radius: 24px;
+        gap: 1rem;
+        flex: 0 0 100%; /* No cutout - full width relative to container */
+    }
+
+    .class-card-header {
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.55rem;
+    }
+
+    .class-card-body .subject-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        max-width: 100%; 
+    }
+
+    .metadata-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .meta-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .meta-text span {
+        font-size: 0.85rem;
+    }
+
+    .break-main-info {
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .break-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+    }
+
+    .break-text-stack h4 {
+        font-size: 1.25rem;
+    }
+
+    .next-up-indicator {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+
+    .timeline-complete-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .trophy-circle {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+
+/* Completion Look */
+.timeline-complete-card {
+    background: radial-gradient(circle at center, rgba(16, 185, 129, 0.1), transparent);
+    justify-content: center;
+    text-align: center;
+}
+
+.complete-visual {
+    margin-bottom: 1.5rem;
+}
+
+.trophy-circle {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+}
+
+.stars-container {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5em;
+}
+
+/* Aura Glow */
+.active-glow-aura {
     position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, var(--accent-color), #2563eb);
+    inset: -5px;
+    background: radial-gradient(circle at 30% 30%, var(--accent-color), transparent 70%);
+    opacity: 0.15;
     z-index: -1;
+    filter: blur(20px);
+    transition: all 0.5s ease;
+}
+
+.is-active .active-glow-aura {
     opacity: 0.3;
-    filter: blur(10px);
-    animation: activePulse 2s infinite alternate;
+}
+
+@keyframes livePulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
 }
 
 @keyframes activePulse {

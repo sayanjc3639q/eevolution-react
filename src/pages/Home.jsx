@@ -5,8 +5,8 @@ import {
     Zap, BookOpen, MessageSquare, Bell, ShieldCheck,
     TrendingUp, Award, Globe, Heart, Star, Quote, ArrowRight,
     Users, Clock, Calendar, Upload, Coins,
-    Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight,
-    FileText, Landmark, CheckCircle2
+    Coffee, Sun, Moon, Sunrise, PartyPopper, ChevronRight, ChevronLeft,
+    FileText, Landmark, CheckCircle2, User, MapPin
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import './Home.css';
@@ -346,7 +346,7 @@ const Home = () => {
 
         const today = currentTime;
         const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
-        const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; // YYYY-MM-DD in local time
         const isWeekend = dayName === 'Saturday' || dayName === 'Sunday';
         const now = today.getHours() * 60 + today.getMinutes();
 
@@ -421,17 +421,28 @@ const Home = () => {
 
         const rows = buildRows();
         const activeIdx = rows.findIndex(r => getRowStatus(r.type === 'class' ? r.data : r, r.type) === 'live');
+        
+        // Find the first upcoming item if no live class/break
+        const firstUpcomingIdx = rows.findIndex(r => getRowStatus(r.type === 'class' ? r.data : r, r.type) === 'upcoming');
 
         // Calculate fallbacks for activeIdx
         let finalActiveIdx = activeIdx;
-        if (finalActiveIdx === -1 && rows.length > 0) {
-            const firstStart = rows[0].type === 'class' ? toMin(rows[0].data.start_time) : toMin(rows[0].from);
-            if (now < firstStart) {
-                finalActiveIdx = 0; // Highlight first class if none started
-            } else {
-                finalActiveIdx = rows.length - 1; // Highlight last if all done
+        if (finalActiveIdx === -1) {
+            if (firstUpcomingIdx !== -1) {
+                finalActiveIdx = firstUpcomingIdx;
+            } else if (rows.length > 0) {
+                finalActiveIdx = rows.length; // Point to the "Day Complete" card we'll add
             }
         }
+
+        const scrollCarousel = (direction) => {
+            if (!carouselRef.current) return;
+            const scrollAmount = carouselRef.current.offsetWidth * 0.8;
+            carouselRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        };
 
         useEffect(() => {
             if (carouselRef.current && finalActiveIdx !== -1) {
@@ -511,54 +522,119 @@ const Home = () => {
                                     <p>Nothing scheduled — enjoy the free day!</p>
                                 </div>
                             ) : (
-                                <div className="schedule-timeline carousel" ref={carouselRef}>
-                                    {rows.map((row, idx) => {
-                                        const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
-                                        if (row.type === 'break') {
+                                <div className="schedule-carousel-wrapper">
+                                    <button 
+                                        className="carousel-nav-btn prev" 
+                                        onClick={() => scrollCarousel('left')}
+                                        aria-label="Previous Class"
+                                    >
+                                        <ChevronLeft size={24} />
+                                    </button>
+                                    
+                                    <div className="schedule-timeline carousel" ref={carouselRef}>
+                                        {rows.map((row, idx) => {
+                                            const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
+                                            const isActive = idx === finalActiveIdx;
+
+                                            if (row.type === 'break') {
+                                                const nextClass = rows[idx + 1]?.data;
+                                                return (
+                                                    <div key={`break-${idx}`} className={`timeline-item timeline-break status-${status} ${isActive ? 'is-active' : ''}`}>
+                                                        <div className="break-glass-strip">
+                                                            <div className="item-status-inline">
+                                                                {status === 'live' ? <span className="status-badge live">ACTIVE BREAK</span> : 
+                                                                 status === 'upcoming' ? <span className="status-badge upcoming">NEXT BREAK</span> :
+                                                                 <span className="status-badge done">PASSED</span>}
+                                                            </div>
+                                                            <div className="break-main-info">
+                                                                <div className="break-icon-box">
+                                                                    <Coffee size={28} />
+                                                                </div>
+                                                                <div className="break-text-stack">
+                                                                    <h4>Break Time</h4>
+                                                                    <div className="break-timer">
+                                                                        <Clock size={14} />
+                                                                        <span>{row.minutes} min · {formatTime(row.from)} – {formatTime(row.to)}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            {nextClass && (
+                                                                <div className="next-up-indicator">
+                                                                    <ArrowRight size={14} />
+                                                                    <span>Next: <b>{nextClass.subject}</b></span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {isActive && <div className="active-glow-aura" />}
+                                                    </div>
+                                                );
+                                            }
+
+                                            const item = row.data;
                                             return (
-                                                <div key={`break-${idx}`} className={`timeline-item timeline-break status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
-                                                    <div className="break-label">
-                                                        <Coffee size={14} />
-                                                        <span>Break Time</span>
+                                                <div key={`class-${idx}`} className={`timeline-item timeline-class-card status-${status} ${isActive ? 'is-active' : ''}`}>
+                                                    <div className="class-card-header">
+                                                        <div className="time-badge">
+                                                            <Clock size={14} />
+                                                            <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
+                                                        </div>
+                                                        <div className="item-status-inline">
+                                                            {status === 'live' ? <span className="status-badge live">LIVE NOW</span> : 
+                                                             status === 'upcoming' ? <span className="status-badge upcoming">UPCOMING</span> :
+                                                             <span className="status-badge done">COMPLETED</span>}
+                                                        </div>
                                                     </div>
-                                                    <div className="break-meta">
-                                                        <span>{row.minutes} min · {formatTime(row.from)} – {formatTime(row.to)}</span>
+
+                                                    <div className="class-card-body">
+                                                        <h4 className="subject-title">{item.subject}</h4>
+                                                        
+                                                        <div className="metadata-grid">
+                                                            <div className="meta-item">
+                                                                <div className="meta-icon"><User size={14} /></div>
+                                                                <div className="meta-text">
+                                                                    <label>Professor</label>
+                                                                    <span>{item.prof}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="meta-item">
+                                                                <div className="meta-icon"><MapPin size={14} /></div>
+                                                                <div className="meta-text">
+                                                                    <label>Location</label>
+                                                                    <span>{item.room}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {idx === finalActiveIdx && <div className="active-glow" />}
+
+                                                    {isActive && <div className="active-glow-aura" />}
+                                                    {status === 'done' && <div className="completion-overlay"><CheckCircle2 size={32} /></div>}
                                                 </div>
                                             );
-                                        }
-                                        const item = row.data;
-                                        return (
-                                            <div key={`class-${idx}`} className={`timeline-item timeline-class-card status-${status} ${idx === finalActiveIdx ? 'is-active' : ''}`}>
-                                                <div className="card-top">
-                                                    {status === 'live' && (
-                                                        <div className="live-pill">
-                                                            <span className="live-dot" />
-                                                            LIVE NOW
-                                                        </div>
-                                                    )}
-                                                    {status === 'done' && (
-                                                        <div className="done-mark">
-                                                            <CheckCircle2 size={18} />
-                                                        </div>
-                                                    )}
+                                        })}
+
+                                        {/* All Classes Done Card - Only show when the entire day is finished */}
+                                        {rows.length > 0 && activeIdx === -1 && firstUpcomingIdx === -1 && (
+                                            <div className={`timeline-item timeline-complete-card is-active`}>
+                                                <div className="complete-visual">
+                                                    <div className="stars-container">✨✨✨</div>
+                                                    <div className="trophy-circle"><CheckCircle2 size={40} /></div>
                                                 </div>
-                                                <div className="timeline-time">
-                                                    <Clock size={14} />
-                                                    <span>{formatTime(item.start_time)} – {formatTime(item.end_time)}</span>
+                                                <div className="complete-text">
+                                                    <h4>Day Accomplished</h4>
+                                                    <p>You've cleared all sessions for today. Time to recharge!</p>
                                                 </div>
-                                                <div className="timeline-details">
-                                                    <h4 className="timeline-subject">{item.subject}</h4>
-                                                    <div className="timeline-meta">
-                                                        <span className="timeline-prof">👨‍🏫 {item.prof}</span>
-                                                        <span className="timeline-room">📍 {item.room}</span>
-                                                    </div>
-                                                </div>
-                                                {idx === finalActiveIdx && <div className="active-glow" />}
+                                                <div className="active-glow-aura" />
                                             </div>
-                                        );
-                                    })}
+                                        )}
+                                    </div>
+
+                                    <button 
+                                        className="carousel-nav-btn next" 
+                                        onClick={() => scrollCarousel('right')}
+                                        aria-label="Next Class"
+                                    >
+                                        <ChevronRight size={24} />
+                                    </button>
                                 </div>
                             )}
                             <Link to="/routine" className="ds-view-more-btn">
