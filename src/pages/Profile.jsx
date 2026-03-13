@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { compressImage } from '../lib/imageCompression';
 import {
     User, LogOut, FileText, ShieldCheck, Mail, Hash,
     UserCircle, Eye, EyeOff, Calendar, Settings,
@@ -79,16 +80,28 @@ const Profile = () => {
         const file = e.target.files[0];
         if (!file || !user) return;
 
-        if (file.size > 1024 * 1024) {
-            alert('Profile picture must be less than 1MB.');
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Profile picture must be less than 5MB.');
             e.target.value = null;
             return;
         }
 
         try {
             setUploadingProfilePic(true);
+
+            // Compress profile pic (limit to 0.3MB as it's just an avatar)
+            let fileToUpload = file;
+            if (file.size > 0.3 * 1024 * 1024) {
+                try {
+                    fileToUpload = await compressImage(file, { maxSizeMB: 0.3, maxWidthOrHeight: 500 });
+                    console.log(`Avatar Compressed: ${(file.size / 1024).toFixed(1)}KB -> ${(fileToUpload.size / 1024).toFixed(1)}KB`);
+                } catch (err) {
+                    console.error('Avatar compression failed:', err);
+                }
+            }
+
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', fileToUpload);
             formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ee_memories');
 
             const res = await fetch(
@@ -98,14 +111,29 @@ const Profile = () => {
             const cloudData = await res.json();
 
             if (cloudData.secure_url) {
+                // Delete old avatar if exists
+                if (studentData.avatar_public_id) {
+                    supabase.functions.invoke('delete-cloudinary-image', {
+                        body: { public_id: studentData.avatar_public_id },
+                        headers: { 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY }
+                    }).catch(err => console.error('Cloudinary delete failed:', err));
+                }
+
                 const { error } = await supabase
                     .from('students')
-                    .update({ avatar_url: cloudData.secure_url })
+                    .update({ 
+                        avatar_url: cloudData.secure_url,
+                        avatar_public_id: cloudData.public_id
+                    })
                     .eq('user_id', user.id);
 
                 if (error) throw error;
 
-                setStudentData(prev => ({ ...prev, avatar_url: cloudData.secure_url }));
+                setStudentData(prev => ({ 
+                    ...prev, 
+                    avatar_url: cloudData.secure_url, 
+                    avatar_public_id: cloudData.public_id 
+                }));
             }
         } catch (error) {
             console.error('Error uploading profile picture:', error);
@@ -154,13 +182,25 @@ const Profile = () => {
 
         try {
             setUploadingProfilePic(true);
+
+            // Delete from Cloudinary
+            if (studentData.avatar_public_id) {
+                await supabase.functions.invoke('delete-cloudinary-image', {
+                    body: { public_id: studentData.avatar_public_id },
+                    headers: { 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY }
+                });
+            }
+
             const { error } = await supabase
                 .from('students')
-                .update({ avatar_url: null })
+                .update({ 
+                    avatar_url: null,
+                    avatar_public_id: null
+                })
                 .eq('user_id', user.id);
 
             if (error) throw error;
-            setStudentData(prev => ({ ...prev, avatar_url: null }));
+            setStudentData(prev => ({ ...prev, avatar_url: null, avatar_public_id: null }));
         } catch (error) {
             console.error('Error deleting profile picture:', error);
             alert('Failed to remove profile picture.');

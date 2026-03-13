@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Image as ImageIcon, Plus, Heart, MessageCircle, X, Loader2, Send, Trash2, ChevronUp, MoreHorizontal, Share2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { compressImage } from '../lib/imageCompression';
 import SEO from '../components/SEO';
 import './Memories.css';
 
@@ -107,8 +108,8 @@ const Memories = () => {
         setUploadError(''); // Clear previous errors
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 3 * 1024 * 1024) {
-                setUploadError('Image is too large. Please select a photo under 3MB.');
+            if (file.size > 10 * 1024 * 1024) {
+                setUploadError('Image is too large. Please select a photo under 10MB.');
                 setImageFile(null);
                 if (imagePreview) URL.revokeObjectURL(imagePreview);
                 setImagePreview(null);
@@ -131,10 +132,20 @@ const Memories = () => {
         setUploadError('');
         setUploading(true);
         try {
+            // STEP 0: Compress image if it's large
+            let fileToUpload = imageFile;
+            if (imageFile.size > 0.5 * 1024 * 1024) { // If > 500KB, compress
+                try {
+                    fileToUpload = await compressImage(imageFile, { maxSizeMB: 0.8, maxWidthOrHeight: 1280 });
+                    console.log(`Compressed: ${(imageFile.size / 1024 / 1024).toFixed(2)}MB -> ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+                } catch (compressErr) {
+                    console.error('Compression failed, uploading original:', compressErr);
+                }
+            }
+
             // STEP 1: Upload to Cloudinary (Using unsigned upload for ease)
-            // You will need to add VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET to your .env
             const formData = new FormData();
-            formData.append('file', imageFile);
+            formData.append('file', fileToUpload);
             formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ee_memories');
 
             const res = await fetch(
@@ -150,6 +161,7 @@ const Memories = () => {
                     roll_number: userRoll,
                     caption,
                     image_url: cloudData.secure_url,
+                    cloudinary_public_id: cloudData.public_id,
                     user_id: session.user.id
                 }]);
 
@@ -237,18 +249,46 @@ const Memories = () => {
         if (!window.confirm("ARE YOU SURE? THIS MEMORY WILL BE DELETED FOREVER!")) return;
 
         setDeletingIds(prev => new Set(prev).add(memoryId));
-        const { error } = await supabase.from('memories').delete().eq('id', memoryId);
+        
+        try {
+            // STEP 1: Get the public_id before deleting the record
+            const { data: memory } = await supabase
+                .from('memories')
+                .select('cloudinary_public_id')
+                .eq('id', memoryId)
+                .single();
 
-        if (!error) {
-            fetchMemories();
-        } else {
-            alert("Error deleting memory: " + error.message);
+            // STEP 2: Delete from Cloudinary via Edge Function
+            if (memory?.cloudinary_public_id) {
+                const { data: funcData, error: funcError } = await supabase.functions.invoke('delete-cloudinary-image', {
+                    body: { public_id: memory.cloudinary_public_id },
+                    headers: {
+                        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
+                    }
+                });
+                
+                if (funcError) console.error("Cloudinary delete function error:", funcError);
+                else console.log("Cloudinary delete result:", funcData);
+            }
+
+            // STEP 3: Delete record from Supabase
+            const { error } = await supabase.from('memories').delete().eq('id', memoryId);
+            
+            if (!error) {
+                fetchMemories();
+            } else {
+                alert("Error deleting memory record: " + error.message);
+            }
+        } catch (err) {
+            console.error("Deletion process failed:", err);
+            alert("Delete failed. Please try again.");
+        } finally {
+            setDeletingIds(prev => {
+                const updated = new Set(prev);
+                updated.delete(memoryId);
+                return updated;
+            });
         }
-        setDeletingIds(prev => {
-            const updated = new Set(prev);
-            updated.delete(memoryId);
-            return updated;
-        });
     };
 
     const handleShare = async (memory) => {
@@ -478,7 +518,7 @@ const Memories = () => {
                             ) : (
                                 <div className="upload-placeholder">
                                     <ImageIcon size={40} />
-                                    <p>Click to select a photo (Max 3MB)</p>
+                                    <p>Click to select a photo (Max 10MB)</p>
                                 </div>
                             )}
                             <input id="fileInput" type="file" accept="image/*" hidden onChange={handleFileChange} />
