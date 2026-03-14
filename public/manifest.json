@@ -3,9 +3,16 @@
   "name": "EEvolution - Electrical Engineering Study Hub",
   "icons": [
     {
-      "src": "/vite.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
+      "src": "https://res.cloudinary.com/dkcsgmfcw/image/upload/v1773265196/eevolution-2-electrical-engineering-logo_lwf2ba.png",
+      "type": "image/png",
+      "sizes": "192x192 512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/dkcsgmfcw/image/upload/v1773265196/eevolution-2-electrical-engineering-logo_lwf2ba.png",
+      "type": "image/png",
+      "sizes": "192x192 512x512",
+      "purpose": "maskable"
     }
   ],
   "start_url": "/",
