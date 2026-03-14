@@ -340,10 +340,34 @@ const Memories = () => {
 
         if (!error) {
             setNewComment('');
-            fetchMemories();
             // Refresh local selected memory comments
             const { data } = await supabase.from('memories').select('*, memory_comments(*)').eq('id', selectedMemory.id).single();
             setSelectedMemory(data);
+            fetchMemories(); // Refresh the main list too for the count
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm("Delete this comment?")) return;
+
+        try {
+            const { error } = await supabase
+                .from('memory_comments')
+                .delete()
+                .eq('id', commentId);
+
+            if (!error) {
+                // Update local state for selected memory
+                setSelectedMemory(prev => ({
+                    ...prev,
+                    memory_comments: prev.memory_comments.filter(c => c.id !== commentId)
+                }));
+                fetchMemories(); // Refresh main list for counts
+            } else {
+                alert("Failed to delete comment");
+            }
+        } catch (err) {
+            console.error("Error deleting comment:", err);
         }
     };
 
@@ -580,8 +604,19 @@ const Memories = () => {
                                     selectedMemory.memory_comments.map(c => (
                                         <div key={c.id} className="comment-bubble">
                                             <div className="comment-bubble-header">
-                                                <strong>{c.user_name}</strong>
-                                                <span>{new Date(c.created_at).toLocaleDateString()}</span>
+                                                <div className="commenter-info">
+                                                    <strong>{c.user_name}</strong>
+                                                    <span>{new Date(c.created_at).toLocaleDateString()}</span>
+                                                </div>
+                                                {(isAdmin || c.user_id === session?.user?.id) && (
+                                                    <button 
+                                                        className="comment-delete-btn"
+                                                        onClick={() => handleDeleteComment(c.id)}
+                                                        title="Delete comment"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                )}
                                             </div>
                                             <p>{c.comment_text}</p>
                                         </div>

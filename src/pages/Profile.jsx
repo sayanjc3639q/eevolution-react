@@ -8,6 +8,7 @@ import {
     ChevronRight, Palette, Lock, LayoutDashboard, AlertCircle,
     Camera, Trash2, Loader2, Crown, Zap
 } from 'lucide-react';
+import ImageCropper from '../components/ImageCropper';
 import './Profile.css';
 
 const Profile = () => {
@@ -22,6 +23,10 @@ const Profile = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [verifying, setVerifying] = useState(false);
     const [verifyError, setVerifyError] = useState('');
+
+    // Cropper State
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [tempImage, setTempImage] = useState(null);
 
     useEffect(() => {
         getProfile();
@@ -80,21 +85,33 @@ const Profile = () => {
         const file = e.target.files[0];
         if (!file || !user) return;
 
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Profile picture must be less than 5MB.');
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Image must be less than 10MB.');
             e.target.value = null;
             return;
         }
 
+        const reader = new FileReader();
+        reader.onload = () => {
+            setTempImage(reader.result);
+            setIsCropperOpen(true);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = null; // Reset input
+    };
+
+    const handleCropComplete = async (croppedBlob) => {
+        setIsCropperOpen(false);
+        setTempImage(null);
+        
         try {
             setUploadingProfilePic(true);
 
-            // Compress profile pic (limit to 0.3MB as it's just an avatar)
-            let fileToUpload = file;
-            if (file.size > 0.3 * 1024 * 1024) {
+            // Compress the cropped image (limit to 0.4MB as it's just an avatar)
+            let fileToUpload = croppedBlob;
+            if (croppedBlob.size > 0.4 * 1024 * 1024) {
                 try {
-                    fileToUpload = await compressImage(file, { maxSizeMB: 0.3, maxWidthOrHeight: 500 });
-                    console.log(`Avatar Compressed: ${(file.size / 1024).toFixed(1)}KB -> ${(fileToUpload.size / 1024).toFixed(1)}KB`);
+                    fileToUpload = await compressImage(croppedBlob, { maxSizeMB: 0.4, maxWidthOrHeight: 600 });
                 } catch (err) {
                     console.error('Avatar compression failed:', err);
                 }
@@ -254,6 +271,16 @@ const Profile = () => {
 
     return (
         <div className="profile-container">
+            {isCropperOpen && (
+                <ImageCropper 
+                    image={tempImage}
+                    onCropComplete={handleCropComplete}
+                    onCancel={() => {
+                        setIsCropperOpen(false);
+                        setTempImage(null);
+                    }}
+                />
+            )}
             {/* Password Verification Modal */}
             {showVerifyModal && (
                 <div className="verify-overlay">

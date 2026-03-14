@@ -502,8 +502,34 @@
 .comment-bubble-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 0.5rem;
     font-size: 0.85rem;
+}
+
+.commenter-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+}
+
+.comment-delete-btn:hover {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    opacity: 1;
 }
 
 .comment-bubble-header strong {
