@@ -33,6 +33,10 @@ const About = () => {
 
     return (
         <div className="about-v2-container">
+            {/* Decorative background elements */}
+            <div className="about-bg-blob blob-1"></div>
+            <div className="about-bg-blob blob-2"></div>
+            
             <SEO 
                 title="About Us"
                 description="Identity, Mission, and the Team behind EEvolution 2.0. A non-profit community platform for Electrical Engineering students."
@@ -137,6 +141,30 @@ const About = () => {
                             <p className="engine-desc">{member.desc}</p>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            <section className="values-section">
+                <div className="section-title-wrapper">
+                    <Heart size={24} className="title-icon" />
+                    <h2>Our <span className="blue-gradient">Core Values</span></h2>
+                </div>
+                <div className="values-grid">
+                    <div className="value-item">
+                        <div className="value-icon"><Award size={20} /></div>
+                        <h4>Excellence</h4>
+                        <p>Striving for the highest quality in academic resources.</p>
+                    </div>
+                    <div className="value-item">
+                        <div className="value-icon"><Users size={20} /></div>
+                        <h4>Community</h4>
+                        <p>Built by Batch 2 students for the entire community.</p>
+                    </div>
+                    <div className="value-item">
+                        <div className="value-icon"><ShieldCheck size={20} /></div>
+                        <h4>Integrity</h4>
+                        <p>Transparent and ethical management of resources.</p>
+                    </div>
                 </div>
             </section>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Zap, BookOpen, Home, MessageSquare, User, LayoutGrid, Bell, Search, Camera, Lock, Crown } from 'lucide-react';
+import { Zap, BookOpen, Home, MessageSquare, User, LayoutGrid, Bell, Search, Camera, Lock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Navbar.css';
 
@@ -130,7 +130,7 @@ const Navbar = () => {
         }
 
         // 2. Restricted path logic
-        const restrictedPaths = ['/chat', '/notices', '/study'];
+        const restrictedPaths = ['/chat', '/notices', '/study', '/memories'];
         if (restrictedPaths.includes(path) && !session) {
             e.preventDefault();
             setShowGuestModal(true);
@@ -208,8 +208,8 @@ const Navbar = () => {
                         <span>Chat</span>
                     </NavLink>
 
-                    <NavLink to="/pricing" className="nav-link plan-nav-highlight" onClick={handleNavbarClick('/pricing')}>
-                        <Crown size={20} /><span>Plans</span>
+                    <NavLink to="/memories" className="nav-link memories-nav-highlight" onClick={handleNavbarClick('/memories')}>
+                        <Camera size={20} /><span>Memories</span>
                     </NavLink>
 
                     {/* Desktop Actions */}

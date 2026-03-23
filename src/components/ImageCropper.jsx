@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Cropper from 'react-easy-crop'
+import Cropper from './CropperStub'
 import getCroppedImg from '../lib/cropImage'
 import { X, Check, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import './ImageCropper.css'
