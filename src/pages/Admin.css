@@ -686,6 +686,21 @@
     color: #6ee7b7;
 }
 
+.type-badge-v2.class-assessment {
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+}
+
+.type-badge-v2.practical {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.type-badge-v2.end-sem {
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+}
+
 /* ============================================
    STUDENTS GRID
    ============================================ */

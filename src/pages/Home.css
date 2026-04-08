@@ -2133,6 +2133,123 @@
     }
 }
 
+/* Exam Card Styles */
+.timeline-exam-card {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.08), rgba(0, 0, 0, 0.3)) !important;
+    border: 1px solid rgba(244, 63, 94, 0.2) !important;
+}
+
+.timeline-exam-card.status-live {
+    border-color: #f43f5e !important;
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(244, 63, 94, 0.05)) !important;
+}
+
+.exam-card-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.exam-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.exam-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(244, 63, 94, 0.1);
+    color: #f43f5e;
+    padding: 0.4rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.status-badge.live {
+    animation: examPulse 2s infinite;
+}
+
+@keyframes examPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+}
+
+.exam-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.exam-time-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+.exam-meta-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.exam-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+}
+
+.exam-meta-item svg {
+    color: #f43f5e;
+}
+
+.exam-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    border-left: 2px solid rgba(244, 63, 94, 0.3);
+    padding-left: 0.75rem;
+    margin-top: auto;
+}
+
+/* Variant Specifics */
+.type-practical {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(0, 0, 0, 0.3)) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+.type-practical .exam-badge { color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); }
+.type-practical .exam-meta-item svg { color: #10b981; }
+
+.type-end-sem {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 0, 0, 0.4)) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.1);
+}
+.type-end-sem .exam-badge { color: #a78bfa; background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); }
+.type-end-sem .exam-meta-item svg { color: #a78bfa; }
+.type-end-sem .exam-title { font-size: 1.8rem; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
 /* Off day cards */
 .schedule-off-card {
     text-align: center;

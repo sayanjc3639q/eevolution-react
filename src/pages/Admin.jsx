@@ -26,6 +26,7 @@ const Admin = () => {
     const [expenses, setExpenses] = useState([]);
     const [students, setStudents] = useState([]);
     const [syllabus, setSyllabus] = useState(null);
+    const [exams, setExams] = useState([]);
 
     const [studentSearch, setStudentSearch] = useState('');
     const [editingStudent, setEditingStudent] = useState(null);
@@ -36,6 +37,7 @@ const Admin = () => {
     const [whatsappForm, setWhatsappForm] = useState({ name: '', description: '', link: '' });
     const [eventForm, setEventForm] = useState({ title: '', description: '', event_date: '', registration_link: '', photo_url: '' });
     const [expenseForm, setExpenseForm] = useState({ name: '', amount: '' });
+    const [examForm, setExamForm] = useState({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '' });
 
     useEffect(() => { checkAdmin(); }, []);
 
@@ -54,6 +56,7 @@ const Admin = () => {
     const fetchAllData = () => {
         fetchStudents(); fetchMaterials(); fetchNotices(); fetchEvents();
         fetchHolidays(); fetchWhatsappGroups(); fetchSyllabus(); fetchExpenses();
+        fetchExams();
     };
 
     const fetchSyllabus = async () => {
@@ -87,6 +90,10 @@ const Admin = () => {
     const fetchExpenses = async () => {
         const { data, error } = await supabase.from('site_expenses').select('*').order('amount', { ascending: false });
         if (!error) setExpenses(data);
+    };
+    const fetchExams = async () => {
+        const { data, error } = await supabase.from('exams').select('*').order('date', { ascending: true });
+        if (!error) setExams(data);
     };
 
     const showAlert = (type, message) => {
@@ -138,6 +145,17 @@ const Admin = () => {
         else { showAlert('success', 'Expense recorded!'); setExpenseForm({ name: '', amount: '' }); fetchExpenses(); }
         setLoading(false);
     };
+    const handleExamSubmit = async (e) => {
+        e.preventDefault(); setLoading(true);
+        const { error } = await supabase.from('exams').insert([examForm]);
+        if (error) showAlert('error', error.message);
+        else { 
+            showAlert('success', 'Exam scheduled successfully!'); 
+            setExamForm({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '' }); 
+            fetchExams(); 
+        }
+        setLoading(false);
+    };
     const handleDelete = async (table, id) => {
         if (table === 'holidays') {
             const h = holidays.find(i => i.id === id);
@@ -155,6 +173,7 @@ const Admin = () => {
             else if (table === 'holidays') fetchHolidays();
             else if (table === 'whatsapp_groups') fetchWhatsappGroups();
             else if (table === 'site_expenses') fetchExpenses();
+            else if (table === 'exams') fetchExams();
         }
         setLoading(false);
     };
@@ -204,6 +223,7 @@ const Admin = () => {
         { id: 'notices', icon: <Bell size={18} />, label: 'Notices', count: notices.length, color: '#f59e0b' },
         { id: 'events', icon: <Calendar size={18} />, label: 'Events', count: events.length, color: '#10b981' },
         { id: 'holidays', icon: <GraduationCap size={18} />, label: 'Holidays', count: holidays.length, color: '#ec4899' },
+        { id: 'exams', icon: <FileText size={18} />, label: 'Exams', count: exams.length, color: '#f43f5e' },
         { id: 'whatsapp', icon: <MessageCircle size={18} />, label: 'WhatsApp Groups', count: whatsappGroups.length, color: '#22c55e' },
         { id: 'finances', icon: <Coins size={18} />, label: 'Finances', count: expenses.length, color: '#f97316' }
     ];
@@ -713,6 +733,92 @@ const Admin = () => {
                                         </div>
                                     ))}
                                     {expenses.length === 0 && <div className="empty-list-msg">No expenses logged.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {/* ========== EXAMS ========== */}
+                {activeTab === 'exams' && (
+                    <div className="admin-v2-page">
+                        <div className="admin-v2-page-header">
+                            <div>
+                                <h1><FileText size={24} /> Examination Management</h1>
+                                <p>Schedule Class Assessments, Practicals, and End Sem exams.</p>
+                            </div>
+                            <div className="page-header-stat">
+                                <div className="stat-num">{exams.length}</div>
+                                <div className="stat-lbl">Scheduled Exams</div>
+                            </div>
+                        </div>
+                        <div className="admin-v2-two-col">
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><Plus size={18} /> <span>Schedule New Exam</span></div>
+                                <form onSubmit={handleExamSubmit} className="admin-v2-form">
+                                    <div className="fv2-group">
+                                        <label>Exam Title</label>
+                                        <input placeholder="e.g., Mathematics II - Second Internal" value={examForm.title} onChange={e => setExamForm({ ...examForm, title: e.target.value })} required />
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label>Exam Type</label>
+                                            <select value={examForm.type} onChange={e => setExamForm({ ...examForm, type: e.target.value })}>
+                                                <option value="Class Assessment">📝 Class Assessment</option>
+                                                <option value="Practical">🧪 Practical Exam</option>
+                                                <option value="End Sem">🎓 End Sem Exam</option>
+                                            </select>
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label>Date</label>
+                                            <input type="date" value={examForm.date} onChange={e => setExamForm({ ...examForm, date: e.target.value })} required />
+                                        </div>
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label><Clock size={14} /> Start Time</label>
+                                            <input type="time" value={examForm.start_time} onChange={e => setExamForm({ ...examForm, start_time: e.target.value })} required />
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label><Clock size={14} /> End Time</label>
+                                            <input type="time" value={examForm.end_time} onChange={e => setExamForm({ ...examForm, end_time: e.target.value })} required />
+                                        </div>
+                                    </div>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label>Subject (Optional)</label>
+                                            <input placeholder="e.g., MATH-201" value={examForm.subject} onChange={e => setExamForm({ ...examForm, subject: e.target.value })} />
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label>Room / Lab</label>
+                                            <input placeholder="e.g., CR-2 or Machine Lab" value={examForm.room} onChange={e => setExamForm({ ...examForm, room: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="fv2-group">
+                                        <label>Description (Optional)</label>
+                                        <textarea placeholder="e.g., Syllabus covers Unit 3 & 4" value={examForm.description} onChange={e => setExamForm({ ...examForm, description: e.target.value })} rows={2} />
+                                    </div>
+                                    <button type="submit" className="admin-v2-submit-btn" style={{ background: '#f43f5e' }} disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="spin" /> : <Save size={16} />} Schedule Exam
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="admin-v2-card">
+                                <div className="card-v2-header"><FileText size={18} /> <span>Scheduled Exams</span><span className="header-count">{exams.length}</span></div>
+                                <div className="admin-v2-list">
+                                    {exams.map(ex => (
+                                        <div key={ex.id} className="admin-v2-list-item">
+                                            <div className="list-item-icon" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}><FileText size={16} /></div>
+                                            <div className="list-item-details">
+                                                <div className="list-item-title">
+                                                    {ex.title}
+                                                    <span className={`type-badge-v2 ${ex.type.toLowerCase().replace(' ', '-')}`}>{ex.type}</span>
+                                                </div>
+                                                <div className="list-item-sub">{new Date(ex.date).toLocaleDateString()} · {ex.start_time} - {ex.end_time}</div>
+                                            </div>
+                                            <button className="list-delete-btn" onClick={() => handleDelete('exams', ex.id)}><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    {exams.length === 0 && <div className="empty-list-msg">No exams scheduled.</div>}
                                 </div>
                             </div>
                         </div>

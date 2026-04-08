@@ -341,6 +341,7 @@ const Home = () => {
         const [recentNotices, setRecentNotices] = useState([]);
         const [recentEvents, setRecentEvents] = useState([]);
         const [recentMaterials, setRecentMaterials] = useState([]);
+        const [exams, setExams] = useState([]);
         const [recentMemory, setRecentMemory] = useState(null);
         const [communityLoading, setCommunityLoading] = useState(true);
 
@@ -353,9 +354,10 @@ const Home = () => {
         useEffect(() => {
             const loadAll = async () => {
                 // Load schedule + holidays + community in parallel
-                const [routineRes, holidayRes, contribRes, donatorRes, noticeRes, eventRes, materialRes, memoryRes] = await Promise.all([
+                const [routineRes, holidayRes, examRes, contribRes, donatorRes, noticeRes, eventRes, materialRes, memoryRes] = await Promise.all([
                     supabase.from('routines').select('*').eq('day', dayName).order('start_time', { ascending: true }),
                     supabase.from('holidays').select('*').eq('date', dateStr),
+                    supabase.from('exams').select('*').eq('date', dateStr).order('start_time', { ascending: true }),
                     supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3),
                     supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3),
                     supabase.from('notices').select('*').order('notice_date', { ascending: false }).limit(3),
@@ -366,6 +368,7 @@ const Home = () => {
 
                 if (!routineRes.error) setTodaySchedule(routineRes.data || []);
                 setIsHoliday(holidayRes.data?.length > 0 ? holidayRes.data[0] : false);
+                setExams(examRes.data || []);
                 setScheduleLoading(false);
 
                 if (!contribRes.error) setContributors(contribRes.data || []);
@@ -395,24 +398,37 @@ const Home = () => {
         };
 
         const getRowStatus = (item, type) => {
-            const start = toMin(type === 'class' ? item.start_time : item.from);
-            const end = toMin(type === 'class' ? item.end_time : item.to);
+            const start = toMin(type === 'class' || type === 'exam' ? item.start_time : item.from);
+            const end = toMin(type === 'class' || type === 'exam' ? item.end_time : item.to);
             if (now >= start && now < end) return 'live';
             if (now < start) return 'upcoming';
             return 'done';
         };
 
-        // Build schedule rows with breaks inserted between classes
+        // Build schedule rows with breaks and exams inserted
         const buildRows = () => {
+            const isEndSem = exams.some(ex => ex.type === 'End Sem');
+            let items = [];
+
+            if (isEndSem) {
+                // Priority mode for End Sem exams
+                items = exams.filter(ex => ex.type === 'End Sem').map(ex => ({ type: 'exam', data: ex }));
+            } else {
+                // Mix regular classes and other exams (Class Assessment, Practical)
+                const classItems = todaySchedule.map(c => ({ type: 'class', data: c }));
+                const examItems = exams.filter(ex => ex.type !== 'End Sem').map(ex => ({ type: 'exam', data: ex }));
+                items = [...classItems, ...examItems].sort((a, b) => toMin(a.data.start_time) - toMin(b.data.start_time));
+            }
+
             const rows = [];
-            for (let i = 0; i < todaySchedule.length; i++) {
-                rows.push({ type: 'class', data: todaySchedule[i] });
-                if (i < todaySchedule.length - 1) {
-                    const gapStart = toMin(todaySchedule[i].end_time);
-                    const gapEnd = toMin(todaySchedule[i + 1].start_time);
+            for (let i = 0; i < items.length; i++) {
+                rows.push(items[i]);
+                if (i < items.length - 1) {
+                    const gapStart = toMin(items[i].data.end_time);
+                    const gapEnd = toMin(items[i + 1].data.start_time);
                     const gapMin = gapEnd - gapStart;
                     if (gapMin >= 5) {
-                        rows.push({ type: 'break', minutes: gapMin, from: todaySchedule[i].end_time, to: todaySchedule[i + 1].start_time });
+                        rows.push({ type: 'break', minutes: gapMin, from: items[i].data.end_time, to: items[i + 1].data.start_time });
                     }
                 }
             }
@@ -420,10 +436,10 @@ const Home = () => {
         };
 
         const rows = buildRows();
-        const activeIdx = rows.findIndex(r => getRowStatus(r.type === 'class' ? r.data : r, r.type) === 'live');
+        const activeIdx = rows.findIndex(r => getRowStatus(r.type === 'class' || r.type === 'exam' ? r.data : r, r.type) === 'live');
         
-        // Find the first upcoming item if no live class/break
-        const firstUpcomingIdx = rows.findIndex(r => getRowStatus(r.type === 'class' ? r.data : r, r.type) === 'upcoming');
+        // Find the first upcoming item if no live class/break/exam
+        const firstUpcomingIdx = rows.findIndex(r => getRowStatus(r.type === 'class' || r.type === 'exam' ? r.data : r, r.type) === 'upcoming');
 
         // Calculate fallbacks for activeIdx
         let finalActiveIdx = activeIdx;
@@ -515,7 +531,7 @@ const Home = () => {
                                         </p>
                                     </div>
                                 </div>
-                            ) : todaySchedule.length === 0 ? (
+                            ) : (todaySchedule.length === 0 && exams.length === 0) ? (
                                 <div className="schedule-off-card">
                                     <div className="schedule-off-icon">📭</div>
                                     <h3>No Classes Today</h3>
@@ -564,6 +580,58 @@ const Home = () => {
                                                                     <span>Next: <b>{nextClass.subject}</b></span>
                                                                 </div>
                                                             )}
+                                                        </div>
+                                                        {isActive && <div className="active-glow-aura" />}
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (row.type === 'exam') {
+                                                const exam = row.data;
+                                                const examStatus = getRowStatus(exam, 'exam');
+                                                const isEndSem = exam.type === 'End Sem';
+
+                                                return (
+                                                    <div key={`exam-${idx}`} className={`timeline-item timeline-exam-card status-${examStatus} ${isActive ? 'is-active' : ''} type-${exam.type.toLowerCase().replace(' ', '-')}`}>
+                                                        <div className="exam-card-wrapper">
+                                                            <div className="exam-card-header">
+                                                                <div className="exam-badge">
+                                                                    <FileText size={14} />
+                                                                    <span>{exam.type}</span>
+                                                                </div>
+                                                                <div className="item-status-inline">
+                                                                    {examStatus === 'live' ? <span className="status-badge live">ONGOING</span> :
+                                                                        examStatus === 'upcoming' ? <span className="status-badge upcoming">IN {Math.max(0, toMin(exam.start_time) - now)} MIN</span> :
+                                                                            <span className="status-badge done">FINISHED</span>}
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="exam-card-body">
+                                                                <h4 className="exam-title">{exam.title}</h4>
+                                                                <div className="exam-time-strip">
+                                                                    <Clock size={14} />
+                                                                    <span>{formatTime(exam.start_time)} – {formatTime(exam.end_time)}</span>
+                                                                </div>
+
+                                                                <div className="exam-meta-grid">
+                                                                    {exam.subject && (
+                                                                        <div className="exam-meta-item">
+                                                                            <BookOpen size={12} />
+                                                                            <span>{exam.subject}</span>
+                                                                        </div>
+                                                                    )}
+                                                                    {exam.room && (
+                                                                        <div className="exam-meta-item">
+                                                                            <MapPin size={12} />
+                                                                            <span>{exam.room}</span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                
+                                                                {exam.description && (
+                                                                    <p className="exam-description">{exam.description}</p>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                         {isActive && <div className="active-glow-aura" />}
                                                     </div>
