@@ -8,7 +8,6 @@ import {
     ChevronRight, Palette, Lock, LayoutDashboard, AlertCircle,
     Camera, Trash2, Loader2, Crown, Zap
 } from 'lucide-react';
-import ImageCropper from '../components/ImageCropper';
 import './Profile.css';
 
 const Profile = () => {
@@ -24,9 +23,7 @@ const Profile = () => {
     const [verifying, setVerifying] = useState(false);
     const [verifyError, setVerifyError] = useState('');
 
-    // Cropper State
-    const [isCropperOpen, setIsCropperOpen] = useState(false);
-    const [tempImage, setTempImage] = useState(null);
+
 
     useEffect(() => {
         getProfile();
@@ -91,27 +88,14 @@ const Profile = () => {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            setTempImage(reader.result);
-            setIsCropperOpen(true);
-        };
-        reader.readAsDataURL(file);
-        e.target.value = null; // Reset input
-    };
-
-    const handleCropComplete = async (croppedBlob) => {
-        setIsCropperOpen(false);
-        setTempImage(null);
-        
         try {
             setUploadingProfilePic(true);
 
-            // Compress the cropped image (limit to 0.4MB as it's just an avatar)
-            let fileToUpload = croppedBlob;
-            if (croppedBlob.size > 0.4 * 1024 * 1024) {
+            // Compress the image (limit to 0.4MB as it's just an avatar)
+            let fileToUpload = file;
+            if (file.size > 0.4 * 1024 * 1024) {
                 try {
-                    fileToUpload = await compressImage(croppedBlob, { maxSizeMB: 0.4, maxWidthOrHeight: 600 });
+                    fileToUpload = await compressImage(file, { maxSizeMB: 0.4, maxWidthOrHeight: 600 });
                 } catch (err) {
                     console.error('Avatar compression failed:', err);
                 }
@@ -157,6 +141,7 @@ const Profile = () => {
             alert('Failed to update profile picture.');
         } finally {
             setUploadingProfilePic(false);
+            e.target.value = null; // Reset input
         }
     };
 
@@ -271,16 +256,7 @@ const Profile = () => {
 
     return (
         <div className="profile-container">
-            {isCropperOpen && (
-                <ImageCropper 
-                    image={tempImage}
-                    onCropComplete={handleCropComplete}
-                    onCancel={() => {
-                        setIsCropperOpen(false);
-                        setTempImage(null);
-                    }}
-                />
-            )}
+
             {/* Password Verification Modal */}
             {showVerifyModal && (
                 <div className="verify-overlay">
