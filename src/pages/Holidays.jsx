@@ -53,7 +53,7 @@ const Holidays = () => {
                     <span>Back</span>
                 </button>
                 <h1>Holiday <span className="highlight">Calendar</span></h1>
-                <p>Official Batch 2 Holiday List 2026</p>
+                <p>Official EE Holiday List 2026</p>
             </div>
 
             <div className="holidays-content">

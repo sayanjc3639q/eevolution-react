@@ -27,7 +27,7 @@ const Notices = () => {
         <div className="notices-page">
             <SEO 
                 title="Official Notices"
-                description="Stay updated with the latest college notices, announcements, and important updates for Batch 2 Electrical Engineering students."
+                description="Stay updated with the latest college notices, announcements, and important updates for EE Electrical Engineering students."
                 keywords="college notices, exam updates, results announcements, college news"
             />
             <div className="page-header">

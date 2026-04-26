@@ -31,13 +31,13 @@ const Admin = () => {
     const [studentSearch, setStudentSearch] = useState('');
     const [editingStudent, setEditingStudent] = useState(null);
 
-    const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'official' });
+    const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'official', batch: 'All' });
     const [moduleForm, setModuleForm] = useState({ section_id: 'class-notes', subject_name: '', chapter_name: '', file_name: '', file_description: '', drive_link: '' });
     const [noticeForm, setNoticeForm] = useState({ title: '', content: '', attachment_link: '', attachment_type: 'pdf', notice_date: new Date().toISOString().split('T')[0] });
     const [whatsappForm, setWhatsappForm] = useState({ name: '', description: '', link: '' });
     const [eventForm, setEventForm] = useState({ title: '', description: '', event_date: '', registration_link: '', photo_url: '' });
     const [expenseForm, setExpenseForm] = useState({ name: '', amount: '' });
-    const [examForm, setExamForm] = useState({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '' });
+    const [examForm, setExamForm] = useState({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '', batch: 'All' });
 
     useEffect(() => { checkAdmin(); }, []);
 
@@ -128,7 +128,7 @@ const Admin = () => {
         e.preventDefault(); setLoading(true);
         const { error } = await supabase.from('holidays').insert([holidayForm]);
         if (error) showAlert('error', error.message);
-        else { showAlert('success', 'Holiday added!'); setHolidayForm({ date: '', name: '', type: 'official' }); fetchHolidays(); }
+        else { showAlert('success', 'Holiday added!'); setHolidayForm({ date: '', name: '', type: 'official', batch: 'All' }); fetchHolidays(); }
         setLoading(false);
     };
     const handleWhatsappSubmit = async (e) => {
@@ -151,7 +151,7 @@ const Admin = () => {
         if (error) showAlert('error', error.message);
         else { 
             showAlert('success', 'Exam scheduled successfully!'); 
-            setExamForm({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '' }); 
+            setExamForm({ title: '', type: 'Class Assessment', date: '', start_time: '', end_time: '', subject: '', room: '', description: '', batch: 'All' }); 
             fetchExams(); 
         }
         setLoading(false);
@@ -417,7 +417,10 @@ const Admin = () => {
                                                         {student.subscription_plan || 'standard'}
                                                     </span>
                                                 </div>
-                                                <div className="student-v2-roll">{student.class_roll_no}</div>
+                                                <div className="student-v2-roll">
+                                                    {student.class_roll_no}
+                                                    {student.batch && <span className={`batch-badge-mini ${student.batch === 'Batch 1' ? 'b1' : 'b2'}`}>{student.batch}</span>}
+                                                </div>
                                                 <div className="student-v2-stats">
                                                     <span className="stat-pill">
                                                         <Coins size={12} /> ₹{student.donation || 0}
@@ -612,13 +615,23 @@ const Admin = () => {
                                 <form onSubmit={handleHolidaySubmit} className="admin-v2-form">
                                     <div className="fv2-group"><label>Holiday Name</label><input placeholder="e.g., Durga Puja" value={holidayForm.name} onChange={e => setHolidayForm({ ...holidayForm, name: e.target.value })} required /></div>
                                     <div className="fv2-group"><label>Date</label><input type="date" value={holidayForm.date} onChange={e => setHolidayForm({ ...holidayForm, date: e.target.value })} required /></div>
-                                    <div className="fv2-group">
-                                        <label>Type</label>
-                                        <select value={holidayForm.type} onChange={e => setHolidayForm({ ...holidayForm, type: e.target.value })}>
-                                            <option value="official">🏛️ Official Holiday (Fixed)</option>
-                                            <option value="unofficial">📅 Unofficial / Prep Holiday</option>
-                                            <option value="event">🎉 Extra-curricular Event Day</option>
-                                        </select>
+                                    <div className="fv2-row">
+                                        <div className="fv2-group">
+                                            <label>Holiday Type</label>
+                                            <select value={holidayForm.type} onChange={e => setHolidayForm({ ...holidayForm, type: e.target.value })}>
+                                                <option value="official">🏛️ Official Holiday (Fixed)</option>
+                                                <option value="unofficial">📅 Unofficial / Prep Holiday</option>
+                                                <option value="event">🎉 Extra-curricular Event Day</option>
+                                            </select>
+                                        </div>
+                                        <div className="fv2-group">
+                                            <label>Target Batch</label>
+                                            <select value={holidayForm.batch} onChange={e => setHolidayForm({ ...holidayForm, batch: e.target.value })}>
+                                                <option value="All">All Batches</option>
+                                                <option value="Batch 1">Batch 1</option>
+                                                <option value="Batch 2">Batch 2</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <button type="submit" className="admin-v2-submit-btn holiday-btn" disabled={loading}>
                                         {loading ? <Loader2 size={16} className="spin" /> : <Plus size={16} />} Add Holiday
@@ -788,10 +801,20 @@ const Admin = () => {
                                             <label>Subject (Optional)</label>
                                             <input placeholder="e.g., MATH-201" value={examForm.subject} onChange={e => setExamForm({ ...examForm, subject: e.target.value })} />
                                         </div>
+                                    <div className="fv2-row">
                                         <div className="fv2-group">
                                             <label>Room / Lab</label>
                                             <input placeholder="e.g., CR-2 or Machine Lab" value={examForm.room} onChange={e => setExamForm({ ...examForm, room: e.target.value })} />
                                         </div>
+                                        <div className="fv2-group">
+                                            <label>Target Batch</label>
+                                            <select value={examForm.batch} onChange={e => setExamForm({ ...examForm, batch: e.target.value })}>
+                                                <option value="All">All Batches</option>
+                                                <option value="Batch 1">Batch 1</option>
+                                                <option value="Batch 2">Batch 2</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     </div>
                                     <div className="fv2-group">
                                         <label>Description (Optional)</label>

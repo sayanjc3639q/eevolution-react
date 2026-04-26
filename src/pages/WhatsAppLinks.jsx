@@ -34,14 +34,14 @@ const WhatsAppLinks = () => {
                         <ArrowLeft size={18} /> Back
                     </button>
                     <h1 className="title">Community <span className="highlight">Groups</span></h1>
-                    <p className="subtitle">Connect with Batch 2 Students</p>
+                    <p className="subtitle">Connect with EE Community Students</p>
                 </div>
             </header>
 
             <main className="whatsapp-content">
                 <div className="info-banner">
                     <Info size={20} />
-                    <p>These groups are for Batch 2 students only. Please maintain decorum and follow group rules.</p>
+                    <p>These groups are for EE community students only. Please maintain decorum and follow group rules.</p>
                 </div>
 
                 {loading ? (

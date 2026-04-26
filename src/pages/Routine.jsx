@@ -15,22 +15,50 @@ const Routine = () => {
     const [selectedDay, setSelectedDay] = useState(initialDay);
     const [routineData, setRoutineData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [studentBatch, setStudentBatch] = useState(null);
 
     useEffect(() => {
-        fetchRoutine();
+        fetchInitialData();
     }, []);
 
-    const fetchRoutine = async () => {
+    const fetchInitialData = async () => {
         setLoading(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            let batch = 'Batch 2'; // Default
+
+            if (session) {
+                const { data: student } = await supabase
+                    .from('students')
+                    .select('batch')
+                    .eq('user_id', session.user.id)
+                    .single();
+                
+                if (student?.batch) {
+                    batch = student.batch;
+                }
+            }
+            
+            setStudentBatch(batch);
+            await fetchRoutine(batch);
+        } catch (err) {
+            console.error("Error fetching student batch:", err);
+            await fetchRoutine('Batch 2');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchRoutine = async (batch) => {
         const { data, error } = await supabase
             .from('routines')
             .select('*')
+            .eq('batch', batch)
             .order('start_time', { ascending: true });
 
         if (!error) {
             setRoutineData(data);
         }
-        setLoading(false);
     };
 
     const routineForDay = routineData.filter(item => item.day === selectedDay);
@@ -47,7 +75,7 @@ const Routine = () => {
                     <span>Back</span>
                 </button>
                 <h1>Class <span className="highlight">Routine</span></h1>
-                <p>EE Batch 2 Weekly Schedule</p>
+                <p>EE Weekly Schedule {studentBatch && <span className="batch-tag-inline">({studentBatch})</span>}</p>
             </div>
 
             <div className="day-selector-wrapper">

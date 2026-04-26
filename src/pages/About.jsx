@@ -60,7 +60,7 @@ const About = () => {
                         <p>
                             EEvolution 2.0 is not a business; it is a non-profit scheme created to allow students easy access 
                             to academic resources, modules, and community information. It is maintained and regulated 
-                            through the decisions of the Electrical Engineering Batch 2 community and its concerned 
+                            through the decisions of the Electrical Engineering community and its concerned 
                             administrators.
                         </p>
 
@@ -158,7 +158,7 @@ const About = () => {
                     <div className="value-item">
                         <div className="value-icon"><Users size={20} /></div>
                         <h4>Community</h4>
-                        <p>Built by Batch 2 students for the entire community.</p>
+                        <p>Built by students for the entire Electrical Engineering community.</p>
                     </div>
                     <div className="value-item">
                         <div className="value-icon"><ShieldCheck size={20} /></div>

@@ -52,6 +52,13 @@
     font-size: 1rem;
 }
 
+.batch-tag-inline {
+    color: var(--accent-color);
+    font-weight: 800;
+    margin-left: 0.25rem;
+    font-size: 0.9rem;
+}
+
 /* Day Selector */
 .day-selector-wrapper {
     background: var(--bg-secondary);

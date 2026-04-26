@@ -60,11 +60,7 @@ const Auth = () => {
             if (!data) {
                 setVerified(false);
                 setStudentData(null);
-                if (rollNum <= 68) {
-                    setError('Currently Available for Batch 2 only.');
-                } else {
-                    setError('Student roll number not found.');
-                }
+                setError('Student roll number not found.');
             } else if (data.user_id) {
                 setVerified(false);
                 setStudentData(null);
@@ -173,9 +169,10 @@ const Auth = () => {
                                         <Hash size={14} /> {studentData.name}
                                     </p>
                                     <p className="batch-info">
-                                        {!studentData.is_approved ?
-                                            "Batch 1 (Approval Pending)" :
-                                            "Batch 2 Student Detected"}
+                                        {studentData.batch ? 
+                                            studentData.batch : 
+                                            (studentData.class_roll_no.includes('25/EE/') ? "EE Student Verified" : "Verified Member")
+                                        }
                                     </p>
                                 </div>
                             )}

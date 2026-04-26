@@ -67,9 +67,9 @@ const Home = () => {
         <div className="guest-home">
             {/* Hero Section */}
             <section className="guest-hero reveal">
-                <div className="hero-badge-top">Batch 2 • 2029 Graduating</div>
+                <div className="hero-badge-top">Electrical Engineering • Batch 1 & 2</div>
                 <h1>EEvolution <span style={{ color: 'var(--accent-color)' }}>2.0</span></h1>
-                <p>The pioneering digital ecosystem for Electrical Engineering Batch 2. Built for excellence, designed for evolution.</p>
+                <p>The pioneering digital ecosystem for the Electrical Engineering Community. Built for excellence, designed for evolution.</p>
                 <div className="hero-btns">
                     <Link to="/login" className="primary-btn">Get Started</Link>
                     <Link to="/explore" className="secondary-btn">Explore Hub</Link>
@@ -157,7 +157,7 @@ const Home = () => {
                         <div className="visual-glow"></div>
                         <div className="visual-card main-card">
                             <div className="visual-badge">EST. 2026</div>
-                            <h3>Batch 2</h3>
+                            <h3>Batch 1 & 2</h3>
                             <p>Electrical Engineering</p>
                         </div>
                         <div className="visual-card sub-card delay-1">
@@ -185,7 +185,7 @@ const Home = () => {
                             </p>
                             <p>
                                 Together, we are not just studying; we are evolving the way we learn.
-                                This project is a testament to the collective spirit of Batch 2, setting a new benchmark for departmental digitalization.
+                                This project is a testament to the collective spirit of the Electrical Engineering community, setting a new benchmark for departmental digitalization.
                             </p>
                         </div>
                         <div className="legacy-actions">
@@ -353,11 +353,24 @@ const Home = () => {
 
         useEffect(() => {
             const loadAll = async () => {
+                // First get user's batch if not already in session metadata
+                let userBatch = 'Batch 2'; // Fallback
+                try {
+                    const { data: student } = await supabase
+                        .from('students')
+                        .select('batch')
+                        .eq('user_id', session.user.id)
+                        .single();
+                    if (student?.batch) userBatch = student.batch;
+                } catch (e) {
+                    console.warn("Could not fetch user batch for schedule");
+                }
+
                 // Load schedule + holidays + community in parallel
                 const [routineRes, holidayRes, examRes, contribRes, donatorRes, noticeRes, eventRes, materialRes, memoryRes] = await Promise.all([
-                    supabase.from('routines').select('*').eq('day', dayName).order('start_time', { ascending: true }),
-                    supabase.from('holidays').select('*').eq('date', dateStr),
-                    supabase.from('exams').select('*').eq('date', dateStr).order('start_time', { ascending: true }),
+                    supabase.from('routines').select('*').eq('day', dayName).eq('batch', userBatch).order('start_time', { ascending: true }),
+                    supabase.from('holidays').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr),
+                    supabase.from('exams').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr).order('start_time', { ascending: true }),
                     supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3),
                     supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3),
                     supabase.from('notices').select('*').order('notice_date', { ascending: false }).limit(3),
@@ -380,7 +393,7 @@ const Home = () => {
                 setCommunityLoading(false);
             };
             loadAll();
-        }, [dayName, dateStr]);
+        }, [dayName, dateStr, session.user.id]);
 
         // Parse "HH:MM" time string to minutes from midnight
         const toMin = (t) => {
@@ -407,17 +420,14 @@ const Home = () => {
 
         // Build schedule rows with breaks and exams inserted
         const buildRows = () => {
-            const isEndSem = exams.some(ex => ex.type === 'End Sem');
             let items = [];
 
-            if (isEndSem) {
-                // Priority mode for End Sem exams
-                items = exams.filter(ex => ex.type === 'End Sem').map(ex => ({ type: 'exam', data: ex }));
+            if (exams.length > 0) {
+                // If there are exams, classes are off. Show only exams scheduled for today.
+                items = exams.map(ex => ({ type: 'exam', data: ex }));
             } else {
-                // Mix regular classes and other exams (Class Assessment, Practical)
-                const classItems = todaySchedule.map(c => ({ type: 'class', data: c }));
-                const examItems = exams.filter(ex => ex.type !== 'End Sem').map(ex => ({ type: 'exam', data: ex }));
-                items = [...classItems, ...examItems].sort((a, b) => toMin(a.data.start_time) - toMin(b.data.start_time));
+                // No exams scheduled, show regular routine classes
+                items = todaySchedule.map(c => ({ type: 'class', data: c }));
             }
 
             const rows = [];
@@ -496,6 +506,11 @@ const Home = () => {
                                 <div className="ds-section-label">
                                     <Calendar size={18} />
                                     <span>Today's Schedule</span>
+                                    {todaySchedule.length > 0 && (
+                                        <span className={`batch-pill-indicator ${todaySchedule[0]?.batch?.toLowerCase().replace(' ', '') || 'b2'}`}>
+                                            {todaySchedule[0]?.batch || 'Batch 2'}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="ds-section-date">
                                     {today.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
@@ -549,7 +564,7 @@ const Home = () => {
                                     
                                     <div className="schedule-timeline carousel" ref={carouselRef}>
                                         {rows.map((row, idx) => {
-                                            const status = getRowStatus(row.type === 'class' ? row.data : row, row.type);
+                                            const status = getRowStatus((row.type === 'class' || row.type === 'exam') ? row.data : row, row.type);
                                             const isActive = idx === finalActiveIdx;
 
                                             if (row.type === 'break') {
@@ -1009,7 +1024,7 @@ const Home = () => {
             <SEO
                 title="Home"
                 description="EEvolution 2.0: The ultimate digital ecosystem for Electrical Engineering students. Centralizing resources, real-time alerts, and batch collaboration."
-                keywords="EEvolution, Electrical Engineering, study hub, HIT Haldia, Batch 2"
+                keywords="EEvolution, Electrical Engineering, study hub, HIT Haldia, Batch 1, Batch 2"
             />
             {status === 'loading' ? null : session ? <UserView /> : <GuestView />}
         </>

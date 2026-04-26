@@ -328,8 +328,13 @@ const Profile = () => {
                     </div>
                     <div className="user-text">
                         <h1>{studentData.name}</h1>
-                        <div className="badge-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <div className="badge-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                             <span className="roll-badge">{studentData.class_roll_no}</span>
+                            {studentData.batch && (
+                                <span className={`batch-badge-profile ${studentData.batch.toLowerCase().replace(' ', '')}`}>
+                                    {studentData.batch}
+                                </span>
+                            )}
                             <span className={`plan-badge-profile ${studentData.subscription_plan || 'standard'}`}>
                                 {studentData.subscription_plan || 'Standard'} Plan
                             </span>
@@ -351,7 +356,7 @@ const Profile = () => {
             <div className="status-indicator-card mobile-only-status">
                 <div className={`status-status ${studentData.is_approved ? 'approved' : 'pending'}`}>
                     <div className="dot"></div>
-                    {studentData.is_approved ? 'Verified Batch 2' : 'Pending Verification'}
+                    {studentData.is_approved ? 'Verified Member' : 'Pending Verification'}
                 </div>
             </div>
 
@@ -455,7 +460,11 @@ const Profile = () => {
                     <div className="status-indicator-card">
                         <div className={`status-status ${studentData.is_approved ? 'approved' : 'pending'}`}>
                             <div className="dot"></div>
-                            {studentData.is_approved ? 'Official Batch 2 Member' : 'Batch 1 - Account Verification Pending'}
+                            {studentData.is_approved ? (
+                                <span>{studentData.batch || 'Verified Member'}</span>
+                            ) : (
+                                'Account Verification Pending'
+                            )}
                         </div>
                     </div>
                 </div>
