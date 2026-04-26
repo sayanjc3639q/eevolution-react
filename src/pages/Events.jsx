@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar as CalendarIcon, ArrowLeft, MapPin, ExternalLink, Ticket, LayoutGrid } from 'lucide-react';
+import { Calendar as CalendarIcon, ArrowLeft, LayoutGrid, Ticket } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import SEO from '../components/SEO';
 import './Events.css';
 
 const Events = () => {
     const navigate = useNavigate();
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchEvents = async () => {
+    // --- CACHED EVENTS FETCHING ---
+    const { data: events = [], isLoading: loading } = useQuery({
+        queryKey: ['events'],
+        queryFn: async () => {
             const { data, error } = await supabase
                 .from('events')
                 .select('*')
                 .order('event_date', { ascending: true });
-
-            if (!error) setEvents(data);
-            setLoading(false);
-        };
-        fetchEvents();
-    }, []);
+            if (error) throw error;
+            return data;
+        }
+    });
 
     const isUpcoming = (dateStr) => {
         const today = new Date();

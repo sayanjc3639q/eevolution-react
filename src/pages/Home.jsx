@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import {
     Zap, BookOpen, MessageSquare, Bell, ShieldCheck,
     TrendingUp, Award, Globe, Heart, Star, Quote, ArrowRight,
@@ -332,68 +333,105 @@ const Home = () => {
         const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
         const GreetIcon = hour < 6 ? Moon : hour < 12 ? Sunrise : hour < 18 ? Sun : Moon;
 
-        // Schedule state
-        const [todaySchedule, setTodaySchedule] = useState([]);
-        const [scheduleLoading, setScheduleLoading] = useState(true);
-        const [isHoliday, setIsHoliday] = useState(null); // null=loading, false=workday, string=holiday name
-        const [contributors, setContributors] = useState([]);
-        const [donators, setDonators] = useState([]);
-        const [recentNotices, setRecentNotices] = useState([]);
-        const [recentEvents, setRecentEvents] = useState([]);
-        const [recentMaterials, setRecentMaterials] = useState([]);
-        const [exams, setExams] = useState([]);
-        const [recentMemory, setRecentMemory] = useState(null);
-        const [communityLoading, setCommunityLoading] = useState(true);
-
         const today = currentTime;
         const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; // YYYY-MM-DD in local time
         const isWeekend = dayName === 'Saturday' || dayName === 'Sunday';
         const now = today.getHours() * 60 + today.getMinutes();
 
-        useEffect(() => {
-            const loadAll = async () => {
-                // First get user's batch if not already in session metadata
-                let userBatch = 'Batch 2'; // Fallback
-                try {
-                    const { data: student } = await supabase
-                        .from('students')
-                        .select('batch')
-                        .eq('user_id', session.user.id)
-                        .single();
-                    if (student?.batch) userBatch = student.batch;
-                } catch (e) {
-                    console.warn("Could not fetch user batch for schedule");
-                }
+        // --- GRANULAR CACHED QUERIES ---
 
-                // Load schedule + holidays + community in parallel
-                const [routineRes, holidayRes, examRes, contribRes, donatorRes, noticeRes, eventRes, materialRes, memoryRes] = await Promise.all([
-                    supabase.from('routines').select('*').eq('day', dayName).eq('batch', userBatch).order('start_time', { ascending: true }),
-                    supabase.from('holidays').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr),
-                    supabase.from('exams').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr).order('start_time', { ascending: true }),
-                    supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3),
-                    supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3),
-                    supabase.from('notices').select('*').order('notice_date', { ascending: false }).limit(3),
-                    supabase.from('events').select('*').order('event_date', { ascending: false }).limit(3),
-                    supabase.from('study_materials').select('*').order('created_at', { ascending: false }).limit(3),
-                    supabase.from('memories').select('*').order('created_at', { ascending: false }).limit(1),
-                ]);
+        // 1. Fetch User Batch
+        const { data: userBatch = 'Batch 2' } = useQuery({
+            queryKey: ['userBatch', session.user.id],
+            queryFn: async () => {
+                const { data } = await supabase.from('students').select('batch').eq('user_id', session.user.id).single();
+                return data?.batch || 'Batch 2';
+            }
+        });
 
-                if (!routineRes.error) setTodaySchedule(routineRes.data || []);
-                setIsHoliday(holidayRes.data?.length > 0 ? holidayRes.data[0] : false);
-                setExams(examRes.data || []);
-                setScheduleLoading(false);
+        // 2. Fetch Schedule
+        const { data: todaySchedule = [], isLoading: routineLoading } = useQuery({
+            queryKey: ['routine', dayName, userBatch],
+            queryFn: async () => {
+                const { data } = await supabase.from('routines').select('*').eq('day', dayName).eq('batch', userBatch).order('start_time', { ascending: true });
+                return data || [];
+            },
+            enabled: !!userBatch
+        });
 
-                if (!contribRes.error) setContributors(contribRes.data || []);
-                if (!donatorRes.error) setDonators(donatorRes.data || []);
-                if (!noticeRes.error) setRecentNotices(noticeRes.data || []);
-                if (!eventRes.error) setRecentEvents(eventRes.data || []);
-                if (!materialRes.error) setRecentMaterials(materialRes.data || []);
-                if (!memoryRes.error && memoryRes.data?.length > 0) setRecentMemory(memoryRes.data[0]);
-                setCommunityLoading(false);
-            };
-            loadAll();
-        }, [dayName, dateStr, session.user.id]);
+        // 3. Fetch Holidays
+        const { data: holidayData = [], isLoading: holidayLoading } = useQuery({
+            queryKey: ['holidays', dateStr, userBatch],
+            queryFn: async () => {
+                const { data } = await supabase.from('holidays').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr);
+                return data || [];
+            },
+            enabled: !!userBatch
+        });
+
+        // 4. Fetch Exams
+        const { data: exams = [], isLoading: examLoading } = useQuery({
+            queryKey: ['exams', dateStr, userBatch],
+            queryFn: async () => {
+                const { data } = await supabase.from('exams').select('*').or(`batch.eq.All,batch.eq.${userBatch}`).eq('date', dateStr).order('start_time', { ascending: true });
+                return data || [];
+            },
+            enabled: !!userBatch
+        });
+
+        // 5. Community Data
+        const { data: contributors = [] } = useQuery({
+            queryKey: ['contributors'],
+            queryFn: async () => {
+                const { data } = await supabase.from('students').select('id, name, class_roll_no, files_count, avatar_url').gt('files_count', 0).order('files_count', { ascending: false }).limit(3);
+                return data || [];
+            }
+        });
+
+        const { data: donators = [] } = useQuery({
+            queryKey: ['donators'],
+            queryFn: async () => {
+                const { data } = await supabase.from('students').select('id, name, class_roll_no, donation, avatar_url').gt('donation', 0).order('donation', { ascending: false }).limit(3);
+                return data || [];
+            }
+        });
+
+        const { data: recentNotices = [] } = useQuery({
+            queryKey: ['notices', 'recent'],
+            queryFn: async () => {
+                const { data } = await supabase.from('notices').select('*').order('notice_date', { ascending: false }).limit(3);
+                return data || [];
+            }
+        });
+
+        const { data: recentEvents = [] } = useQuery({
+            queryKey: ['events', 'recent'],
+            queryFn: async () => {
+                const { data } = await supabase.from('events').select('*').order('event_date', { ascending: false }).limit(3);
+                return data || [];
+            }
+        });
+
+        const { data: recentMaterials = [] } = useQuery({
+            queryKey: ['materials', 'recent'],
+            queryFn: async () => {
+                const { data } = await supabase.from('study_materials').select('*').order('created_at', { ascending: false }).limit(3);
+                return data || [];
+            }
+        });
+
+        const { data: recentMemory = null } = useQuery({
+            queryKey: ['memory', 'recent'],
+            queryFn: async () => {
+                const { data } = await supabase.from('memories').select('*').order('created_at', { ascending: false }).limit(1);
+                return data?.[0] || null;
+            }
+        });
+
+        const scheduleLoading = routineLoading || holidayLoading || examLoading;
+        const isHoliday = holidayData.length > 0 ? holidayData[0] : false;
+        const communityLoading = false; // TanStack handles this automatically now
 
         // Parse "HH:MM" time string to minutes from midnight
         const toMin = (t) => {

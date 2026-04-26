@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import {
     BookOpen,
     ChevronLeft,
@@ -36,24 +37,19 @@ const MOOCSSkeleton = () => (
 
 const MOOCS = () => {
     const navigate = useNavigate();
-    const [metadata, setMetadata] = useState({});
-    const [buckets, setBuckets] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchMOOCSData();
         window.scrollTo(0, 0);
     }, []);
 
-    const fetchMOOCSData = async () => {
-        setLoading(true);
-        try {
+    const { data: moocsData, isLoading: loading } = useQuery({
+        queryKey: ['moocsData'],
+        queryFn: async () => {
             // Fetch metadata
             const { data: metaData } = await supabase.from('moocs_metadata').select('*');
+            const metaObj = {};
             if (metaData) {
-                const metaObj = {};
                 metaData.forEach(m => metaObj[m.key] = m.value);
-                setMetadata(metaObj);
             }
 
             // Fetch buckets with courses
@@ -65,15 +61,15 @@ const MOOCS = () => {
                     moocs_courses (*)
                 `);
 
-            if (bucketData) {
-                setBuckets(bucketData);
-            }
-        } catch (error) {
-            console.error('Error fetching MOOCS data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (bucketError) throw bucketError;
+
+            return { metadata: metaObj, buckets: bucketData || [] };
+        },
+        staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    const metadata = moocsData?.metadata || {};
+    const buckets = moocsData?.buckets || [];
 
     if (loading) return <MOOCSSkeleton />;
 

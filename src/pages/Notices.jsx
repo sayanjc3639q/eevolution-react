@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowLeft, Download, ExternalLink, Calendar as CalendarIcon, FileText, Image as ImageIcon } from 'lucide-react';
+import { Bell, Calendar as CalendarIcon, FileText, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import SEO from '../components/SEO';
 import './Notices.css';
 
 const Notices = () => {
     const navigate = useNavigate();
-    const [notices, setNotices] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchNotices = async () => {
+    // --- CACHED NOTICES FETCHING ---
+    const { data: notices = [], isLoading: loading } = useQuery({
+        queryKey: ['notices'],
+        queryFn: async () => {
             const { data, error } = await supabase
                 .from('notices')
                 .select('*')
                 .order('notice_date', { ascending: false });
-
-            if (!error) setNotices(data);
-            setLoading(false);
-        };
-        fetchNotices();
-    }, []);
+            if (error) throw error;
+            return data;
+        }
+    });
 
     return (
         <div className="notices-page">

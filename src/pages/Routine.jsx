@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, ArrowLeft, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, MapPin, User, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import './Routine.css';
 
 const Routine = () => {
@@ -13,53 +14,38 @@ const Routine = () => {
     const initialDay = days.includes(today) ? today : "Monday";
 
     const [selectedDay, setSelectedDay] = useState(initialDay);
-    const [routineData, setRoutineData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [studentBatch, setStudentBatch] = useState(null);
 
-    useEffect(() => {
-        fetchInitialData();
-    }, []);
-
-    const fetchInitialData = async () => {
-        setLoading(true);
-        try {
+    // --- CACHED BATCH FETCHING ---
+    const { data: studentBatch = 'Batch 2' } = useQuery({
+        queryKey: ['userBatch'],
+        queryFn: async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            let batch = 'Batch 2'; // Default
-
-            if (session) {
-                const { data: student } = await supabase
-                    .from('students')
-                    .select('batch')
-                    .eq('user_id', session.user.id)
-                    .single();
-                
-                if (student?.batch) {
-                    batch = student.batch;
-                }
-            }
-            
-            setStudentBatch(batch);
-            await fetchRoutine(batch);
-        } catch (err) {
-            console.error("Error fetching student batch:", err);
-            await fetchRoutine('Batch 2');
-        } finally {
-            setLoading(false);
+            if (!session) return 'Batch 2';
+            const { data: student } = await supabase
+                .from('students')
+                .select('batch')
+                .eq('user_id', session.user.id)
+                .single();
+            return student?.batch || 'Batch 2';
         }
-    };
+    });
 
-    const fetchRoutine = async (batch) => {
-        const { data, error } = await supabase
-            .from('routines')
-            .select('*')
-            .eq('batch', batch)
-            .order('start_time', { ascending: true });
+    // --- CACHED ROUTINE FETCHING ---
+    const { data: routineData = [], isLoading: routineLoading } = useQuery({
+        queryKey: ['routine', studentBatch],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('routines')
+                .select('*')
+                .eq('batch', studentBatch)
+                .order('start_time', { ascending: true });
+            if (error) throw error;
+            return data;
+        },
+        enabled: !!studentBatch
+    });
 
-        if (!error) {
-            setRoutineData(data);
-        }
-    };
+    const loading = routineLoading;
 
     const routineForDay = routineData.filter(item => item.day === selectedDay);
 

@@ -14,16 +14,36 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import SEO from '../components/SEO';
+import { useQuery } from '@tanstack/react-query';
 import './StudySection.css';
 
 const StudySection = () => {
     const { categoryId, subjectId, chapterId } = useParams();
     const navigate = useNavigate();
-    const [materials, setMaterials] = useState([]);
-    const [syllabus, setSyllabus] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [previewFile, setPreviewFile] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // --- CACHED DATA FETCHING ---
+    const { data: materials = [], isLoading: materialsLoading } = useQuery({
+        queryKey: ['studyMaterials'],
+        queryFn: async () => {
+            const { data, error } = await supabase.from('study_materials').select('*');
+            if (error) throw error;
+            return data;
+        }
+    });
+
+    const { data: syllabus = null, isLoading: syllabusLoading } = useQuery({
+        queryKey: ['syllabus'],
+        queryFn: async () => {
+            const { data, error } = await supabase.from('syllabus').select('data').single();
+            if (error) throw error;
+            return data.data;
+        }
+    });
+
+    const loading = materialsLoading || syllabusLoading;
 
     const handleShare = async (file, e) => {
         if (e && e.preventDefault) e.preventDefault();
@@ -74,17 +94,9 @@ const StudySection = () => {
         { id: 'practice-set', name: 'Practice Sets', icon: <ClipboardList />, description: 'Problem sets and exercise materials.' },
         { id: 'books', name: 'Books', icon: <Book />, description: 'Recommended textbooks and reference material.' },
         { id: 'handwritten', name: 'Handwritten & PPTs', icon: <FileText />, description: 'Student-made notes and academic slides.' },
-        { id: 'lab-notes', name: 'Lab Notes', icon: <FlaskConical />, description: 'Practical records and laboratory guides.' }
+        { id: 'lab-notes', name: 'Lab Notes', icon: <FlaskConical />, description: 'Practical records and laboratory guides.' },
+        { id: 'all-docs', name: 'All Documents', icon: <Layers />, highlight: false, description: 'Browse everything in one place with advanced naming.' }
     ];
-
-    useEffect(() => {
-        const loadAllData = async () => {
-            setLoading(true);
-            await Promise.all([fetchMaterials(), fetchSyllabus()]);
-            setLoading(false);
-        };
-        loadAllData();
-    }, []);
 
     // Effect to handle deep linking via preview query param
     useEffect(() => {
@@ -94,32 +106,10 @@ const StudySection = () => {
                 const file = materials.find(m => m.id === previewId || m.id === parseInt(previewId));
                 if (file) {
                     setPreviewFile(file);
-                    // Clear the query param so it doesn't re-open on refresh if user closed it
-                    // but we might want to keep it if we want users to be able to refresh and keep the modal open.
-                    // For now, let's just set it.
                 }
             }
         }
     }, [loading, materials, searchParams]);
-
-    const fetchMaterials = async () => {
-        const { data, error } = await supabase
-            .from('study_materials')
-            .select('*');
-        if (!error) {
-            setMaterials(data);
-        }
-    };
-
-    const fetchSyllabus = async () => {
-        const { data, error } = await supabase
-            .from('syllabus')
-            .select('data')
-            .single();
-        if (!error && data) {
-            setSyllabus(data.data);
-        }
-    };
 
     // --- DERIVED DATA FROM SYLLABUS ---
     const getSubjects = () => {
@@ -194,6 +184,19 @@ const StudySection = () => {
             selectedSubject?.name === m.subject_name &&
             (categoryId === 'practice-set' ? true : selectedChapter?.name === m.chapter_name)
         )
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    const allDocuments = materials
+        .filter(m => {
+            if (!searchTerm) return true;
+            const searchLower = searchTerm.toLowerCase();
+            return (
+                m.subject_name?.toLowerCase().includes(searchLower) ||
+                m.chapter_name?.toLowerCase().includes(searchLower) ||
+                m.file_name?.toLowerCase().includes(searchLower) ||
+                m.file_description?.toLowerCase().includes(searchLower)
+            );
+        })
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // --- NAVIGATION LOGIC ---
@@ -370,8 +373,87 @@ const StudySection = () => {
         </div>
     );
 
+    const renderAllDocs = () => (
+        <div className="cascade-view" key="all-docs-view">
+            <div className="section-intro">
+                <div className="section-title-row">
+                    <button onClick={goBack} className="back-btn-square">
+                        <ArrowLeft size={20} />
+                    </button>
+                    <h2>All <span className="highlight">Documents</span></h2>
+                </div>
+                <p>Everything uploaded to the system, organized by subject.</p>
+                
+                <div className="search-box-container">
+                    <div className="search-input-wrapper">
+                        <Info size={18} className="search-icon-fixed" />
+                        <input 
+                            type="text" 
+                            placeholder="Search by subject, chapter or filename..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="all-docs-search"
+                        />
+                        {searchTerm && (
+                            <button className="clear-search" onClick={() => setSearchTerm('')}>
+                                <X size={16} />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="file-grid skeleton-loading">
+                    {[1, 2, 3, 4, 5, 6].map(n => (
+                        <div key={n} className="file-card skeleton-item skeleton-pulse" style={{ height: '180px', border: 'none' }}></div>
+                    ))}
+                </div>
+            ) : allDocuments.length > 0 ? (
+                <div className="file-grid">
+                    {allDocuments.map(file => (
+                        <div key={file.id} className={`file-card all-docs-item ${isNew(file.created_at) ? 'is-new' : ''}`}>
+                            {isNew(file.created_at) && (
+                                <div className="new-file-tag">
+                                    <Zap size={10} fill="currentColor" /> NEW
+                                </div>
+                            )}
+                            <div className="file-header">
+                                <div className="file-icon"><Layers /></div>
+                                <div className="file-meta">
+                                    <span className="category-tag-mini">{file.section_id.replace(/-/g, ' ')}</span>
+                                    <h4>{file.subject_name} - {file.chapter_name}</h4>
+                                </div>
+                            </div>
+                            <p className="file-desc-alt">
+                                <strong>Original File:</strong> {file.file_name}
+                            </p>
+                            <div className="file-actions">
+                                <button onClick={() => setPreviewFile(file)} className="download-btn view-btn">
+                                    <Eye size={18} /> View
+                                </button>
+                                <button onClick={(e) => handleShare(file, e)} className="share-btn-card">
+                                    <Share2 size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="empty-state">
+                    <div className="empty-icon-burn">
+                        <FileX size={48} />
+                    </div>
+                    <h3>No Documents Found</h3>
+                    <p>No results match your search criteria. Try a different keyword.</p>
+                </div>
+            )}
+        </div>
+    );
+
     // Determine current view based on params
     const renderContent = () => {
+        if (categoryId === 'all-docs') return <div className="study-container">{renderAllDocs()}</div>;
         if (categoryId && subjectId && chapterId) return <div className="study-container">{renderFiles()}</div>;
         if (categoryId && subjectId) return <div className="study-container">{renderChapters()}</div>;
         if (categoryId) return <div className="study-container">{renderSubjects()}</div>;

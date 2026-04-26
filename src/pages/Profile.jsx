@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { compressImage } from '../lib/imageCompression';
 import {
     User, LogOut, FileText, ShieldCheck, Mail, Hash,
@@ -12,10 +13,7 @@ import './Profile.css';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(null);
-    const [studentData, setStudentData] = useState(null);
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const queryClient = useQueryClient();
     const [showSensitive, setShowSensitive] = useState(false);
     const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
@@ -23,26 +21,15 @@ const Profile = () => {
     const [verifying, setVerifying] = useState(false);
     const [verifyError, setVerifyError] = useState('');
 
-
-
-    useEffect(() => {
-        getProfile();
-    }, []);
-
-    const getProfile = async () => {
-        try {
-            setLoading(true);
+    // --- CACHED PROFILE FETCHING ---
+    const { data: profileData, isLoading: loading } = useQuery({
+        queryKey: ['userProfile'],
+        queryFn: async () => {
             const { data: { user }, error: authError } = await supabase.auth.getUser();
-
             if (authError || !user) {
-                if (authError?.message?.includes('refresh_token_not_found') || authError?.message?.includes('Refresh Token Not Found')) {
-                    await supabase.auth.signOut();
-                }
                 navigate('/login');
-                return;
+                return null;
             }
-
-            setUser(user);
 
             const { data, error } = await supabase
                 .from('students')
@@ -51,19 +38,19 @@ const Profile = () => {
                 .single();
 
             if (error) throw error;
-            setStudentData(data);
 
             // SuperAdmin Check
             const superAdminEmail = 'jcsayan7@gmail.com';
             const superAdminRoll = '25/EE/092';
-            const isUserSuperAdmin = user.email === superAdminEmail || data?.class_roll_no === superAdminRoll;
-            setIsSuperAdmin(isUserSuperAdmin);
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-        } finally {
-            setLoading(false);
+            const isSuperAdmin = user.email === superAdminEmail || data?.class_roll_no === superAdminRoll;
+
+            return { user, studentData: data, isSuperAdmin };
         }
-    };
+    });
+
+    const studentData = profileData?.studentData;
+    const user = profileData?.user;
+    const isSuperAdmin = profileData?.isSuperAdmin;
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -129,12 +116,7 @@ const Profile = () => {
                     .eq('user_id', user.id);
 
                 if (error) throw error;
-
-                setStudentData(prev => ({ 
-                    ...prev, 
-                    avatar_url: cloudData.secure_url, 
-                    avatar_public_id: cloudData.public_id 
-                }));
+                queryClient.invalidateQueries(['userProfile']);
             }
         } catch (error) {
             console.error('Error uploading profile picture:', error);
@@ -202,7 +184,7 @@ const Profile = () => {
                 .eq('user_id', user.id);
 
             if (error) throw error;
-            setStudentData(prev => ({ ...prev, avatar_url: null, avatar_public_id: null }));
+            queryClient.invalidateQueries(['userProfile']);
         } catch (error) {
             console.error('Error deleting profile picture:', error);
             alert('Failed to remove profile picture.');

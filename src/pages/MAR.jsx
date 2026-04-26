@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Award,
@@ -11,33 +11,26 @@ import {
     Star
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import './MAR.css';
 
 const MAR = () => {
     const navigate = useNavigate();
-    const [activities, setActivities] = useState([]);
-    const [metadata, setMetadata] = useState({});
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchMARData();
-    }, []);
-
-    const fetchMARData = async () => {
-        setLoading(true);
-        try {
+    const { data: marData, isLoading: loading } = useQuery({
+        queryKey: ['marData'],
+        queryFn: async () => {
             // Fetch metadata
             const { data: metaData, error: metaError } = await supabase
                 .from('mar_metadata')
                 .select('key, value');
 
-            if (!metaError && metaData) {
-                const metaObj = {};
-                metaData.forEach(item => {
-                    metaObj[item.key] = item.value;
-                });
-                setMetadata(metaObj);
-            }
+            if (metaError) throw metaError;
+
+            const metaObj = {};
+            metaData.forEach(item => {
+                metaObj[item.key] = item.value;
+            });
 
             // Fetch activities
             const { data: actData, error: actError } = await supabase
@@ -45,15 +38,15 @@ const MAR = () => {
                 .select('*')
                 .order('sl_no', { ascending: true });
 
-            if (!actError && actData) {
-                setActivities(actData);
-            }
-        } catch (err) {
-            console.error('Error fetching MAR data:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (actError) throw actError;
+
+            return { metadata: metaObj, activities: actData };
+        },
+        staleTime: 24 * 60 * 60 * 1000, // 24 hours (MAR guidelines rarely change)
+    });
+
+    const activities = marData?.activities || [];
+    const metadata = marData?.metadata || {};
 
     const renderPoints = (points) => {
         if (points && typeof points === 'object') {

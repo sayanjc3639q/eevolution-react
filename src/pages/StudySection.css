@@ -832,4 +832,115 @@
     border: 1px solid rgba(var(--accent-color-rgb), 0.1);
 }
 
-
+
+/* --- All Documents Section Special Styles --- */
+.search-box-container {
+    margin: 1.5rem 0;
+    max-width: 600px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon-fixed {
+    position: absolute;
+    left: 1.25rem;
+    color: var(--accent-color);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.all-docs-search {
+    width: 100%;
+    padding: 1rem 3rem 1rem 3.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.all-docs-search:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: var(--bg-tertiary);
+    box-shadow: 0 8px 30px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.clear-search {
+    position: absolute;
+    right: 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-search:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.category-tag-mini {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--accent-color);
+    background: rgba(var(--accent-color-rgb), 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 0.4rem;
+    display: inline-block;
+}
+
+.file-desc-alt {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    background: var(--bg-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.file-desc-alt strong {
+    color: var(--text-primary);
+    font-size: 0.75rem;
+}
+
+.all-docs-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.all-docs-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 640px) {
+    .all-docs-search {
+        font-size: 0.9rem;
+        padding: 0.85rem 2.5rem 0.85rem 3rem;
+    }
+    
+    .search-icon-fixed {
+        left: 1rem;
+    }
+}
+

@@ -371,6 +371,29 @@ const Memories = () => {
         }
     };
 
+    const [columnCount, setColumnCount] = useState(3);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 600) setColumnCount(1);
+            else if (width < 900) setColumnCount(2);
+            else setColumnCount(3);
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const getColumns = () => {
+        const columns = Array.from({ length: columnCount }, () => []);
+        memories.forEach((memory, index) => {
+            columns[index % columnCount].push(memory);
+        });
+        return columns;
+    };
+
     return (
         <div className="memories-page">
             <SEO 
@@ -410,108 +433,112 @@ const Memories = () => {
                     ))}
                 </div>
             ) : memories.length > 0 ? (
-                <div className="memories-grid">
-                    {memories.map((memory) => {
-                        const isLiked = memory.memory_likes?.some(l => l.user_id === session?.user?.id);
-                        return (
-                            <div key={memory.id} className="memory-card">
-                                {/* Card Header */}
-                                <div className="memory-card-header">
-                                    <div className="uploader-meta">
-                                        <div className="uploader-avatar">
-                                            {memory.students?.avatar_url ? (
-                                                <img
-                                                    src={memory.students.avatar_url}
-                                                    alt={memory.uploader_name}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
-                                                />
-                                            ) : (
-                                                memory.uploader_name.charAt(0)
-                                            )}
-                                        </div>
-                                        <div className="uploader-details">
-                                            <span className="uploader-name">{memory.uploader_name}</span>
-                                            <span className="uploader-roll">{memory.roll_number}</span>
-                                        </div>
-                                    </div>
-                                    <div className="memory-header-options">
-                                        <button
-                                            className="options-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setActiveMenuId(activeMenuId === memory.id ? null : memory.id);
-                                            }}
-                                        >
-                                            <MoreHorizontal size={20} />
-                                        </button>
+                <div className="memories-masonry-grid">
+                    {getColumns().map((column, colIdx) => (
+                        <div key={colIdx} className="masonry-column">
+                            {column.map((memory) => {
+                                const isLiked = memory.memory_likes?.some(l => l.user_id === session?.user?.id);
+                                return (
+                                    <div key={memory.id} className="memory-card">
+                                        {/* Card Header */}
+                                        <div className="memory-card-header">
+                                            <div className="uploader-meta">
+                                                <div className="uploader-avatar">
+                                                    {memory.students?.avatar_url ? (
+                                                        <img
+                                                            src={memory.students.avatar_url}
+                                                            alt={memory.uploader_name}
+                                                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                                                        />
+                                                    ) : (
+                                                        memory.uploader_name.charAt(0)
+                                                    )}
+                                                </div>
+                                                <div className="uploader-details">
+                                                    <span className="uploader-name">{memory.uploader_name}</span>
+                                                    <span className="uploader-roll">{memory.roll_number}</span>
+                                                </div>
+                                            </div>
+                                            <div className="memory-header-options">
+                                                <button
+                                                    className="options-btn"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setActiveMenuId(activeMenuId === memory.id ? null : memory.id);
+                                                    }}
+                                                >
+                                                    <MoreHorizontal size={20} />
+                                                </button>
 
-                                        {activeMenuId === memory.id && (
-                                            <div className="options-dropdown">
-                                                {(isAdmin || memory.user_id === session?.user?.id) && (
-                                                    <button
-                                                        className="dropdown-item delete"
-                                                        onClick={() => handleDelete(memory.id)}
-                                                        disabled={deletingIds.has(memory.id)}
-                                                    >
-                                                        <Trash2 size={16} /> Delete Post
-                                                    </button>
+                                                {activeMenuId === memory.id && (
+                                                    <div className="options-dropdown">
+                                                        {(isAdmin || memory.user_id === session?.user?.id) && (
+                                                            <button
+                                                                className="dropdown-item delete"
+                                                                onClick={() => handleDelete(memory.id)}
+                                                                disabled={deletingIds.has(memory.id)}
+                                                            >
+                                                                <Trash2 size={16} /> Delete Post
+                                                            </button>
+                                                        )}
+                                                        <button className="dropdown-item" onClick={() => handleShare(memory)}>
+                                                            <Share2 size={16} /> Share Post
+                                                        </button>
+                                                    </div>
                                                 )}
-                                                <button className="dropdown-item" onClick={() => handleShare(memory)}>
-                                                    <Share2 size={16} /> Share Post
+                                            </div>
+                                        </div>
+
+                                        {/* Main Image */}
+                                        <div className="memory-image">
+                                            <img src={memory.image_url} alt={memory.caption} />
+                                        </div>
+
+                                        {/* Action Bar */}
+                                        <div className="memory-card-actions">
+                                            <div className="interaction-buttons">
+                                                <button
+                                                    className={`action-icon-btn ${isLiked ? 'liked' : ''}`}
+                                                    onClick={() => handleLike(memory.id, isLiked)}
+                                                >
+                                                    <Heart
+                                                        size={26}
+                                                        fill={isLiked ? "#ff4d4d" : "none"}
+                                                        color={isLiked ? "#ff4d4d" : "currentColor"}
+                                                    />
+                                                </button>
+                                                <button className="action-icon-btn" onClick={() => {
+                                                    setSelectedMemory(memory);
+                                                    setIsCommentModalOpen(true);
+                                                }}>
+                                                    <MessageCircle size={26} />
+                                                </button>
+                                                <button className="action-icon-btn" onClick={() => handleShare(memory)}>
+                                                    <Share2 size={24} />
                                                 </button>
                                             </div>
-                                        )}
+                                        </div>
+
+                                        {/* Card Content */}
+                                        <div className="memory-card-content">
+                                            <div className="card-likes-count">{memory.likes_count} likes</div>
+                                            <p className="memory-caption">
+                                                <span className="caption-date">{new Date(memory.created_at).toLocaleDateString()}</span> {memory.caption}
+                                            </p>
+                                            {memory.memory_comments?.length > 0 && (
+                                                <button className="view-comments-link" onClick={() => {
+                                                    setSelectedMemory(memory);
+                                                    setIsCommentModalOpen(true);
+                                                }}>
+                                                    View all {memory.memory_comments?.length} comments
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-
-                                {/* Main Image */}
-                                <div className="memory-image">
-                                    <img src={memory.image_url} alt={memory.caption} />
-                                </div>
-
-                                {/* Action Bar */}
-                                <div className="memory-card-actions">
-                                    <div className="interaction-buttons">
-                                        <button
-                                            className={`action-icon-btn ${isLiked ? 'liked' : ''}`}
-                                            onClick={() => handleLike(memory.id, isLiked)}
-                                        >
-                                            <Heart
-                                                size={26}
-                                                fill={isLiked ? "#ff4d4d" : "none"}
-                                                color={isLiked ? "#ff4d4d" : "currentColor"}
-                                            />
-                                        </button>
-                                        <button className="action-icon-btn" onClick={() => {
-                                            setSelectedMemory(memory);
-                                            setIsCommentModalOpen(true);
-                                        }}>
-                                            <MessageCircle size={26} />
-                                        </button>
-                                        <button className="action-icon-btn" onClick={() => handleShare(memory)}>
-                                            <Share2 size={24} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Card Content */}
-                                <div className="memory-card-content">
-                                    <div className="card-likes-count">{memory.likes_count} likes</div>
-                                    <p className="memory-caption">
-                                        <span className="caption-date">{new Date(memory.created_at).toLocaleDateString()}</span> {memory.caption}
-                                    </p>
-                                    {memory.memory_comments?.length > 0 && (
-                                        <button className="view-comments-link" onClick={() => {
-                                            setSelectedMemory(memory);
-                                            setIsCommentModalOpen(true);
-                                        }}>
-                                            View all {memory.memory_comments?.length} comments
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                                );
+                            })}
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <div className="empty-memories">

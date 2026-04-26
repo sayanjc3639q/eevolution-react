@@ -1,30 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Calendar, TreePalm, ArrowLeft, ChevronRight, Info, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import './Holidays.css';
 
 const Holidays = () => {
     const navigate = useNavigate();
-    const [holidays, setHolidays] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchHolidays();
-    }, []);
-
-    const fetchHolidays = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('holidays')
-            .select('*')
-            .order('date', { ascending: true });
-
-        if (!error) {
-            setHolidays(data);
-        }
-        setLoading(false);
-    };
+    const { data: holidays = [], isLoading: loading } = useQuery({
+        queryKey: ['holidays'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('holidays')
+                .select('*')
+                .order('date', { ascending: true });
+            if (error) throw error;
+            return data;
+        },
+        staleTime: 60 * 60 * 1000, // 1 hour (holidays don't change often)
+    });
 
     // Helper to check if a date has passed
     const isUpcoming = (dateStr) => {

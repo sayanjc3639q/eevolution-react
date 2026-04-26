@@ -1,46 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-    Book,
-    FileText,
-    ChevronDown,
-    ChevronUp,
-    Info,
-    Layers,
-    GraduationCap,
-    School,
-    Calendar,
-    ArrowLeft,
-    Loader2,
-    FlaskConical,
-    Target
+    Book, FileText, ChevronDown, ChevronUp, Info, Layers, GraduationCap, School, Calendar, ArrowLeft, FlaskConical, Target
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useQuery } from '@tanstack/react-query';
 import './Syllabus.css';
 
 const Syllabus = () => {
     const navigate = useNavigate();
-    const [syllabusData, setSyllabusData] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [activeType, setActiveType] = useState('theory'); // 'theory' or 'practical'
     const [expandedSubject, setExpandedSubject] = useState(null);
 
-    useEffect(() => {
-        fetchSyllabus();
-    }, []);
-
-    const fetchSyllabus = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('syllabus')
-            .select('data')
-            .single();
-
-        if (!error && data) {
-            setSyllabusData(data.data);
+    // --- CACHED SYLLABUS FETCHING ---
+    const { data: syllabusData = null, isLoading: loading } = useQuery({
+        queryKey: ['syllabus'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('syllabus')
+                .select('data')
+                .single();
+            if (error) throw error;
+            return data.data;
         }
-        setLoading(false);
-    };
+    });
 
     const toggleSubject = (index) => {
         setExpandedSubject(expandedSubject === index ? null : index);
