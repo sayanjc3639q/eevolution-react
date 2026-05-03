@@ -1,434 +1,578 @@
 [
   {
-    "roll_no": 251030111231,
-    "registration_no": "016-25-0456",
-    "university_roll": 10301625001,
-    "name": "ABHIGYAN SHEET"
+    "name": "ABHIGYAN SHEET",
+    "university_roll_no": "10301625001",
+    "reg_no": "016-25-0456",
+    "class_roll_no": "25/EE/001",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ABHIJIT DAS",
+    "university_roll_no": "10301625002",
+    "reg_no": "016-25-0943",
+    "class_roll_no": "25/EE/002",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ABHIRUP DEY",
+    "university_roll_no": "10301625003",
+    "reg_no": "016-25-0494",
+    "class_roll_no": "25/EE/003",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ADARSH SHAW",
+    "university_roll_no": "10301625004",
+    "reg_no": "016-25-1993",
+    "class_roll_no": "25/EE/004",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ADITYA RAJ",
+    "university_roll_no": "10301625005",
+    "reg_no": "016-25-1936",
+    "class_roll_no": "25/EE/005",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "AKASH KUMAR YADAV",
+    "university_roll_no": "10301625006",
+    "reg_no": "016-25-1832",
+    "class_roll_no": "25/EE/006",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "AKASH MANNA",
+    "university_roll_no": "10301625007",
+    "reg_no": "016-25-0445",
+    "class_roll_no": "25/EE/007",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANANDI",
+    "university_roll_no": "10301625008",
+    "reg_no": "016-25-0531",
+    "class_roll_no": "25/EE/008",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANANYA AGYA",
+    "university_roll_no": "10301625009",
+    "reg_no": "016-25-2020",
+    "class_roll_no": "25/EE/009",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANINDYA KARAK",
+    "university_roll_no": "10301625010",
+    "reg_no": "016-25-0441",
+    "class_roll_no": "25/EE/010",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANIRBAN HAZRA",
+    "university_roll_no": "10301625011",
+    "reg_no": "016-25-0482",
+    "class_roll_no": "25/EE/011",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANIRUDDHA JANA",
+    "university_roll_no": "10301625012",
+    "reg_no": "016-25-0472",
+    "class_roll_no": "25/EE/012",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "ANISH KUMAR PRADHAN",
+    "university_roll_no": "10301625013",
+    "reg_no": "016-25-0516",
+    "class_roll_no": "25/EE/013",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111232,
-    "registration_no": "016-25-0943",
-    "university_roll": 10301625002,
-    "name": "ABHIJIT DAS"
+    "name": "ANKIT DEY",
+    "university_roll_no": "10301625014",
+    "reg_no": "016-25-1006",
+    "class_roll_no": "25/EE/014",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111233,
-    "registration_no": "016-25-0494",
-    "university_roll": 10301625003,
-    "name": "ABHIRUP DEY"
+    "name": "ANKIT KUMAR",
+    "university_roll_no": "10301625015",
+    "reg_no": "016-25-0957",
+    "class_roll_no": "25/EE/015",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111234,
-    "registration_no": "016-25-1993",
-    "university_roll": 10301625004,
-    "name": "ADARSH SHAW"
+    "name": "ANSHUMAN CHAULYA",
+    "university_roll_no": "10301625016",
+    "reg_no": "016-25-0500",
+    "class_roll_no": "25/EE/016",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111235,
-    "registration_no": "016-25-1936",
-    "university_roll": 10301625005,
-    "name": "ADITYA RAJ"
+    "name": "ANUSHREE MISHRA",
+    "university_roll_no": "10301625017",
+    "reg_no": "016-25-0462",
+    "class_roll_no": "25/EE/017",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111236,
-    "registration_no": "016-25-1832",
-    "university_roll": 10301625006,
-    "name": "AKASH KUMAR YADAV"
+    "name": "ANUSREE BERA",
+    "university_roll_no": "10301625018",
+    "reg_no": "016-25-0518",
+    "class_roll_no": "25/EE/018",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111237,
-    "registration_no": "016-25-0445",
-    "university_roll": 10301625007,
-    "name": "AKASH MANNA"
+    "name": "ARATRIK BERA",
+    "university_roll_no": "10301625019",
+    "reg_no": "016-25-0484",
+    "class_roll_no": "25/EE/019",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111238,
-    "registration_no": "016-25-0531",
-    "university_roll": 10301625008,
-    "name": "ANANDI"
+    "name": "ARITRA SARDAR",
+    "university_roll_no": "10301625020",
+    "reg_no": "016-25-0470",
+    "class_roll_no": "25/EE/020",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111239,
-    "registration_no": "016-25-2020",
-    "university_roll": 10301625009,
-    "name": "ANANYA AGYA"
+    "name": "ARKA BARMAN",
+    "university_roll_no": "10301625021",
+    "reg_no": "016-25-1752",
+    "class_roll_no": "25/EE/021",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111240,
-    "registration_no": "016-25-0441",
-    "university_roll": 10301625010,
-    "name": "ANINDYA KARAK"
+    "name": "ARNAB BARMAN",
+    "university_roll_no": "10301625022",
+    "reg_no": "016-25-0953",
+    "class_roll_no": "25/EE/022",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111241,
-    "registration_no": "016-25-0482",
-    "university_roll": 10301625011,
-    "name": "ANIRBAN HAZRA"
+    "name": "ARNAB SAMANTA",
+    "university_roll_no": "10301625023",
+    "reg_no": "016-25-0468",
+    "class_roll_no": "25/EE/023",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111242,
-    "registration_no": "016-25-0472",
-    "university_roll": 10301625012,
-    "name": "ANIRUDDHA JANA"
+    "name": "ATANU MIDYA",
+    "university_roll_no": "10301625024",
+    "reg_no": "016-25-1787",
+    "class_roll_no": "25/EE/024",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111243,
-    "registration_no": "016-25-0516",
-    "university_roll": 10301625013,
-    "name": "ANISH KUMAR PRADHAN"
+    "name": "AVIGYAN BANERJEE",
+    "university_roll_no": "10301625025",
+    "reg_no": "016-25-0442",
+    "class_roll_no": "25/EE/025",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111244,
-    "registration_no": "016-25-1006",
-    "university_roll": 10301625014,
-    "name": "ANKIT DEY"
+    "name": "AVIJIT GHORAI",
+    "university_roll_no": "10301625026",
+    "reg_no": "016-25-0452",
+    "class_roll_no": "25/EE/026",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111245,
-    "registration_no": "016-25-0957",
-    "university_roll": 10301625015,
-    "name": "ANKIT KUMAR"
+    "name": "AVINANDAN KHATUA",
+    "university_roll_no": "10301625027",
+    "reg_no": "016-25-1844",
+    "class_roll_no": "25/EE/027",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111246,
-    "registration_no": "016-25-0500",
-    "university_roll": 10301625016,
-    "name": "ANSHUMAN CHAULYA"
+    "name": "AVINANDAN MANDAL",
+    "university_roll_no": "10301625028",
+    "reg_no": "016-25-0499",
+    "class_roll_no": "25/EE/028",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111247,
-    "registration_no": "016-25-0462",
-    "university_roll": 10301625017,
-    "name": "ANUSHREE MISHRA"
+    "name": "AYAN PRAMANIK",
+    "university_roll_no": "10301625029",
+    "reg_no": "016-25-0469",
+    "class_roll_no": "25/EE/029",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111248,
-    "registration_no": "016-25-0518",
-    "university_roll": 10301625018,
-    "name": "ANUSREE BERA"
+    "name": "AYUSH KUMAR",
+    "university_roll_no": "10301625030",
+    "reg_no": "016-25-0465",
+    "class_roll_no": "25/EE/030",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111249,
-    "registration_no": "016-25-0484",
-    "university_roll": 10301625019,
-    "name": "ARATRIK BERA"
+    "name": "AYUSHI SINGH",
+    "university_roll_no": "10301625031",
+    "reg_no": "016-25-0440",
+    "class_roll_no": "25/EE/031",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111250,
-    "registration_no": "016-25-0470",
-    "university_roll": 10301625020,
-    "name": "ARITRA SARDAR"
+    "name": "BILTU BARIK",
+    "university_roll_no": "10301625032",
+    "reg_no": "016-25-0510",
+    "class_roll_no": "25/EE/032",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111251,
-    "registration_no": "016-25-1752",
-    "university_roll": 10301625021,
-    "name": "ARKA BARMAN"
+    "name": "BITAN MALIK",
+    "university_roll_no": "10301625033",
+    "reg_no": "016-25-0466",
+    "class_roll_no": "25/EE/033",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111252,
-    "registration_no": "016-25-0953",
-    "university_roll": 10301625022,
-    "name": "ARNAB BARMAN"
+    "name": "CHANDAN KUMAR",
+    "university_roll_no": "10301625034",
+    "reg_no": "016-25-0479",
+    "class_roll_no": "25/EE/034",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111253,
-    "registration_no": "016-25-0468",
-    "university_roll": 10301625023,
-    "name": "ARNAB SAMANTA"
+    "name": "DEBAJYOTI MANDAL",
+    "university_roll_no": "10301625035",
+    "reg_no": "016-25-0485",
+    "class_roll_no": "25/EE/035",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111254,
-    "registration_no": "016-25-1787",
-    "university_roll": 10301625024,
-    "name": "ATANU MIDYA"
+    "name": "DEBDUT BERA",
+    "university_roll_no": "10301625036",
+    "reg_no": "016-25-0467",
+    "class_roll_no": "25/EE/036",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111255,
-    "registration_no": "016-25-0442",
-    "university_roll": 10301625025,
-    "name": "AVIGYAN BANERJEE"
+    "name": "DEBDUT MANDAL",
+    "university_roll_no": "10301625037",
+    "reg_no": "016-25-0460",
+    "class_roll_no": "25/EE/037",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111256,
-    "registration_no": "016-25-0452",
-    "university_roll": 10301625026,
-    "name": "AVIJIT GHORAI"
+    "name": "DEBJIT BARIK",
+    "university_roll_no": "10301625038",
+    "reg_no": "016-25-0505",
+    "class_roll_no": "25/EE/038",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111257,
-    "registration_no": "016-25-1844",
-    "university_roll": 10301625027,
-    "name": "AVINANDAN KHATUA"
+    "name": "DEVANSHU THAKUR",
+    "university_roll_no": "10301625039",
+    "reg_no": "016-25-1154",
+    "class_roll_no": "25/EE/039",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111258,
-    "registration_no": "016-25-0499",
-    "university_roll": 10301625028,
-    "name": "AVINANDAN MANDAL"
+    "name": "DIPAK RANJAN KAR",
+    "university_roll_no": "10301625040",
+    "reg_no": "016-25-0911",
+    "class_roll_no": "25/EE/040",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111259,
-    "registration_no": "016-25-0469",
-    "university_roll": 10301625029,
-    "name": "AYAN PRAMANIK"
+    "name": "DIPANJAN SAMANTA",
+    "university_roll_no": "10301625041",
+    "reg_no": "016-25-0509",
+    "class_roll_no": "25/EE/041",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111260,
-    "registration_no": "016-25-0465",
-    "university_roll": 10301625030,
-    "name": "AYUSH KUMAR"
+    "name": "DIPAYAN JANA",
+    "university_roll_no": "10301625042",
+    "reg_no": "016-25-0532",
+    "class_roll_no": "25/EE/042",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111261,
-    "registration_no": "016-25-0440",
-    "university_roll": 10301625031,
-    "name": "AYUSHI SINGH"
+    "name": "DWIP HALDER",
+    "university_roll_no": "10301625043",
+    "reg_no": "016-25-1974",
+    "class_roll_no": "25/EE/043",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111262,
-    "registration_no": "016-25-0510",
-    "university_roll": 10301625032,
-    "name": "BILTU BARIK"
+    "name": "HARSHIT RAJ",
+    "university_roll_no": "10301625044",
+    "reg_no": "016-25-0458",
+    "class_roll_no": "25/EE/044",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111263,
-    "registration_no": "016-25-0466",
-    "university_roll": 10301625033,
-    "name": "BITAN MALIK"
+    "name": "HIRANMOY PRAMANIK",
+    "university_roll_no": "10301625045",
+    "reg_no": "016-25-0444",
+    "class_roll_no": "25/EE/045",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111264,
-    "registration_no": "016-25-0479",
-    "university_roll": 10301625034,
-    "name": "CHANDAN KUMAR"
+    "name": "KANCHAN BAIRAGI",
+    "university_roll_no": "10301625046",
+    "reg_no": "016-25-1043",
+    "class_roll_no": "25/EE/046",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111265,
-    "registration_no": "016-25-0485",
-    "university_roll": 10301625035,
-    "name": "DEBAJYOTI MANDAL"
+    "name": "KHOKAN PRAMANIK",
+    "university_roll_no": "10301625047",
+    "reg_no": "016-25-0450",
+    "class_roll_no": "25/EE/047",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111266,
-    "registration_no": "016-25-0467",
-    "university_roll": 10301625036,
-    "name": "DEBDUT BERA"
+    "name": "KISHOR KUMAR ADAK",
+    "university_roll_no": "10301625048",
+    "reg_no": "016-25-1831",
+    "class_roll_no": "25/EE/048",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111267,
-    "registration_no": "016-25-0460",
-    "university_roll": 10301625037,
-    "name": "DEBDUT MANDAL"
+    "name": "KOUSHIK KALA",
+    "university_roll_no": "10301625049",
+    "reg_no": "016-25-0483",
+    "class_roll_no": "25/EE/049",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111268,
-    "registration_no": "016-25-0505",
-    "university_roll": 10301625038,
-    "name": "DEBJIT BARIK"
+    "name": "KOUSHIK MAHATO",
+    "university_roll_no": "10301625050",
+    "reg_no": "016-25-1754",
+    "class_roll_no": "25/EE/050",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111269,
-    "registration_no": "016-25-1154",
-    "university_roll": 10301625039,
-    "name": "DEVANSHU THAKUR"
+    "name": "KOUSHIK PATRA",
+    "university_roll_no": "10301625051",
+    "reg_no": "016-25-0780",
+    "class_roll_no": "25/EE/051",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111270,
-    "registration_no": "016-25-0911",
-    "university_roll": 10301625040,
-    "name": "DIPAK RANJAN KAR"
+    "name": "KRISHANU DAS",
+    "university_roll_no": "10301625052",
+    "reg_no": "016-25-1851",
+    "class_roll_no": "25/EE/052",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111271,
-    "registration_no": "016-25-0509",
-    "university_roll": 10301625041,
-    "name": "DIPANJAN SAMANTA"
+    "name": "KUMAR VINAY",
+    "university_roll_no": "10301625053",
+    "reg_no": "016-25-1931",
+    "class_roll_no": "25/EE/053",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111272,
-    "registration_no": "016-25-0532",
-    "university_roll": 10301625042,
-    "name": "DIPAYAN JANA"
+    "name": "LOKESH KUMAR GUPTA",
+    "university_roll_no": "10301625054",
+    "reg_no": "016-25-1193",
+    "class_roll_no": "25/EE/054",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111273,
-    "registration_no": "016-25-1974",
-    "university_roll": 10301625043,
-    "name": "DWIP HALDER"
+    "name": "MANAB MONDAL",
+    "university_roll_no": "10301625055",
+    "reg_no": "016-25-2082",
+    "class_roll_no": "25/EE/055",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111274,
-    "registration_no": "016-25-0458",
-    "university_roll": 10301625044,
-    "name": "HARSHIT RAJ"
+    "name": "MD MUSTAKIM KHAN",
+    "university_roll_no": "10301625056",
+    "reg_no": "016-25-0514",
+    "class_roll_no": "25/EE/056",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111275,
-    "registration_no": "016-25-0444",
-    "university_roll": 10301625045,
-    "name": "HIRANMOY PRAMANIK"
+    "name": "MD SHIBLI RAZA",
+    "university_roll_no": "10301625057",
+    "reg_no": "016-25-0513",
+    "class_roll_no": "25/EE/057",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111276,
-    "registration_no": "016-25-1043",
-    "university_roll": 10301625046,
-    "name": "KANCHAN BAIRAGI"
+    "name": "MERAZ SEIKH",
+    "university_roll_no": "10301625058",
+    "reg_no": "016-25-1933",
+    "class_roll_no": "25/EE/058",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111277,
-    "registration_no": "016-25-0450",
-    "university_roll": 10301625047,
-    "name": "KHOKAN PRAMANIK"
+    "name": "MRITUNJAY KUMAR",
+    "university_roll_no": "10301625059",
+    "reg_no": "016-25-1940",
+    "class_roll_no": "25/EE/059",
+    "batch": "Batch 1",
+    "is_approved": false
   },
   {
-    "roll_no": 251030111278,
-    "registration_no": "016-25-1831",
-    "university_roll": 10301625048,
-    "name": "KISHOR KUMAR ADAK"
-  },
-  {
-    "roll_no": 251030111279,
-    "registration_no": "016-25-0483",
-    "university_roll": 10301625049,
-    "name": "KOUSHIK KALA"
-  },
-  {
-    "roll_no": 251030111280,
-    "registration_no": "016-25-1754",
-    "university_roll": 10301625050,
-    "name": "KOUSHIK MAHATO"
-  },
-  {
-    "roll_no": 251030111281,
-    "registration_no": "016-25-0780",
-    "university_roll": 10301625051,
-    "name": "KOUSHIK PATRA"
-  },
-  {
-    "roll_no": 251030111282,
-    "registration_no": "016-25-1851",
-    "university_roll": 10301625052,
-    "name": "KRISHANU DAS"
-  },
-  {
-    "roll_no": 251030111283,
-    "registration_no": "016-25-1931",
-    "university_roll": 10301625053,
-    "name": "KUMAR VINAY"
-  },
-  {
-    "roll_no": 251030111284,
-    "registration_no": "016-25-1193",
-    "university_roll": 10301625054,
-    "name": "LOKESH KUMAR GUPTA"
-  },
-  {
-    "roll_no": 251030111285,
-    "registration_no": "016-25-2082",
-    "university_roll": 10301625055,
-    "name": "MANAB MONDAL"
-  },
-  {
-    "roll_no": 251030111286,
-    "registration_no": "016-25-0514",
-    "university_roll": 10301625056,
-    "name": "MD MUSTAKIM KHAN"
-  },
-  {
-    "roll_no": 251030111287,
-    "registration_no": "016-25-0513",
-    "university_roll": 10301625057,
-    "name": "MD SHIBLI RAZA"
-  },
-  {
-    "roll_no": 251030111288,
-    "registration_no": "016-25-1933",
-    "university_roll": 10301625058,
-    "name": "MERAZ SEIKH"
-  },
-  {
-    "roll_no": 251030111289,
-    "registration_no": "016-25-1940",
-    "university_roll": 10301625059,
-    "name": "MRITUNJAY KUMAR"
-  },
-  {
-    "roll_no": 251030111290,
-    "registration_no": "016-25-2006",
-    "university_roll": 10301625060,
-    "name": "NAVNEET KUMAR SINGH"
-  },
-  {
-    "roll_no": 251030111291,
-    "registration_no": "016-25-1848",
-    "university_roll": 10301625061,
-    "name": "NILESH KISHORE"
-  },
-  {
-    "roll_no": 251030111292,
-    "registration_no": "016-25-2076",
-    "university_roll": 10301625062,
-    "name": "PRINCE KUMAR YADAV"
-  },
-  {
-    "roll_no": 251030111293,
-    "registration_no": "016-25-0481",
-    "university_roll": 10301625063,
-    "name": "PRIYANSHU KUMAR"
-  },
-  {
-    "roll_no": 251030111294,
-    "registration_no": "016-25-2172",
-    "university_roll": 10301625064,
-    "name": "RADHIKA KUMARI"
-  },
-  {
-    "roll_no": 251030111295,
-    "registration_no": "016-25-0504",
-    "university_roll": 10301625065,
-    "name": "RAHUL KOLEY"
-  },
-  {
-    "roll_no": 251030111296,
-    "registration_no": "016-25-0817",
-    "university_roll": 10301625066,
-    "name": "RAJESH MANDAL"
-  },
-  {
-    "roll_no": 251030111297,
-    "registration_no": "016-25-0459",
-    "university_roll": 10301625067,
-    "name": "RAJIB MANNA"
-  },
-  {
-    "roll_no": 251030111298,
-    "registration_no": "016-25-0449",
-    "university_roll": 10301625068,
-    "name": "RAJIB SAHU"
-  },
-  {
-    "roll_no": 251030111299,
-    "registration_no": "016-25-0511",
-    "university_roll": 10301625069,
-    "name": "RAM VIKASH KUMAR"
-  },
-  {
-    "roll_no": 251030111300,
-    "registration_no": "016-25-0913",
-    "university_roll": 10301625070,
-    "name": "RANI ROY"
-  },
-  {
-    "roll_no": 251030111301,
-    "registration_no": "016-25-0506",
-    "university_roll": 10301625071,
-    "name": "RANIT KUMAR SAHOO"
-  },
-  {
-    "roll_no": 251030111302,
-    "registration_no": "016-25-0454",
-    "university_roll": 10301625072,
-    "name": "RAUL GHOSH"
+    "name": "NAVNEET KUMAR SINGH",
+    "university_roll_no": "10301625060",
+    "reg_no": "016-25-2006",
+    "class_roll_no": "25/EE/060",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "NILESH KISHORE",
+    "university_roll_no": "10301625061",
+    "reg_no": "016-25-1848",
+    "class_roll_no": "25/EE/061",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "PRINCE KUMAR YADAV",
+    "university_roll_no": "10301625062",
+    "reg_no": "016-25-2076",
+    "class_roll_no": "25/EE/062",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "PRIYANSHU KUMAR",
+    "university_roll_no": "10301625063",
+    "reg_no": "016-25-0481",
+    "class_roll_no": "25/EE/063",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RADHIKA KUMARI",
+    "university_roll_no": "10301625064",
+    "reg_no": "016-25-2172",
+    "class_roll_no": "25/EE/064",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RAHUL KOLEY",
+    "university_roll_no": "10301625065",
+    "reg_no": "016-25-0504",
+    "class_roll_no": "25/EE/065",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RAJESH MANDAL",
+    "university_roll_no": "10301625066",
+    "reg_no": "016-25-0817",
+    "class_roll_no": "25/EE/066",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RAJIB MANNA",
+    "university_roll_no": "10301625067",
+    "reg_no": "016-25-0459",
+    "class_roll_no": "25/EE/067",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RAJIB SAHU",
+    "university_roll_no": "10301625068",
+    "reg_no": "016-25-0449",
+    "class_roll_no": "25/EE/068",
+    "batch": "Batch 1",
+    "is_approved": false
+  },
+  {
+    "name": "RAM VIKASH KUMAR",
+    "university_roll_no": "10301625069",
+    "reg_no": "016-25-0511",
+    "class_roll_no": "25/EE/069",
+    "batch": "Batch 2",
+    "is_approved": false
+  },
+  {
+    "name": "RANI ROY",
+    "university_roll_no": "10301625070",
+    "reg_no": "016-25-0913",
+    "class_roll_no": "25/EE/070",
+    "batch": "Batch 2",
+    "is_approved": false
+  },
+  {
+    "name": "RANIT KUMAR SAHOO",
+    "university_roll_no": "10301625071",
+    "reg_no": "016-25-0506",
+    "class_roll_no": "25/EE/071",
+    "batch": "Batch 2",
+    "is_approved": false
+  },
+  {
+    "name": "RAUL GHOSH",
+    "university_roll_no": "10301625072",
+    "reg_no": "016-25-0454",
+    "class_roll_no": "25/EE/072",
+    "batch": "Batch 2",
+    "is_approved": false
   }
 ]

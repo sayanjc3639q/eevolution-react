@@ -1,0 +1,20 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+
+async function checkSchema() {
+    try {
+        const { data, error } = await supabase.from('students').select('*').limit(1);
+        if (error) {
+            console.error('Error fetching data:', error);
+        } else if (data && data.length > 0) {
+            console.log('Columns:', Object.keys(data[0]));
+        } else {
+            console.log('No data in students table.');
+        }
+    } catch (err) {
+        console.error('Catch Error:', err);
+    }
+}
+
+checkSchema();

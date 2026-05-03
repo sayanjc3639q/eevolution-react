@@ -180,7 +180,7 @@ const Auth = () => {
                     )}
 
                     <div className="form-group">
-                        <label>Institutional Email</label>
+                        <label>Email</label>
                         <div className="input-with-icon">
                             <Mail className="icon" size={18} />
                             <input
